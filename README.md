@@ -13,7 +13,7 @@ $ npm install jsonwebtoken
 
 # Usage
 
-## jwt.sign(payload, secretOrPrivateKey, options)
+### jwt.sign(payload, secretOrPrivateKey, options)
 
 (Synchronous) Returns the JsonWebToken as string
 
@@ -46,7 +46,7 @@ var cert = fs.readFileSync('private.key');  // get private key
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 ```
 
-## jwt.verify(token, secretOrPublicKey, options, callback)
+### jwt.verify(token, secretOrPublicKey, options, callback)
 
 (Synchronous with callback) Returns the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will return the error.
 
