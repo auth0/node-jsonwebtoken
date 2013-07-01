@@ -1,0 +1,27 @@
+{
+  "name": "node-jsonwebtoken",
+  "version": "0.1.0",
+  "description": "JSON Web Token implementation (symmetric and asymmetric)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auth0/node-jsonwebtoken"
+  },
+  "keywords": [
+    "jwt"
+  ],
+  "author": "auth0",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/auth0/node-jsonwebtoken/issues"
+  },
+  "dependencies": {
+    "jws": "~0.2.2"
+  },
+  "devDependencies": {
+    "chai": "*"
+  }
+}
