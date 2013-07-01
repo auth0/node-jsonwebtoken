@@ -1,4 +1,4 @@
-# node-jws  [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.png)](http://travis-ci.org/auth0/node-jsonwebtoken)
+# jsonwebtoken [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.png)](http://travis-ci.org/auth0/node-jsonwebtoken)
 
 
 An implementation of [JSON Web Tokens](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html).
