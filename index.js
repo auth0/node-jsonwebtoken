@@ -1,5 +1,4 @@
 var jws = require('jws');
-var moment = require('moment');
 
 module.exports.decode = function (jwt) {
   return jws.decode(jwt).payload;
@@ -9,8 +8,13 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   options = options || {};
 
   var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
-  if (options.expiresInMinutes)
-    payload.exp = moment().add('minutes', options.expiresInMinutes).utc().unix();
+
+  payload.iat = Date.now();
+
+  if (options.expiresInMinutes) {
+    var ms = options.expiresInMinutes * 60 * 1000;
+    payload.exp = payload.iat + ms;
+  }
 
   if (options.audience)
     payload.aud = options.audience;
@@ -20,8 +24,6 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   if (options.subject)
     payload.sub = options.subject;
-
-  payload.iat = moment().utc().unix();
 
   var signed = jws.sign({header: header, payload: payload, secret: secretOrPrivateKey});
 
@@ -46,7 +48,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload = this.decode(jwtString);
 
   if (payload.exp) {
-    if (moment().utc().unix() >= payload.exp)
+    if (Date.now() >= payload.exp)
       return callback(new Error('jwt expired'));
   }
 
