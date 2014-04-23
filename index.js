@@ -52,17 +52,15 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
       return callback(new Error('jwt expired'));
   }
 
-  if (payload.aud && options.audience) {
+  if (options.audience) {
     if (payload.aud !== options.audience)
       return callback(new Error('jwt audience invalid. expected: ' + payload.aud));
   }
 
-  if (payload.iss && options.issuer) {
+  if (options.issuer) {
     if (payload.iss !== options.issuer)
       return callback(new Error('jwt issuer invalid. expected: ' + payload.iss));
   }
 
   callback(null, payload);
 };
-
-

@@ -12,7 +12,7 @@ describe('RS256', function() {
 
   describe('when signing a token', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
-  
+
     it('should be syntactically valid', function() {
       expect(token).to.be.a('string');
       expect(token.split('.')).to.have.length(3);
@@ -40,7 +40,7 @@ describe('RS256', function() {
 
   describe('when signing a token with expiration', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: 10 });
-  
+
     it('should be valid expiration', function(done) {
       jwt.verify(token, pub, function(err, decoded) {
         assert.isNotNull(decoded);
@@ -64,9 +64,9 @@ describe('RS256', function() {
 
   describe('when signing a token with audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', audience: 'urn:foo' });
-  
+
     it('should check audience', function(done) {
-      jwt.verify(token, pub, function(err, decoded) {
+      jwt.verify(token, pub, { audience: 'urn:foo' }, function(err, decoded) {
         assert.isNotNull(decoded);
         assert.isNull(err);
         done();
@@ -83,9 +83,22 @@ describe('RS256', function() {
 
   });
 
+  describe('when signing a token without audience', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check audience', function(done) {
+      jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
+  });
+
   describe('when signing a token with issuer', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', issuer: 'urn:foo' });
-  
+
     it('should check issuer', function() {
       jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
         assert.isNotNull(decoded);
@@ -95,6 +108,17 @@ describe('RS256', function() {
 
     it('should throw when invalid issuer', function() {
       jwt.verify(token, pub, { issuer: 'urn:wrong' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+      });
+    });
+  });
+
+  describe('when signing a token without issuer', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check issuer', function() {
+      jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
       });
