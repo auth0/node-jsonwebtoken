@@ -9,10 +9,10 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
 
-  payload.iat = Date.now();
+  payload.iat = Math.round(Date.now() / 1000);
 
   if (options.expiresInMinutes) {
-    var ms = options.expiresInMinutes * 60 * 1000;
+    var ms = options.expiresInMinutes * 60;
     payload.exp = payload.iat + ms;
   }
 
@@ -48,7 +48,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload = this.decode(jwtString);
 
   if (payload.exp) {
-    if (Date.now() >= payload.exp)
+    if (Math.round(Date.now()) / 1000 >= payload.exp)
       return callback(new Error('jwt expired'));
   }
 
