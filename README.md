@@ -93,6 +93,19 @@ jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(
       
 ```
 
+### jwt.decode(token)
+
+(Synchronous) Returns the decoded payload without verifying if the signature is valid.
+
+`token` is the JsonWebToken string
+
+Example
+
+```js
+// get the decoded payload ignoring signature, no secretOrPrivateKey needed
+var decoded = jwt.decode(token);
+```
+
 ## Algorithms supported
 
 Array of supported algorithms. The following algorithms are currently supported.
