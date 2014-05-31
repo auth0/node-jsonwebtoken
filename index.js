@@ -49,7 +49,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   if (payload.exp) {
     if (Math.round(Date.now()) / 1000 >= payload.exp)
-      return callback(new Error('jwt expired'));
+      return callback(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
 
   if (options.audience) {
@@ -64,3 +64,20 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   callback(null, payload);
 };
+
+function JsonWebTokenError(message, error) {
+  Error.call(this, message);
+  this.name = 'JsonWebTokenError';
+  this.message = message;
+  if (error) this.inner = error;
+}
+JsonWebTokenError.prototype = Object.create(Error.prototype);
+JsonWebTokenError.prototype.constructor = JsonWebTokenError;
+
+var TokenExpiredError = module.exports.TokenExpiredError = function (message, expiredAt) {
+  JsonWebTokenError.call(this, message);
+  this.name = 'TokenExpiredError';
+  this.expiredAt = expiredAt;
+}
+TokenExpiredError.prototype = Object.create(JsonWebTokenError.prototype);
+TokenExpiredError.prototype.constructor = TokenExpiredError;

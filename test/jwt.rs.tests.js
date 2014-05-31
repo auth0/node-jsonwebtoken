@@ -56,6 +56,8 @@ describe('RS256', function() {
       jwt.verify(token, pub, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.instanceOf(err, jwt.TokenExpiredError);
+        assert.instanceOf(err.expiredAt, Date);
         done();
       });
     });
