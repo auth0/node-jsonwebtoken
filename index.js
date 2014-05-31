@@ -53,7 +53,8 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   }
 
   if (options.audience) {
-    if (payload.aud !== options.audience)
+    var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
+    if (options.audience.indexOf(payload.aud) < 0)
       return callback(new Error('jwt audience invalid. expected: ' + payload.aud));
   }
 
