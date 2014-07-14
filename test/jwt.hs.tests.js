@@ -31,5 +31,15 @@ describe('HS256', function() {
       });
     });
 
+    it('should throw with secret and token not signed', function(done) {
+      var signed = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'none' });
+      var unsigned = signed.split('.')[0] + '.' + signed.split('.')[1] + '.';
+      jwt.verify(unsigned, 'secret', function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
   });
 });

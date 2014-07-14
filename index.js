@@ -34,6 +34,13 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if ((typeof options === 'function') && !callback) callback = options;
   if (!options) options = {};
 
+  var parts = jwtString.split('.');
+  if (parts.length < 3)
+    return callback(new Error('jwt malformed'));
+
+  if (parts[2].trim() === '' && secretOrPublicKey)
+    return callback(new Error('jwt signature is required'));
+
   var valid;
   try {
     valid = jws.verify(jwtString, secretOrPublicKey);
