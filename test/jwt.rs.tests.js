@@ -135,5 +135,21 @@ describe('RS256', function() {
     });
   });
 
+  describe('when decoding a invalid jwt token', function() {
+    it('should return null', function(done) {
+      var payload = jwt.decode('whatever.token');
+      assert.isNull(payload);
+      done();
+    });
+  });
 
+  describe('when decoding a valid jwt token', function() {
+    it('should return the payload', function(done) {
+      var obj     = { foo: 'bar' };
+      var token   = jwt.sign(obj, priv, { algorithm: 'RS256' });
+      var payload = jwt.decode(token);
+      assert.deepEqual(payload, obj);
+      done();
+    });
+  });
 });

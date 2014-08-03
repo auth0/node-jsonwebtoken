@@ -1,7 +1,8 @@
 var jws = require('jws');
 
 module.exports.decode = function (jwt) {
-  return jws.decode(jwt).payload;
+  var decoded = jws.decode(jwt);
+  return decoded && decoded.payload;
 };
 
 module.exports.sign = function(payload, secretOrPrivateKey, options) {
