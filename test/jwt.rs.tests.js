@@ -75,8 +75,24 @@ describe('RS256', function() {
       });
     });
 
+    it('should check audience in array', function(done) {
+      jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
     it('should throw when invalid audience', function(done) {
       jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
+    it('should throw when invalid audience in array', function(done) {
+      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
@@ -90,6 +106,14 @@ describe('RS256', function() {
 
     it('should check audience', function(done) {
       jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
+    it('should check audience in array', function(done) {
+      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
