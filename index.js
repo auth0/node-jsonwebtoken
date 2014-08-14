@@ -87,6 +87,6 @@ var TokenExpiredError = module.exports.TokenExpiredError = function (message, ex
   JsonWebTokenError.call(this, message);
   this.name = 'TokenExpiredError';
   this.expiredAt = expiredAt;
-}
+};
 TokenExpiredError.prototype = Object.create(JsonWebTokenError.prototype);
 TokenExpiredError.prototype.constructor = TokenExpiredError;
