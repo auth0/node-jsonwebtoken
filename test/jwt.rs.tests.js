@@ -161,6 +161,18 @@ describe('RS256', function() {
     });
   });
 
+  describe('when decoding a jwt token with additional parts', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should throw', function(done) {
+      jwt.verify(token + '.foo', pub, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+  });
+
   describe('when decoding a invalid jwt token', function() {
     it('should return null', function(done) {
       var payload = jwt.decode('whatever.token');

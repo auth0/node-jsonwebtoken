@@ -36,7 +36,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (!options) options = {};
 
   var parts = jwtString.split('.');
-  if (parts.length < 3)
+  if (parts.length !== 3)
     return callback(new Error('jwt malformed'));
 
   if (parts[2].trim() === '' && secretOrPublicKey)
