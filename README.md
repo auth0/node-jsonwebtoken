@@ -106,6 +106,28 @@ Example
 var decoded = jwt.decode(token);
 ```
 
+## Errors & Codes
+### TokenExpiredError
+
+Thrown error if the token is expired.
+
+Error object:
+
+* name: 'TokenExpiredError'
+* message: 'jwt expired'
+* expiredAt: [ExpDate]
+
+### JsonWebTokenError
+Error object:
+
+* name: 'JsonWebTokenError'
+* message:
+  * 'jwt malformed'
+  * 'jwt signature is required'
+  * 'invalid signature'
+  * 'jwt audience invalid. expected: [PAYLOAD AUDIENCE]'
+  * 'jwt issuer invalid. expected: [PAYLOAD ISSUER]'
+
 ## Algorithms supported
 
 Array of supported algorithms. The following algorithms are currently supported.
