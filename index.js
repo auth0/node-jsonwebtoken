@@ -74,7 +74,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   callback(null, payload);
 };
 
-function JsonWebTokenError(message, error) {
+var JsonWebTokenError = module.exports.JsonWebTokenError = function (message, error) {
   Error.call(this, message);
   this.name = 'JsonWebTokenError';
   this.message = message;
@@ -83,7 +83,7 @@ function JsonWebTokenError(message, error) {
 JsonWebTokenError.prototype = Object.create(Error.prototype);
 JsonWebTokenError.prototype.constructor = JsonWebTokenError;
 
-function TokenExpiredError(message, expiredAt) {
+var TokenExpiredError = module.exports.TokenExpiredError = function (message, expiredAt) {
   JsonWebTokenError.call(this, message);
   this.name = 'TokenExpiredError';
   this.expiredAt = expiredAt;
