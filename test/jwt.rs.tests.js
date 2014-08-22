@@ -56,7 +56,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
-        assert.instanceOf(err, jwt.TokenExpiredError);
+        assert.equal(err.name, 'TokenExpiredError');
         assert.instanceOf(err.expiredAt, Date);
         done();
       });
@@ -87,6 +87,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
@@ -95,6 +96,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
@@ -108,6 +110,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
@@ -116,6 +119,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
@@ -136,6 +140,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { issuer: 'urn:wrong' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
       });
     });
   });
@@ -147,6 +152,7 @@ describe('RS256', function() {
       jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
       });
     });
   });
@@ -156,6 +162,7 @@ describe('RS256', function() {
       jwt.verify('fruit.fruit.fruit', pub, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
