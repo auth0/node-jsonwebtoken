@@ -37,7 +37,6 @@ describe('RS256', function() {
 
   });
 
-
   describe('when signing a token with expiration', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: 10 });
 
@@ -162,7 +161,7 @@ describe('RS256', function() {
       jwt.verify('fruit.fruit.fruit', pub, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
-        assert.equal(err.name, 'JsonWebTokenError');
+        assert.equal(err.name, 'Error');
         done();
       });
     });
