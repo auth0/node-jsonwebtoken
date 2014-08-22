@@ -37,10 +37,10 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   var parts = jwtString.split('.');
   if (parts.length < 3)
-    return callback(new Error('jwt malformed'));
+    return callback(new JsonWebTokenError('jwt malformed'));
 
   if (parts[2].trim() === '' && secretOrPublicKey)
-    return callback(new Error('jwt signature is required'));
+    return callback(new JsonWebTokenError('jwt signature is required'));
 
   var valid;
   try {
@@ -51,7 +51,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   }
 
   if (!valid)
-    return callback(new Error('invalid signature'));
+    return callback(new JsonWebTokenError('invalid signature'));
 
   var payload = this.decode(jwtString);
 
@@ -63,12 +63,12 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (options.audience) {
     var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
     if (options.audience.indexOf(payload.aud) < 0)
-      return callback(new Error('jwt audience invalid. expected: ' + payload.aud));
+      return callback(new JsonWebTokenError('jwt audience invalid. expected: ' + payload.aud));
   }
 
   if (options.issuer) {
     if (payload.iss !== options.issuer)
-      return callback(new Error('jwt issuer invalid. expected: ' + payload.iss));
+      return callback(new JsonWebTokenError('jwt issuer invalid. expected: ' + payload.iss));
   }
 
   callback(null, payload);
@@ -83,7 +83,7 @@ function JsonWebTokenError(message, error) {
 JsonWebTokenError.prototype = Object.create(Error.prototype);
 JsonWebTokenError.prototype.constructor = JsonWebTokenError;
 
-var TokenExpiredError = module.exports.TokenExpiredError = function (message, expiredAt) {
+function TokenExpiredError(message, expiredAt) {
   JsonWebTokenError.call(this, message);
   this.name = 'TokenExpiredError';
   this.expiredAt = expiredAt;
