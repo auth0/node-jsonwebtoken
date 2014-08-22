@@ -57,10 +57,10 @@ describe('RS256', function() {
         assert.isNotNull(err);
         assert.equal(err.name, 'TokenExpiredError');
         assert.instanceOf(err.expiredAt, Date);
+        assert.instanceOf(err, jwt.TokenExpiredError);
         done();
       });
     });
-
   });
 
   describe('when signing a token with audience', function() {
@@ -87,6 +87,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
         done();
       });
     });
@@ -96,6 +97,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
         done();
       });
     });
@@ -110,6 +112,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
         done();
       });
     });
@@ -119,6 +122,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
         done();
       });
     });
@@ -140,6 +144,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
       });
     });
   });
@@ -152,6 +157,7 @@ describe('RS256', function() {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
       });
     });
   });
