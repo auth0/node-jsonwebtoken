@@ -19,7 +19,7 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
-    "jws": "~0.2.2"
+    "jws": "~0.2.6"
   },
   "devDependencies": {
     "chai": "*",
