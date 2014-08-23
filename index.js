@@ -1,7 +1,7 @@
 var jws = require('jws');
 
 module.exports.decode = function (jwt) {
-  var decoded = jws.decode(jwt);
+  var decoded = jws.decode(jwt, {json: true});
   return decoded && decoded.payload;
 };
 
