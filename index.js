@@ -10,7 +10,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
 
-  payload.iat = Math.round(Date.now() / 1000);
+  payload.iat = Math.floor(Date.now() / 1000);
 
   if (options.expiresInMinutes) {
     var ms = options.expiresInMinutes * 60;
@@ -56,7 +56,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload = this.decode(jwtString);
 
   if (payload.exp) {
-    if (Math.round(Date.now()) / 1000 >= payload.exp)
+    if (Math.floor(Date.now()) / 1000 >= payload.exp)
       return callback(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
 
