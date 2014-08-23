@@ -106,6 +106,58 @@ Example
 var decoded = jwt.decode(token);
 ```
 
+## Errors & Codes
+Possible thrown errors during verification.
+Error is the first argument of the verification callback.
+
+### TokenExpiredError
+
+Thrown error if the token is expired.
+
+Error object:
+
+* name: 'TokenExpiredError'
+* message: 'jwt expired'
+* expiredAt: [ExpDate]
+
+```js
+jwt.verify(token, 'shhhhh', function(err, decoded) {
+  if (err) {
+    /* 
+      err = {
+        name: 'TokenExpiredError',
+        message: 'jwt expired',
+        expiredAt: 1408621000
+      }
+    */
+  }
+});
+```
+
+### JsonWebTokenError
+Error object:
+
+* name: 'JsonWebTokenError'
+* message:
+  * 'jwt malformed'
+  * 'jwt signature is required'
+  * 'invalid signature'
+  * 'jwt audience invalid. expected: [PAYLOAD AUDIENCE]'
+  * 'jwt issuer invalid. expected: [PAYLOAD ISSUER]'
+
+```js
+jwt.verify(token, 'shhhhh', function(err, decoded) {
+  if (err) {
+    /* 
+      err = {
+        name: 'JsonWebTokenError',
+        message: 'jwt malformed'
+      }
+    */
+  }
+});
+```
+
 ## Algorithms supported
 
 Array of supported algorithms. The following algorithms are currently supported.
