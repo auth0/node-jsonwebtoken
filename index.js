@@ -56,7 +56,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload = this.decode(jwtString);
 
   if (payload.exp) {
-    if (Math.floor(Date.now()) / 1000 >= payload.exp)
+    if (Math.floor(Date.now() / 1000) >= payload.exp)
       return callback(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
 
