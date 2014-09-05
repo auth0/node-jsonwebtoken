@@ -35,6 +35,9 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if ((typeof options === 'function') && !callback) callback = options;
   if (!options) options = {};
 
+  if (!jwtString)
+  	return callback(new JsonWebTokenError('jwt must be provided'));
+
   var parts = jwtString.split('.');
   if (parts.length !== 3)
     return callback(new JsonWebTokenError('jwt malformed'));
