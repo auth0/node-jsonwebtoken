@@ -41,5 +41,13 @@ describe('HS256', function() {
       });
     });
 
+    it('should throw when verifying null', function(done) {
+      jwt.verify(null, 'secret', function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
   });
 });
