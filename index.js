@@ -36,7 +36,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (!options) options = {};
 
   if (!jwtString)
-  	return callback(new JsonWebTokenError('jwt must be provided'));
+    return callback(new JsonWebTokenError('jwt must be provided'));
 
   var parts = jwtString.split('.');
   if (parts.length !== 3)
@@ -56,7 +56,13 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (!valid)
     return callback(new JsonWebTokenError('invalid signature'));
 
-  var payload = this.decode(jwtString);
+  var payload;
+
+  try {
+   payload = this.decode(jwtString);
+  } catch(err) {
+    return callback(err);
+  }
 
   if (payload.exp) {
     if (Math.floor(Date.now() / 1000) >= payload.exp)
@@ -82,7 +88,8 @@ var JsonWebTokenError = module.exports.JsonWebTokenError = function (message, er
   this.name = 'JsonWebTokenError';
   this.message = message;
   if (error) this.inner = error;
-}
+};
+
 JsonWebTokenError.prototype = Object.create(Error.prototype);
 JsonWebTokenError.prototype.constructor = JsonWebTokenError;
 

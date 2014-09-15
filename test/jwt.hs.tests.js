@@ -9,7 +9,7 @@ describe('HS256', function() {
     var secret = 'shhhhhh';
 
     var token = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
-  
+
     it('should be syntactically valid', function() {
       expect(token).to.be.a('string');
       expect(token.split('.')).to.have.length(3);
@@ -45,6 +45,13 @@ describe('HS256', function() {
       jwt.verify(null, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        done();
+      });
+    });
+
+    it.only('should throw when the payload is not json', function(done) {
+      var token = jwt.sign('bar', 'secret', { algorithm: 'HS256' });
+      jwt.verify(token, 'secret', function() {
         done();
       });
     });
