@@ -49,12 +49,11 @@ describe('HS256', function() {
       });
     });
 
-    it.only('should throw when the payload is not json', function(done) {
+    it('should throw when the payload is not json', function(done) {
       var token = jwt.sign('bar', 'secret', { algorithm: 'HS256' });
       jwt.verify(token, 'secret', function() {
         done();
       });
     });
-
   });
 });
