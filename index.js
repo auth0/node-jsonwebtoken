@@ -10,7 +10,9 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
 
-  payload.iat = Math.floor(Date.now() / 1000);
+  if (!options.noTimestamp) {
+    payload.iat = Math.floor(Date.now() / 1000);
+  }
 
   if (options.expiresInMinutes) {
     var ms = options.expiresInMinutes * 60;
