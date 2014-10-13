@@ -29,11 +29,14 @@ encoded private key for RSA and ECDSA.
 * `audience`
 * `subject`
 * `issuer`
+* `noTimestamp`
 
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
 
 If any `expiresInMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The  jwt generated won't include those properties in the payload.
+
+Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
 
 Example
 
