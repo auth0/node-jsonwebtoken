@@ -15,6 +15,16 @@ describe('HS256', function() {
       expect(token.split('.')).to.have.length(3);
     });
 
+    it('should without options', function(done) {
+      var callback = function(err, decoded) {
+    	assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
+        done();
+      };
+      callback.issuer = "shouldn't affect";
+      jwt.verify(token, secret, callback );
+    });
+
     it('should validate with secret', function(done) {
       jwt.verify(token, secret, function(err, decoded) {
         assert.ok(decoded.foo);
@@ -49,7 +59,7 @@ describe('HS256', function() {
       });
     });
 
-    it.only('should throw when the payload is not json', function(done) {
+    it('should throw when the payload is not json', function(done) {
       var token = jwt.sign('bar', 'secret', { algorithm: 'HS256' });
       jwt.verify(token, 'secret', function() {
         done();
