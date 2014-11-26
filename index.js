@@ -71,7 +71,11 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   if (options.audience) {
     var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
-    if (audiences.indexOf(payload.aud) < 0)
+    var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    
+    var match = target.some(function(aud) { return audiences.indexOf(aud) != -1; });
+
+    if (!match)
       return callback(new JsonWebTokenError('jwt audience invalid. expected: ' + payload.aud));
   }
 

@@ -104,6 +104,55 @@ describe('RS256', function() {
 
   });
 
+  describe('when signing a token with array audience', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', audience: [ 'urn:foo', 'urn:bar' ] });
+
+    it('should check audience', function(done) {
+      jwt.verify(token, pub, { audience: 'urn:foo' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
+    it('should check other audience', function(done) {
+      jwt.verify(token, pub, { audience: 'urn:bar' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
+    it('should check audience in array', function(done) {
+      jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
+    it('should throw when invalid audience', function(done) {
+      jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+        done();
+      });
+    });
+
+    it('should throw when invalid audience in array', function(done) {
+      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+        done();
+      });
+    });
+
+  });
+
   describe('when signing a token without audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
