@@ -10,6 +10,12 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
 
+  if (options.header) {
+    Object.keys(options.header).forEach(function (k) {
+      header[k] = options.header[k];
+    });
+  }
+
   payload.iat = Math.floor(Date.now() / 1000);
 
   if (options.expiresInMinutes) {
