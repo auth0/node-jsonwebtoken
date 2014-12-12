@@ -18,21 +18,35 @@ describe('RS256', function() {
       expect(token.split('.')).to.have.length(3);
     });
 
-    it('should validate with public key', function(done) {
-      jwt.verify(token, pub, function(err, decoded) {
-        assert.ok(decoded.foo);
-        assert.equal('bar', decoded.foo);
-        done();
+    context('asynchronous', function() {
+      it('should validate with public key', function(done) {
+        jwt.verify(token, pub, function(err, decoded) {
+          assert.ok(decoded.foo);
+          assert.equal('bar', decoded.foo);
+          done();
+        });
+      });
+
+      it('should throw with invalid public key', function(done) {
+        jwt.verify(token, invalid_pub, function(err, decoded) {
+          assert.isUndefined(decoded);
+          assert.isNotNull(err);
+          done();
+        });
       });
     });
 
-    it('should throw with invalid public key', function(done) {
-      jwt.verify(token, invalid_pub, function(err, decoded) {
-        assert.isUndefined(decoded);
-        assert.isNotNull(err);
-        done();
+    context('synchronous', function() {
+      it('should validate with public key', function() {
+        var decoded = jwt.verify(token, pub);
+        assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
       });
 
+      it('should throw with invalid public key', function() {
+        var jwtVerify = jwt.verify.bind(null, token, invalid_pub)
+        assert.throw(jwtVerify, 'invalid signature');
+      });
     });
 
   });
