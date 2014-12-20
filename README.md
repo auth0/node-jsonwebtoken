@@ -47,9 +47,11 @@ var cert = fs.readFileSync('private.key');  // get private key
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 ```
 
-### jwt.verify(token, secretOrPublicKey, options, callback)
+### jwt.verify(token, secretOrPublicKey, [options, callback])
 
-(Synchronous with callback) Returns the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will return the error.
+(Asynchronous) If a callback is supplied, function acts asynchronously. Callback passed the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will be passed the error.
+
+(Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will throw the error.
 
 `token` is the JsonWebToken string
 
@@ -62,10 +64,21 @@ encoded public key for RSA and ECDSA.
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 
 ```js
+// verify a token symmetric - synchronous
+var decoded = jwt.verify(token, 'shhhhh');
+console.log(decoded.foo) // bar
+
 // verify a token symmetric
 jwt.verify(token, 'shhhhh', function(err, decoded) {
   console.log(decoded.foo) // bar
 });
+
+// invalid token - synchronous
+try {
+  var decoded = jwt.verify(token, 'wrong-secret');
+} catch(err) {
+  // err 
+}
 
 // invalid token
 jwt.verify(token, 'wrong-secret', function(err, decoded) {
