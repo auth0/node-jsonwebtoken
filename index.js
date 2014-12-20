@@ -8,7 +8,9 @@ module.exports.decode = function (jwt) {
 module.exports.sign = function(payload, secretOrPrivateKey, options) {
   options = options || {};
 
-  var header = {typ: 'JWT', alg: options.algorithm || 'HS256'};
+  var header = ((typeof options.headers === 'object') && options.headers) || {};
+  header.typ = 'JWT';
+  header.alg = options.algorithm || 'HS256';
 
   if (options.header) {
     Object.keys(options.header).forEach(function (k) {
