@@ -15,6 +15,16 @@ describe('HS256', function() {
       expect(token.split('.')).to.have.length(3);
     });
 
+    it('should without options', function(done) {
+      var callback = function(err, decoded) {
+    	assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
+        done();
+      };
+      callback.issuer = "shouldn't affect";
+      jwt.verify(token, secret, callback );
+    });
+
     it('should validate with secret', function(done) {
       jwt.verify(token, secret, function(err, decoded) {
         assert.ok(decoded.foo);

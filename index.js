@@ -38,7 +38,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 };
 
 module.exports.verify = function(jwtString, secretOrPublicKey, options, callback) {
-  if ((typeof options === 'function') && !callback) callback = options;
+  if ((typeof options === 'function') && !callback) callback = options, options = null;
   if (!options) options = {};
 
   if (!jwtString)
