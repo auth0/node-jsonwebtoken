@@ -17,7 +17,7 @@ describe('HS256', function() {
 
     it('should without options', function(done) {
       var callback = function(err, decoded) {
-    	assert.ok(decoded.foo);
+        assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         done();
       };
@@ -64,6 +64,25 @@ describe('HS256', function() {
       jwt.verify(token, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
+        done();
+      });
+    });
+
+    it('should return an error when the token is expired', function(done) {
+      var token = jwt.sign({ exp: 1 }, secret, { algorithm: 'HS256' });
+      jwt.verify(token, secret, { algorithm: 'HS256' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
+    it('should NOT return an error when the token is expired with "ignoreExpiration"', function(done) {
+      var token = jwt.sign({ exp: 1, foo: 'bar' }, secret, { algorithm: 'HS256' });
+      jwt.verify(token, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err, decoded) {
+        assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
+        assert.isNull(err);
         done();
       });
     });

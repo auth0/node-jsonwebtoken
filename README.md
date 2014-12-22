@@ -30,6 +30,7 @@ encoded private key for RSA and ECDSA.
 * `subject`
 * `issuer`
 * `noTimestamp`
+* `ignoreExpiration`
 
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
@@ -37,6 +38,8 @@ using `JSON.stringify`.
 If any `expiresInMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The  jwt generated won't include those properties in the payload.
 
 Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
+
+Setting `ignoreExpiration` to `true` will prevent expired tokens from generating an error.
 
 Example
 

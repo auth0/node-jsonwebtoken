@@ -92,7 +92,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     return done(err);
   }
 
-  if (payload.exp) {
+  if (payload.exp && !options.ignoreExpiration) {
     if (Math.floor(Date.now() / 1000) >= payload.exp)
       return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
@@ -100,7 +100,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (options.audience) {
     var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
     var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-    
+
     var match = target.some(function(aud) { return audiences.indexOf(aud) != -1; });
 
     if (!match)
