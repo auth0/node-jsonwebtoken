@@ -80,12 +80,12 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 try {
   var decoded = jwt.verify(token, 'wrong-secret');
 } catch(err) {
-  // err 
+  // err
 }
 
 // invalid token
 jwt.verify(token, 'wrong-secret', function(err, decoded) {
-  // err 
+  // err
   // decoded undefined
 });
 
@@ -106,14 +106,18 @@ var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(err, decoded) {
   // if issuer mismatch, err == invalid issuer
 });
-      
+
 ```
 
-### jwt.decode(token)
+### jwt.decode(token [, options])
 
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
 
 `token` is the JsonWebToken string
+
+`options`:
+
+* `json`: force JSON.parse on the payload even if the header doesn't contain `"typ":"JWT"`.
 
 Example
 
@@ -139,7 +143,7 @@ Error object:
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {
   if (err) {
-    /* 
+    /*
       err = {
         name: 'TokenExpiredError',
         message: 'jwt expired',
@@ -164,7 +168,7 @@ Error object:
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {
   if (err) {
-    /* 
+    /*
       err = {
         name: 'JsonWebTokenError',
         message: 'jwt malformed'
@@ -178,11 +182,11 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 
 Array of supported algorithms. The following algorithms are currently supported.
 
-alg Parameter Value | Digital Signature or MAC Algorithm 
+alg Parameter Value | Digital Signature or MAC Algorithm
 ----------------|----------------------------
-HS256 | HMAC using SHA-256 hash algorithm 
-HS384 | HMAC using SHA-384 hash algorithm 
-HS512 | HMAC using SHA-512 hash algorithm 
+HS256 | HMAC using SHA-256 hash algorithm
+HS384 | HMAC using SHA-384 hash algorithm
+HS512 | HMAC using SHA-512 hash algorithm
 RS256 | RSASSA using SHA-256 hash algorithm
 RS384 | RSASSA using SHA-384 hash algorithm
 RS512 | RSASSA using SHA-512 hash algorithm

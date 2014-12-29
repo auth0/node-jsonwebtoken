@@ -3,8 +3,8 @@ var jws = require('jws');
 var JsonWebTokenError = module.exports.JsonWebTokenError = require('./lib/JsonWebTokenError');
 var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenExpiredError');
 
-module.exports.decode = function (jwt) {
-  var decoded = jws.decode(jwt);
+module.exports.decode = function (jwt, options) {
+  var decoded = jws.decode(jwt, options);
   return decoded && decoded.payload;
 };
 
