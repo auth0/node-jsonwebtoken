@@ -17,7 +17,7 @@ describe('HS256', function() {
 
     it('should without options', function(done) {
       var callback = function(err, decoded) {
-    	assert.ok(decoded.foo);
+      assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         done();
       };
@@ -53,15 +53,6 @@ describe('HS256', function() {
 
     it('should throw when verifying null', function(done) {
       jwt.verify(null, 'secret', function(err, decoded) {
-        assert.isUndefined(decoded);
-        assert.isNotNull(err);
-        done();
-      });
-    });
-
-    it('should throw when the payload is not json', function(done) {
-      var token = jwt.sign('bar', 'secret', { algorithm: 'HS256' });
-      jwt.verify(token, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();

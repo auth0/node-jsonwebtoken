@@ -1,7 +1,7 @@
 var jws = require('jws');
 
 module.exports.decode = function (jwt) {
-  var decoded = jws.decode(jwt, {json: true});
+  var decoded = jws.decode(jwt);
   return decoded && decoded.payload;
 };
 
@@ -9,7 +9,11 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   options = options || {};
 
   var header = ((typeof options.headers === 'object') && options.headers) || {};
-  header.typ = 'JWT';
+
+  if (typeof payload === 'object') {
+    header.typ = 'JWT';
+  }
+
   header.alg = options.algorithm || 'HS256';
 
   if (options.header) {
@@ -49,35 +53,39 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   if (!options) options = {};
 
+  var done;
+
   if (callback) {
-    var done = function() {
-      var args = Array.prototype.slice.call(arguments, 0)
+    done = function() {
+      var args = Array.prototype.slice.call(arguments, 0);
       return process.nextTick(function() {
-          callback.apply(null, args)
+        callback.apply(null, args);
       });
     };
   } else {
-    var done = function(err, data) {
+    done = function(err, data) {
       if (err) throw err;
       return data;
     };
   }
 
-  if (!jwtString)
+  if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
+  }
 
   var parts = jwtString.split('.');
   if (parts.length !== 3)
     return done(new JsonWebTokenError('jwt malformed'));
 
-  if (parts[2].trim() === '' && secretOrPublicKey)
+  if (parts[2].trim() === '' && secretOrPublicKey){
     return done(new JsonWebTokenError('jwt signature is required'));
+  }
 
   var valid;
+
   try {
     valid = jws.verify(jwtString, secretOrPublicKey);
-  }
-  catch (e) {
+  } catch (e) {
     return done(e);
   }
 
@@ -100,7 +108,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (options.audience) {
     var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
     var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-    
+
     var match = target.some(function(aud) { return audiences.indexOf(aud) != -1; });
 
     if (!match)
