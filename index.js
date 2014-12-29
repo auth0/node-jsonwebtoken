@@ -1,5 +1,8 @@
 var jws = require('jws');
 
+var JsonWebTokenError = module.exports.JsonWebTokenError = require('./lib/JsonWebTokenError');
+var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenExpiredError');
+
 module.exports.decode = function (jwt) {
   var decoded = jws.decode(jwt);
   return decoded && decoded.payload;
@@ -74,8 +77,10 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   }
 
   var parts = jwtString.split('.');
-  if (parts.length !== 3)
+
+  if (parts.length !== 3){
     return done(new JsonWebTokenError('jwt malformed'));
+  }
 
   if (parts[2].trim() === '' && secretOrPublicKey){
     return done(new JsonWebTokenError('jwt signature is required'));
@@ -100,7 +105,10 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     return done(err);
   }
 
-  if (payload.exp) {
+  if (typeof payload.exp !== 'undefined') {
+    if (typeof payload.exp !== 'number') {
+      return done(new JsonWebTokenError('invalid exp value'));
+    }
     if (Math.floor(Date.now() / 1000) >= payload.exp)
       return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
@@ -122,21 +130,3 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   return done(null, payload);
 };
-
-var JsonWebTokenError = module.exports.JsonWebTokenError = function (message, error) {
-  Error.call(this, message);
-  this.name = 'JsonWebTokenError';
-  this.message = message;
-  if (error) this.inner = error;
-};
-
-JsonWebTokenError.prototype = Object.create(Error.prototype);
-JsonWebTokenError.prototype.constructor = JsonWebTokenError;
-
-var TokenExpiredError = module.exports.TokenExpiredError = function (message, expiredAt) {
-  JsonWebTokenError.call(this, message);
-  this.name = 'TokenExpiredError';
-  this.expiredAt = expiredAt;
-};
-TokenExpiredError.prototype = Object.create(JsonWebTokenError.prototype);
-TokenExpiredError.prototype.constructor = TokenExpiredError;
