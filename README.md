@@ -203,7 +203,10 @@ If you have found a bug or if you have a feature request, please report them at 
 
 * X.509 certificate chain is not checked
 
-# License
+## Author
 
-MIT
+[Auth0](auth0.com)
 
+## License
+
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
