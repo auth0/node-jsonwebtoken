@@ -120,12 +120,12 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     var match = target.some(function(aud) { return audiences.indexOf(aud) != -1; });
 
     if (!match)
-      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + payload.aud));
+      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
   }
 
   if (options.issuer) {
     if (payload.iss !== options.issuer)
-      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + payload.iss));
+      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
   }
 
   return done(null, payload);
