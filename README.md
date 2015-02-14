@@ -162,8 +162,8 @@ Error object:
   * 'jwt malformed'
   * 'jwt signature is required'
   * 'invalid signature'
-  * 'jwt audience invalid. expected: [PAYLOAD AUDIENCE]'
-  * 'jwt issuer invalid. expected: [PAYLOAD ISSUER]'
+  * 'jwt audience invalid. expected: [OPTIONS AUDIENCE]'
+  * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
 
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {
