@@ -5,7 +5,18 @@ var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenE
 
 module.exports.decode = function (jwt, options) {
   var decoded = jws.decode(jwt, options);
-  return decoded && decoded.payload;
+  var payload = decoded && decoded.payload;
+
+  if(typeof payload === 'string') {
+    try {
+       var obj = JSON.parse(payload);
+       if(typeof obj === 'object') {
+           return obj;
+       }
+    } catch (e) { }
+  }
+
+  return payload;
 };
 
 module.exports.sign = function(payload, secretOrPrivateKey, options) {
@@ -109,7 +120,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload;
 
   try {
-   payload = this.decode(jwtString);
+    payload = this.decode(jwtString);
   } catch(err) {
     return done(err);
   }
