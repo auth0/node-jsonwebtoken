@@ -1,6 +1,6 @@
 {
   "name": "jsonwebtoken",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
-    "jws": "~1.0.1"
+    "jws": "~2.0.0"
   },
   "devDependencies": {
     "atob": "~1.1.2",
