@@ -106,7 +106,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload;
 
   try {
-   payload = this.decode(jwtString);
+   payload = this.decode(jwtString, {json: true});
   } catch(err) {
     return done(err);
   }
