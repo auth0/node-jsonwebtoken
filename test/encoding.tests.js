@@ -8,10 +8,17 @@ describe('encoding', function() {
     return decodeURIComponent(escape(atob( str )));
   }
 
-  it('should properly encode the token', function () {
+  it('should properly encode the token (utf8)', function () {
     var expected = 'José';
     var token = jwt.sign({ name: expected }, 'shhhhh');
     var decoded_name = JSON.parse(b64_to_utf8(token.split('.')[1])).name;
+    expect(decoded_name).to.equal(expected);
+  });
+
+  it('should properly encode the token (binary)', function () {
+    var expected = 'José';
+    var token = jwt.sign({ name: expected }, 'shhhhh', { encoding: 'binary' });
+    var decoded_name = JSON.parse(atob(token.split('.')[1])).name;
     expect(decoded_name).to.equal(expected);
   });
 
