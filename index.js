@@ -111,7 +111,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     return done(err);
   }
 
-  if (typeof payload.exp !== 'undefined') {
+  if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
     if (typeof payload.exp !== 'number') {
       return done(new JsonWebTokenError('invalid exp value'));
     }

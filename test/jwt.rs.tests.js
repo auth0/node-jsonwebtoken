@@ -75,6 +75,17 @@ describe('RS256', function() {
         done();
       });
     });
+
+    it('should NOT be invalid', function(done) {
+      // expired token
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: -10 });
+
+      jwt.verify(token, pub, { ignoreExpiration: true }, function(err, decoded) {
+        assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
+        done();
+      });
+    });
   });
 
   describe('when signing a token with audience', function() {
