@@ -59,15 +59,6 @@ describe('HS256', function() {
       });
     });
 
-    it('should throw when the payload is not json', function(done) {
-      var token = jwt.sign('bar', 'secret', { algorithm: 'HS256' });
-      jwt.verify(token, 'secret', function(err, decoded) {
-        assert.isUndefined(decoded);
-        assert.isNotNull(err);
-        done();
-      });
-    });
-
     it('should return an error when the token is expired', function(done) {
       var token = jwt.sign({ exp: 1 }, secret, { algorithm: 'HS256' });
       jwt.verify(token, secret, { algorithm: 'HS256' }, function(err, decoded) {
