@@ -30,9 +30,12 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
     payload.iat = timestamp;
   }
 
-  if (options.expiresInMinutes) {
-    var ms = options.expiresInMinutes * 60;
-    payload.exp = timestamp + ms;
+  var expiresInSeconds = options.expiresInMinutes ?
+      options.expiresInMinutes * 60 :
+      options.expiresInSeconds;
+
+  if (expiresInSeconds) {
+    payload.exp = timestamp + expiresInSeconds;
   }
 
   if (options.audience)

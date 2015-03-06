@@ -25,7 +25,7 @@ encoded private key for RSA and ECDSA.
 `options`:
 
 * `algorithm` (default: `HS256`)
-* `expiresInMinutes`
+* `expiresInMinutes` or `expiresInSeconds`
 * `audience`
 * `subject`
 * `issuer`
