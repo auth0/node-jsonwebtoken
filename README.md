@@ -41,6 +41,8 @@ Additional headers can be provided via the `headers` object.
 
 Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
 
+Setting `ignoreExpiration` to `true` will prevent expired tokens from generating an error.
+
 Example
 
 ```js
@@ -54,6 +56,13 @@ var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 ```
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
+
+`options`:
+
+*  `ignoreExpiration`
+*  `audience`
+*  `issuer`
+
 
 (Asynchronous) If a callback is supplied, function acts asynchronously. Callback passed the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will be passed the error.
 
