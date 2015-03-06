@@ -24,7 +24,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
       header[k] = options.header[k];
     });
   }
-  
+
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
     payload.iat = timestamp;
