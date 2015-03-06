@@ -43,7 +43,12 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   if (options.subject)
     payload.sub = options.subject;
 
-  var signed = jws.sign({header: header, payload: payload, secret: secretOrPrivateKey});
+  var encoding = 'utf8';
+  if (options.encoding) {
+    encoding = options.encoding;
+  }
+
+  var signed = jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
 
   return signed;
 };
