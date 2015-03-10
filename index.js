@@ -7,12 +7,13 @@ module.exports.decode = function (jwt, options) {
   var decoded = jws.decode(jwt, options);
   var payload = decoded && decoded.payload;
 
+  //try parse the payload
   if(typeof payload === 'string') {
     try {
-       var obj = JSON.parse(payload);
-       if(typeof obj === 'object') {
-           return obj;
-       }
+      var obj = JSON.parse(payload);
+      if(typeof obj === 'object') {
+        return obj;
+      }
     } catch (e) { }
   }
 
