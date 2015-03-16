@@ -15,6 +15,7 @@
     "it": true,
     "require": true,
     "atob": false,
-    "escape": true
+    "escape": true,
+    "before": true
   }
 }
