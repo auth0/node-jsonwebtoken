@@ -107,6 +107,12 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     return done(new JsonWebTokenError('jwt signature is required'));
   }
 
+  if (!options.algorithms) {
+    options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ?
+                        [ 'RS256','RS384','RS512','ES256','ES384','ES512' ] :
+                        [ 'HS256','HS384','HS512' ];
+  }
+
   var valid;
 
   try {
@@ -124,6 +130,11 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     payload = this.decode(jwtString);
   } catch(err) {
     return done(err);
+  }
+
+  var header = jws.decode(jwtString).header;
+  if (!~options.algorithms.indexOf(header.alg)) {
+    return done(new JsonWebTokenError('invalid signature'));
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
