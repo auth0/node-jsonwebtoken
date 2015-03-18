@@ -25,7 +25,9 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var header = ((typeof options.headers === 'object') && options.headers) || {};
 
-  if (typeof payload === 'object') {
+  var pl = {content: payload}
+
+  if (typeof pl.content === 'object') {
     header.typ = 'JWT';
   }
 
@@ -39,7 +41,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
-    payload.iat = timestamp;
+    pl.iat = timestamp;
   }
 
   var expiresInSeconds = options.expiresInMinutes ?
@@ -47,24 +49,24 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
       options.expiresInSeconds;
 
   if (expiresInSeconds) {
-    payload.exp = timestamp + expiresInSeconds;
+    pl.exp = timestamp + expiresInSeconds;
   }
 
   if (options.audience)
-    payload.aud = options.audience;
+    pl.aud = options.audience;
 
   if (options.issuer)
-    payload.iss = options.issuer;
+    pl.iss = options.issuer;
 
   if (options.subject)
-    payload.sub = options.subject;
+    pl.sub = options.subject;
 
   var encoding = 'utf8';
   if (options.encoding) {
     encoding = options.encoding;
   }
 
-  var signed = jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
+  var signed = jws.sign({header: header, payload: pl, secret: secretOrPrivateKey, encoding: encoding});
 
   return signed;
 };
@@ -162,5 +164,5 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
       return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
   }
 
-  return done(null, payload);
+  return done(null, payload.content);
 };
