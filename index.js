@@ -111,7 +111,9 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
                          ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
                           [ 'RS256','RS384','RS512','ES256','ES384','ES512' ] :
-                          [ 'HS256','HS384','HS512' ];
+                         ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ?
+							[ 'RS256','RS384','RS512' ] :
+							[ 'HS256','HS384','HS512' ];
 
   }
 
