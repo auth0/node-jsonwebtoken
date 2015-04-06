@@ -75,6 +75,7 @@ encoded public key for RSA and ECDSA.
 
 `options`
 
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 
@@ -117,6 +118,12 @@ jwt.verify(token, cert, { audience: 'urn:foo' }, function(err, decoded) {
 var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(err, decoded) {
   // if issuer mismatch, err == invalid issuer
+});
+
+// alg mismatch
+var cert = fs.readFileSync('public.pem'); // get public key
+jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
+  // if token alg != RS256,  err == invalid signature
 });
 
 ```
