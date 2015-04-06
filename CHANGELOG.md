@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.2.2] - 2015-03-26
+### Fixed
+
+ - [asymmetric-keys] Fix verify for RSAPublicKey formated keys (`jfromaniello - awlayton`)
+  https://github.com/auth0/node-jsonwebtoken/commit/402794663b9521bf602fcc6f2e811e7d3912f9dc
+  https://github.com/auth0/node-jsonwebtoken/commit/8df6aabbc7e1114c8fb3917931078254eb52c222
+
+## [4.2.1] - 2015-03-17
+### Fixed
+
+ - [asymmetric-keys] Fixed issue when public key starts with BEING PUBLIC KEY (https://github.com/auth0/node-jsonwebtoken/issues/70) (`jfromaniello`)
+  https://github.com/auth0/node-jsonwebtoken/commit/7017e74db9b194448ff488b3e16468ada60c4ee5
+
+## [4.2.0] - 2015-03-16
+### Security
+
+ - [asymmetric-keys] Making sure a token signed with an asymmetric key will be verified using a asymmetric key.
+
+This was a vulnerability in this module: When the verification part was expecting a token digitally signed with an asymmetric key (RS/ES family) of algorithms an attacker could send a token signed with a symmetric algorithm (HS* family).
+
+The issue was caused because the same signature was used to verify both type of tokens (`verify` method parameter: `secretOrPublicKey`).
+
+This change adds a new parameter to the verify called `algorithms`. This can be used to specify a list of supported algorithms, but the default value depends on the secret used: if the secretOrPublicKey contains the string `BEGIN CERTIFICATE` the default is `[ 'RS256','RS384','RS512','ES256','ES384','ES512' ]` otherwise is `[ 'HS256','HS384','HS512' ]`. (`jfromaniello`)
+  https://github.com/auth0/node-jsonwebtoken/commit/c2bf7b2cd7e8daf66298c2d168a008690bc4bdd3
+  https://github.com/auth0/node-jsonwebtoken/commit/1bb584bc382295eeb7ee8c4452a673a77a68b687
+
 ## [4.1.0] - 2015-03-10
 ### Changed
 - Assume the payload is JSON even when there is no `typ` property. [5290db1](https://github.com/auth0/node-jsonwebtoken/commit/5290db1bd74f74cd38c90b19e2355ef223a4d931)
