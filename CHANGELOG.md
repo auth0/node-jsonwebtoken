@@ -20,12 +20,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Security
 
  - [asymmetric-keys] Making sure a token signed with an asymmetric key will be verified using a asymmetric key.
-
-This was a vulnerability in this module: When the verification part was expecting a token digitally signed with an asymmetric key (RS/ES family) of algorithms an attacker could send a token signed with a symmetric algorithm (HS* family).
-
-The issue was caused because the same signature was used to verify both type of tokens (`verify` method parameter: `secretOrPublicKey`).
-
-This change adds a new parameter to the verify called `algorithms`. This can be used to specify a list of supported algorithms, but the default value depends on the secret used: if the secretOrPublicKey contains the string `BEGIN CERTIFICATE` the default is `[ 'RS256','RS384','RS512','ES256','ES384','ES512' ]` otherwise is `[ 'HS256','HS384','HS512' ]`. (`jfromaniello`)
+   When the verification part was expecting a token digitally signed with an asymmetric key (RS/ES family) of algorithms an attacker could send a token signed with a symmetric algorithm (HS* family).
+  
+  The issue was caused because the same signature was used to verify both type of tokens (`verify` method parameter: `secretOrPublicKey`).
+  
+  This change adds a new parameter to the verify called `algorithms`. This can be used to specify a list of supported algorithms, but the default value depends on the secret used: if the secretOrPublicKey contains the string `BEGIN CERTIFICATE` the default is `[ 'RS256','RS384','RS512','ES256','ES384','ES512' ]` otherwise is `[ 'HS256','HS384','HS512' ]`. (`jfromaniello`)
   https://github.com/auth0/node-jsonwebtoken/commit/c2bf7b2cd7e8daf66298c2d168a008690bc4bdd3
   https://github.com/auth0/node-jsonwebtoken/commit/1bb584bc382295eeb7ee8c4452a673a77a68b687
 
