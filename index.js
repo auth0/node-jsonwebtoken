@@ -112,15 +112,25 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
                          ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
                           [ 'RS256','RS384','RS512','ES256','ES384','ES512' ] :
                          ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ?
-							[ 'RS256','RS384','RS512' ] :
-							[ 'HS256','HS384','HS512' ];
+                          [ 'RS256','RS384','RS512' ] :
+                          [ 'HS256','HS384','HS512' ];
 
+  }
+
+  if (!jws.isValid(jwtString)) {
+    return done(new JsonWebTokenError('invalid token'));
+  }
+
+  var header = jws.decode(jwtString).header;
+
+  if (!~options.algorithms.indexOf(header.alg)) {
+    return done(new JsonWebTokenError('invalid signature'));
   }
 
   var valid;
 
   try {
-    valid = jws.verify(jwtString, secretOrPublicKey);
+    valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
   } catch (e) {
     return done(e);
   }
@@ -134,11 +144,6 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     payload = this.decode(jwtString);
   } catch(err) {
     return done(err);
-  }
-
-  var header = jws.decode(jwtString).header;
-  if (!~options.algorithms.indexOf(header.alg)) {
-    return done(new JsonWebTokenError('invalid signature'));
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
