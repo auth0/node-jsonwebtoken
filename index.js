@@ -117,11 +117,13 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
 
   }
 
-  if (!jws.isValid(jwtString)) {
+  var decodedToken = jws.decode(jwtString);
+
+  if (!decodedToken) {
     return done(new JsonWebTokenError('invalid token'));
   }
 
-  var header = jws.decode(jwtString).header;
+  var header = decodedToken.header;
 
   if (!~options.algorithms.indexOf(header.alg)) {
     return done(new JsonWebTokenError('invalid signature'));
