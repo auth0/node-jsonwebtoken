@@ -241,7 +241,7 @@ describe('RS256', function() {
       jwt.verify('fruit.fruit.fruit', pub, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
-        assert.equal(err.name, 'Error');
+        assert.equal(err.name, 'JsonWebTokenError');
         done();
       });
     });
