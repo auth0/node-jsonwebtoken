@@ -126,7 +126,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var header = decodedToken.header;
 
   if (!~options.algorithms.indexOf(header.alg)) {
-    return done(new JsonWebTokenError('invalid signature'));
+    return done(new JsonWebTokenError('invalid algorithm'));
   }
 
   var valid;
