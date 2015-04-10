@@ -39,7 +39,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
 
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
-    payload.iat = timestamp;
+    payload.iat = payload.iat || timestamp;
   }
 
   var expiresInSeconds = options.expiresInMinutes ?
