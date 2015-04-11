@@ -8,8 +8,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
  - [sign] Only set defautl `iat` if the user does not specify that argument.
-
-Documenting verify `algorithms` parameter. (`pose - dschenkelman`)
   https://github.com/auth0/node-jsonwebtoken/commit/e900282a8d2dff1d4dec815f7e6aa7782e867d91
   https://github.com/auth0/node-jsonwebtoken/commit/35036b188b4ee6b42df553bbb93bc8a6b19eae9d
   https://github.com/auth0/node-jsonwebtoken/commit/954bd7a312934f03036b6bb6f00edd41f29e54d9
