@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
  - [sign] Only set defautl `iat` if the user does not specify that argument.
+
   https://github.com/auth0/node-jsonwebtoken/commit/e900282a8d2dff1d4dec815f7e6aa7782e867d91
   https://github.com/auth0/node-jsonwebtoken/commit/35036b188b4ee6b42df553bbb93bc8a6b19eae9d
   https://github.com/auth0/node-jsonwebtoken/commit/954bd7a312934f03036b6bb6f00edd41f29e54d9
@@ -28,6 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  That old error (removed from jws) has been replaced by a `JsonWebTokenError` with message `invalid token`.
  
  > Important: the 4.x branch of the library is secure to use but we decided to deprecate everything `< 5.0.0` to prevent security warnings from library `node-jws` when doing `npm install`.
+
   https://github.com/auth0/node-jsonwebtoken/commit/634b8ed0ff5267dc25da5c808634208af109824e
   https://github.com/auth0/node-jsonwebtoken/commit/9f24ffd5791febb449d4d03ff58d7807da9b9b7e
   https://github.com/auth0/node-jsonwebtoken/commit/19e6cc6a1f2fd90356f89b074223b9665f2aa8a2
