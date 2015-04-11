@@ -28,7 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
  That old error (removed from jws) has been replaced by a `JsonWebTokenError` with message `invalid token`.
  
- > Important: the 4.x branch of the library is secure to use but we decided to deprecate everything `< 5.0.0` to prevent security warnings from library `node-jws` when doing `npm install`.
+ > Important: versions >= 4.2.2 this library is secure to use but we decided to deprecate everything `< 5.0.0` to prevent security warnings from library `node-jws` when doing `npm install`.
 
   https://github.com/auth0/node-jsonwebtoken/commit/634b8ed0ff5267dc25da5c808634208af109824e
   https://github.com/auth0/node-jsonwebtoken/commit/9f24ffd5791febb449d4d03ff58d7807da9b9b7e
