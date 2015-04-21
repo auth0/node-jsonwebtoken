@@ -108,7 +108,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   }
 
   if (typeof secretOrPublicKey === "undefined" || secretOrPublicKey === null) // secretOrPublicKey can be empty string
-    return done(new JsonWebTokenError('secret or publick key must be provided'));
+    return done(new JsonWebTokenError('secret or public key must be provided'));
 
   if (!options.algorithms) {
     options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
