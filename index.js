@@ -6,7 +6,8 @@ var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenE
 module.exports.decode = function (jwt, options) {
   options = options || {};
   var decoded = jws.decode(jwt, options);
-  var payload = decoded && decoded.payload;
+  if (!decoded) { return null; }
+  var payload = decoded.payload;
 
   //try parse the payload
   if(typeof payload === 'string') {
