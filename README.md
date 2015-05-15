@@ -146,7 +146,7 @@ Example
 var decoded = jwt.decode(token);
 
 // get the decoded payload and header
-var decoded = jwt.decode(token);
+var decoded = jwt.decode(token, {complete: true});
 console.log(decoded.header);
 console.log(decoded.payload)
 ```

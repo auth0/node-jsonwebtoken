@@ -279,7 +279,6 @@ describe('RS256', function() {
       var obj     = { foo: 'bar' };
       var token   = jwt.sign(obj, priv, { algorithm: 'RS256' });
       var decoded = jwt.decode(token, { complete: true });
-      console.log(decoded);
       assert.deepEqual(decoded.payload, obj);
       assert.deepEqual(decoded.header, { typ: 'JWT', alg: 'RS256' });
       assert.ok(typeof decoded.signature == 'string');
