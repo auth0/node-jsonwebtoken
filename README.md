@@ -41,8 +41,6 @@ Additional headers can be provided via the `headers` object.
 
 Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
 
-Setting `ignoreExpiration` to `true` will prevent expired tokens from generating an error.
-
 Example
 
 ```js
@@ -78,6 +76,7 @@ encoded public key for RSA and ECDSA.
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
+* `ignoreExpiration`: if `true` do not validate the expiration of the token.
 
 ```js
 // verify a token symmetric - synchronous
