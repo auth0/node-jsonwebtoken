@@ -136,7 +136,7 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
 `options`:
 
 * `json`: force JSON.parse on the payload even if the header doesn't contain `"typ":"JWT"`.
-* `complete`: return an object with the decode payload and header.
+* `complete`: return an object with the decoded payload and header.
 
 Example
 
