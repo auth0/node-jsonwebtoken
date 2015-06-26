@@ -26,6 +26,7 @@ encoded private key for RSA and ECDSA.
 
 * `algorithm` (default: `HS256`)
 * `expiresInMinutes` or `expiresInSeconds`
+* `notBeforeMinutes` or `notBeforeSeconds`
 * `audience`
 * `subject`
 * `issuer`
@@ -37,7 +38,7 @@ encoded private key for RSA and ECDSA.
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
 
-If any `expiresInMinutes`, `audience`, `subject`, `issuer`, `jwtid`, `subject` are not provided, there is no default. The jwt generated won't include those properties in the payload.
+If any `expiresInMinutes`, `notBeforeMinutes`, `audience`, `subject`, `issuer`, `jwtid`, `subject` are not provided, there is no default. The jwt generated won't include those properties in the payload.
 
 Additional headers can be provided via the `headers` object.
 
@@ -60,6 +61,7 @@ var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 `options`:
 
 *  `ignoreExpiration`
+*  `ignoreNotBefore`
 *  `audience`
 *  `issuer`
 *  `jwtid`
@@ -81,6 +83,7 @@ encoded public key for RSA and ECDSA.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
+* `ignoreNotBefore`: if `true` do not validate the not before of the token.
 * `jwtid`: if you want to check JWT ID (`jti`), provide a value here
 * `subject`: if you want to check subject (`sub`), provide a value here
 

@@ -1,6 +1,7 @@
 var jws = require('jws');
 
 var JsonWebTokenError = module.exports.JsonWebTokenError = require('./lib/JsonWebTokenError');
+var NotBeforeError = module.exports.NotBeforeError = require('./lib/NotBeforeError');
 var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenExpiredError');
 
 module.exports.decode = function (jwt, options) {
@@ -52,6 +53,14 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
     payload.iat = payload.iat || timestamp;
+  }
+  
+  var notBeforeSeconds = options.notBeforeMinutes ?
+      options.notBeforeMinutes * 60 :
+      options.notBeforeSeconds;
+  
+  if (notBeforeSeconds) {
+      payload.nbf = timestamp + notBeforeSeconds;
   }
 
   var expiresInSeconds = options.expiresInMinutes ?
@@ -166,6 +175,14 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
     payload = this.decode(jwtString);
   } catch(err) {
     return done(err);
+  }
+    
+  if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
+    if (typeof payload.nbf !== 'number') {
+      return done(new JsonWebTokenError('invalid nbf value'));
+    }
+    if (payload.nbf >= Math.floor(Date.now() / 1000))
+      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
