@@ -71,6 +71,9 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   if (options.subject)
     payload.sub = options.subject;
 
+  if (options.jwtid)
+    payload.jti = options.jwtid;
+
   var encoding = 'utf8';
   if (options.encoding) {
     encoding = options.encoding;
@@ -186,6 +189,16 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   if (options.issuer) {
     if (payload.iss !== options.issuer)
       return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+  }
+
+  if (options.subject) {
+    if (payload.sub !== options.subject)
+      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
+  }
+
+  if (options.jwtid) {
+    if (payload.jti !== options.jwtid)
+      return done(new JsonWebTokenError('jwt id invalid. expected: ' + options.jwtid));
   }
 
   return done(null, payload);

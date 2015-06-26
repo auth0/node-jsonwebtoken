@@ -236,6 +236,72 @@ describe('RS256', function() {
     });
   });
 
+  describe('when signing a token with subject', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', subject: 'subject' });
+
+    it('should check subject', function() {
+      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+      });
+    });
+
+    it('should throw when invalid subject', function() {
+      jwt.verify(token, pub, { issuer: 'wrongSubject' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token without subject', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check subject', function() {
+      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token with jwt id', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', jwtid: 'jwtid' });
+
+    it('should check jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+      });
+    });
+
+    it('should throw when invalid jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'wrongJwtid' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token without jwt id', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
   describe('when verifying a malformed token', function() {
     it('should throw', function(done) {
       jwt.verify('fruit.fruit.fruit', pub, function(err, decoded) {
