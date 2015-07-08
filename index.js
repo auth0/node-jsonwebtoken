@@ -160,7 +160,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload;
 
   try {
-    payload = this.decode(jwtString);
+    payload = module.exports.decode(jwtString);
   } catch(err) {
     return done(err);
   }
