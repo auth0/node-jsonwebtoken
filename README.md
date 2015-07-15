@@ -25,7 +25,7 @@ encoded private key for RSA and ECDSA.
 `options`:
 
 * `algorithm` (default: `HS256`)
-* `expiresInMinutes` or `expiresInSeconds`
+* `expiresIn`: expressed in seconds or an string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
 * `subject`
 * `issuer`
@@ -35,7 +35,7 @@ encoded private key for RSA and ECDSA.
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
 
-If any `expiresInMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
+If any `expiresIn`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
 
 Additional headers can be provided via the `headers` object.
 
