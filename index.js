@@ -1,9 +1,12 @@
 var jws = require('jws');
 
-var JsonWebTokenError = module.exports.JsonWebTokenError = require('./lib/JsonWebTokenError');
-var TokenExpiredError = module.exports.TokenExpiredError = require('./lib/TokenExpiredError');
+var JWT = module.exports;
 
-module.exports.decode = function (jwt, options) {
+var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
+var TokenExpiredError = JWT.TokenExpiredError = require('./lib/TokenExpiredError');
+
+
+JWT.decode = function (jwt, options) {
   options = options || {};
   var decoded = jws.decode(jwt, options);
   if (!decoded) { return null; }
@@ -18,7 +21,7 @@ module.exports.decode = function (jwt, options) {
       }
     } catch (e) { }
   }
-  
+
   //return header if `complete` option is enabled.  header includes claims
   //such as `kid` and `alg` used to select the key within a JWKS needed to
   //verify the signature
@@ -32,7 +35,7 @@ module.exports.decode = function (jwt, options) {
   return payload;
 };
 
-module.exports.sign = function(payload, secretOrPrivateKey, options) {
+JWT.sign = function(payload, secretOrPrivateKey, options) {
   options = options || {};
 
   var header = ((typeof options.headers === 'object') && options.headers) || {};
@@ -81,7 +84,7 @@ module.exports.sign = function(payload, secretOrPrivateKey, options) {
   return signed;
 };
 
-module.exports.verify = function(jwtString, secretOrPublicKey, options, callback) {
+JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
     options = {};
@@ -160,7 +163,7 @@ module.exports.verify = function(jwtString, secretOrPublicKey, options, callback
   var payload;
 
   try {
-    payload = module.exports.decode(jwtString);
+    payload = JWT.decode(jwtString);
   } catch(err) {
     return done(err);
   }
