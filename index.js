@@ -122,6 +122,10 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt signature is required'));
   }
 
+  if (!secretOrPublicKey) {
+    return done(new JsonWebTokenError('secret or public key must be provided'));
+  }
+
   if (!options.algorithms) {
     options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
                          ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
