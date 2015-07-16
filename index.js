@@ -201,7 +201,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
       return done(new JsonWebTokenError('iat required when maxAge is specified'));
     }
     if (Date.now() - (payload.iat * 1000) > maxAge) {
-      return done(new TokenExpiredError('maxAge exceded', new Date(payload.iat * 1000 + maxAge)));
+      return done(new TokenExpiredError('maxAge exceeded', new Date(payload.iat * 1000 + maxAge)));
     }
   }
 

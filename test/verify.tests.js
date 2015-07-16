@@ -70,7 +70,7 @@ describe('verify', function() {
 
         jwt.verify(token, key, options, function (err, p) {
           assert.equal(err.name, 'TokenExpiredError');
-          assert.equal(err.message, 'maxAge exceded');
+          assert.equal(err.message, 'maxAge exceeded');
           assert.equal(err.expiredAt.constructor.name, 'Date');
           assert.equal(Number(err.expiredAt), 1437018582321);
           assert.isUndefined(p);
@@ -93,7 +93,7 @@ describe('verify', function() {
         
         jwt.verify(token, key, options, function (err, p) {
           assert.equal(err.name, 'TokenExpiredError');
-          assert.equal(err.message, 'maxAge exceded');
+          assert.equal(err.message, 'maxAge exceeded');
           assert.equal(err.expiredAt.constructor.name, 'Date');
           assert.equal(Number(err.expiredAt), 1437018582800);
           assert.isUndefined(p);
