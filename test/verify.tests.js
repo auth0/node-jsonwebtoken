@@ -29,19 +29,20 @@ describe('verify', function() {
   });
 
   describe('expiration', function () {
+    // { foo: 'bar', iat: 1437018582, exp: 1437018583 }
+    var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
+    var key = 'key';
+      
     var clock;
-    beforeEach(function () {
-      // clock = sinon.useFakeTimers(1437018650768);
-    });
     afterEach(function () {
       try { clock.restore(); } catch (e) {}
     });
 
     it('should error on expired token', function (done) {
-      clock = sinon.useFakeTimers(1437018650768);
-      var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
-      var key = 'key';
-      jwt.verify(token, key, {algorithms: ['HS256']}, function (err, p) {
+      clock = sinon.useFakeTimers(1437018650000);
+      var options = {algorithms: ['HS256']};
+
+      jwt.verify(token, key, options, function (err, p) {
         assert.equal(err.name, 'TokenExpiredError');
         assert.equal(err.message, 'jwt expired');
         assert.equal(err.expiredAt.constructor.name, 'Date');
@@ -53,12 +54,77 @@ describe('verify', function() {
 
     it('should not error on unexpired token', function (done) {
       clock = sinon.useFakeTimers(1437018582000);
-      var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
-      var key = 'key';
-      jwt.verify(token, key, {algorithms: ['HS256']}, function (err, p) {
+      var options = {algorithms: ['HS256']}
+
+      jwt.verify(token, key, options, function (err, p) {
         assert.isNull(err);
         assert.equal(p.foo, 'bar');
         done();
+      });
+    });
+
+    describe('option: maxAge', function () {
+      it('should error for claims issued before a certain timespan', function (done) {
+        clock = sinon.useFakeTimers(1437018582500);
+        var options = {algorithms: ['HS256'], maxAge: '321ms'};
+
+        jwt.verify(token, key, options, function (err, p) {
+          assert.equal(err.name, 'TokenExpiredError');
+          assert.equal(err.message, 'maxAge exceded');
+          assert.equal(err.expiredAt.constructor.name, 'Date');
+          assert.equal(Number(err.expiredAt), 1437018582321);
+          assert.isUndefined(p);
+          done();
+        });
+      });
+      it('should not error if within maxAge timespan', function (done) {
+        clock = sinon.useFakeTimers(1437018582500);
+        var options = {algorithms: ['HS256'], maxAge: '600ms'};
+        
+        jwt.verify(token, key, options, function (err, p) {
+          assert.isNull(err);
+          assert.equal(p.foo, 'bar');
+          done();
+        });
+      });
+      it('can be more restrictive than expiration', function (done) {
+        clock = sinon.useFakeTimers(1437018582900);
+        var options = {algorithms: ['HS256'], maxAge: '800ms'};
+        
+        jwt.verify(token, key, options, function (err, p) {
+          assert.equal(err.name, 'TokenExpiredError');
+          assert.equal(err.message, 'maxAge exceded');
+          assert.equal(err.expiredAt.constructor.name, 'Date');
+          assert.equal(Number(err.expiredAt), 1437018582800);
+          assert.isUndefined(p);
+          done();
+        });
+      });
+      it('cannot be more permissive than expiration', function (done) {
+        clock = sinon.useFakeTimers(1437018583100);
+        var options = {algorithms: ['HS256'], maxAge: '1200ms'};
+        
+        jwt.verify(token, key, options, function (err, p) {
+          // maxAge not exceded, but still expired
+          assert.equal(err.name, 'TokenExpiredError');
+          assert.equal(err.message, 'jwt expired');
+          assert.equal(err.expiredAt.constructor.name, 'Date');
+          assert.equal(Number(err.expiredAt), 1437018583000);
+          assert.isUndefined(p);
+          done();
+        });
+      });
+      it('should error if maxAge is specified but there is no iat claim', function (done) {
+        clock = sinon.useFakeTimers(1437018582900);
+        var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIifQ.0MBPd4Bru9-fK_HY3xmuDAc6N_embknmNuhdb9bKL_U';
+        var options = {algorithms: ['HS256'], maxAge: '1s'};
+        
+        jwt.verify(token, key, options, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'iat required when maxAge is specified');
+          assert.isUndefined(p);
+          done();
+        });
       });
     });
   });

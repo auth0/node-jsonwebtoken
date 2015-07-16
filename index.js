@@ -4,7 +4,7 @@ var JWT = module.exports;
 
 var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
 var TokenExpiredError = JWT.TokenExpiredError = require('./lib/TokenExpiredError');
-
+var ms = require('ms')
 
 JWT.decode = function (jwt, options) {
   options = options || {};
@@ -193,6 +193,16 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
   if (options.issuer) {
     if (payload.iss !== options.issuer)
       return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+  }
+
+  if (options.maxAge) {
+    var maxAge = ms(options.maxAge);
+    if (typeof payload.iat !== 'number') {
+      return done(new JsonWebTokenError('iat required when maxAge is specified'));
+    }
+    if (Date.now() - (payload.iat * 1000) > maxAge) {
+      return done(new TokenExpiredError('maxAge exceded', new Date(payload.iat * 1000 + maxAge)));
+    }
   }
 
   return done(null, payload);
