@@ -219,6 +219,12 @@ ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
 ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
 none | No digital signature or MAC value included
 
+## Security
+
+As you may know there is are a few [critical vulnerabilities](https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/) with the JWT specification.
+
+You will be happy to know that these vulnerablities are addressed by this library. Most notably an attacker may not specify 'none' as the algorithm. Also, the provided 'secret' will be checked as to whether it is an HMAC or RSA key to prevent key spoofing.
+
 ## Issue Reporting
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
