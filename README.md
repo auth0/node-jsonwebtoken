@@ -17,7 +17,7 @@ $ npm install jsonwebtoken
 
 (Synchronous) Returns the JsonWebToken as string
 
-`payload` could be an literal, buffer or string
+`payload` could be a literal, buffer or string
 
 `secretOrPrivateKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded private key for RSA and ECDSA.
