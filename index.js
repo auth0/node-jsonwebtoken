@@ -30,7 +30,7 @@ JWT.decode = function (jwt, options) {
       header: decoded.header,
       payload: payload,
       signature: decoded.signature
-    }
+    };
   }
   return payload;
 };
@@ -38,7 +38,7 @@ JWT.decode = function (jwt, options) {
 JWT.sign = function(payload, secretOrPrivateKey, options) {
   options = options || {};
 
-  var header = ((typeof options.headers === 'object') && options.headers) || {};
+  var header = {};
 
   if (typeof payload === 'object') {
     header.typ = 'JWT';
@@ -46,9 +46,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options) {
 
   header.alg = options.algorithm || 'HS256';
 
-  if (options.header) {
-    Object.keys(options.header).forEach(function (k) {
-      header[k] = options.header[k];
+  if (options.headers) {
+    Object.keys(options.headers).forEach(function (k) {
+      header[k] = options.headers[k];
     });
   }
 
