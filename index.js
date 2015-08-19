@@ -30,7 +30,7 @@ JWT.decode = function (jwt, options) {
       header: decoded.header,
       payload: payload,
       signature: decoded.signature
-    }
+    };
   }
   return payload;
 };
