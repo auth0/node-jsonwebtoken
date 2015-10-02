@@ -131,6 +131,8 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
 
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
 
+__Warning:__ This will __not__ verify whether the signature is valid. You should __not__ use this for untrusted messages. You most likely want to use `jwt.verify` instead.
+
 `token` is the JsonWebToken string
 
 `options`:
