@@ -55,13 +55,6 @@ var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
 
-`options`:
-
-*  `ignoreExpiration`
-*  `audience`
-*  `issuer`
-
-
 (Asynchronous) If a callback is supplied, function acts asynchronously. Callback passed the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will be passed the error.
 
 (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature (and optionally expiration, audience, issuer) are valid. If not, it will throw the error.
@@ -77,6 +70,7 @@ encoded public key for RSA and ECDSA.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
+* `maxAge`: optional sets an expiration based on the `iat` field. Eg `2h`
 
 ```js
 // verify a token symmetric - synchronous
