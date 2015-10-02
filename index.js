@@ -1,4 +1,5 @@
 var jws = require('jws');
+var ms = require('ms');
 
 var JWT = module.exports;
 
@@ -57,12 +58,34 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     payload.iat = payload.iat || timestamp;
   }
 
-  var expiresInSeconds = options.expiresInMinutes ?
-      options.expiresInMinutes * 60 :
-      options.expiresInSeconds;
+  if (options.expiresInSeconds || options.expiresInMinutes) {
+    var deprecated_line;
+    try {
+      deprecated_line = /.*\((.*)\).*/.exec((new Error()).stack.split('\n')[2])[1];
+    } catch(err) {
+      deprecated_line = '';
+    }
 
-  if (expiresInSeconds) {
+    console.warn('jsonwebtoken: expiresInMinutes and expiresInSeconds is deprecated. (' + deprecated_line + ')\n' +
+                 'Use "expiresIn" expressed in seconds.');
+
+    var expiresInSeconds = options.expiresInMinutes ?
+        options.expiresInMinutes * 60 :
+        options.expiresInSeconds;
+
     payload.exp = timestamp + expiresInSeconds;
+  } else if (options.expiresIn) {
+    if (typeof options.expiresIn === 'string') {
+      var milliseconds = ms(options.expiresIn);
+      if (typeof milliseconds === 'undefined') {
+        throw new Error('bad "expiresIn" format: ' + options.expiresIn);
+      }
+      payload.exp = timestamp + milliseconds / 1000;
+    } else if (typeof options.expiresIn === 'number' ) {
+      payload.exp = timestamp + options.expiresIn;
+    } else {
+      throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
+    }
   }
 
   if (options.audience)
