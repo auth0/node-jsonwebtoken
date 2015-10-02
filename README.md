@@ -13,7 +13,9 @@ $ npm install jsonwebtoken
 
 # Usage
 
-### jwt.sign(payload, secretOrPrivateKey, options)
+### jwt.sign(payload, secretOrPrivateKey, options, [callback])
+
+(Asynchronous) If a callback is supplied, callback is called with the JsonWebToken string
 
 (Synchronous) Returns the JsonWebToken as string
 
@@ -51,6 +53,11 @@ var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 // sign with RSA SHA256
 var cert = fs.readFileSync('private.key');  // get private key
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
+
+// sign asynchronously
+jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(token) {
+  console.log(token);
+});
 ```
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
