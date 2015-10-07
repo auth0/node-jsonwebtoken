@@ -105,7 +105,6 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
   if(typeof callback === 'function') {
     jws.createSign({
       header: header,
-      payload: payload,
       privateKey: secretOrPrivateKey,
       payload: JSON.stringify(payload)
     }).on('done', callback);
