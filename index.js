@@ -5,7 +5,6 @@ var JWT = module.exports;
 
 var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
 var TokenExpiredError = JWT.TokenExpiredError = require('./lib/TokenExpiredError');
-var ms = require('ms')
 
 JWT.decode = function (jwt, options) {
   options = options || {};
