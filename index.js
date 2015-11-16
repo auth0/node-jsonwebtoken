@@ -53,9 +53,18 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     });
   }
 
+
+var clockTolerance = 0;
+if (options.clockTolerance) {
+    if (typeof options.clockTolerance === 'number' && options.clockTolerance >= 0) {
+      clockTolerance = options.clockTolerance;
+    } else {
+      throw new Error('"clockTolerance" should be a positive number of milliseconds');
+    }
+}
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
-    payload.iat = payload.iat || timestamp;
+    payload.iat = payload.iat || timestamp - clockTolerance;
   }
 
   if (options.expiresInSeconds || options.expiresInMinutes) {
