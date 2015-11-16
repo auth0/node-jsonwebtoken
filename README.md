@@ -31,6 +31,7 @@ encoded private key for RSA and ECDSA.
 * `issuer`
 * `noTimestamp`
 * `headers`
+* `clockTolerance`
 
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
@@ -40,6 +41,8 @@ If any `expiresIn`, `audience`, `subject`, `issuer` are not provided, there is n
 Additional headers can be provided via the `headers` object.
 
 Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
+The `iat` will be backdated of the amount of seconds specified in `clockTolerance`, if defined. Use this field when the token has to be validated by a machine which may have a slightly different system time due to clock drift.
+
 
 Example
 
