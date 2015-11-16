@@ -14,5 +14,11 @@ describe('clockTolerance', function() {
     var result = jwt.verify(token, 'yyy');
     expect(result.iat).to.be.closeTo(Math.floor(Date.now() / 1000), 0.5);
   });
+  
+  it('should throw if clockTolerance is negative', function () {
+    expect(function () {
+      jwt.sign({foo: 123}, '123', { clockTolerance: -3 });
+    }).to.throw(/"clockTolerance" should be a positive number of seconds/);
+  });
 
 });
