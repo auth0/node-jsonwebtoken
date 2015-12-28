@@ -1,9 +1,11 @@
 var jws = require('jws');
 var ms = require('ms');
+var timespan = require('./lib/timespan');
 
 var JWT = module.exports;
 
 var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
+var NotBeforeError = module.exports.NotBeforeError = require('./lib/NotBeforeError');
 var TokenExpiredError = JWT.TokenExpiredError = require('./lib/TokenExpiredError');
 
 JWT.decode = function (jwt, options) {
@@ -57,6 +59,13 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     payload.iat = payload.iat || timestamp;
   }
 
+  if (options.notBefore) {
+    payload.nbf = timespan(options.notBefore);
+    if (typeof payload.nbf === 'undefined') {
+      throw new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
+    }
+  }
+
   if (options.expiresInSeconds || options.expiresInMinutes) {
     var deprecated_line;
     try {
@@ -74,15 +83,8 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
 
     payload.exp = timestamp + expiresInSeconds;
   } else if (options.expiresIn) {
-    if (typeof options.expiresIn === 'string') {
-      var milliseconds = ms(options.expiresIn);
-      if (typeof milliseconds === 'undefined') {
-        throw new Error('bad "expiresIn" format: ' + options.expiresIn);
-      }
-      payload.exp = timestamp + milliseconds / 1000;
-    } else if (typeof options.expiresIn === 'number' ) {
-      payload.exp = timestamp + options.expiresIn;
-    } else {
+    payload.exp = timespan(options.expiresIn);
+    if (typeof payload.exp === 'undefined') {
       throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
     }
   }
@@ -95,6 +97,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
 
   if (options.subject)
     payload.sub = options.subject;
+
+  if (options.jwtid)
+    payload.jti = options.jwtid;
 
   var encoding = 'utf8';
   if (options.encoding) {
@@ -198,6 +203,16 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     payload = JWT.decode(jwtString);
   } catch(err) {
     return done(err);
+  }
+
+  if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
+    if (typeof payload.nbf !== 'number') {
+      return done(new JsonWebTokenError('invalid nbf value'));
+    }
+    if (payload.nbf >= Math.floor(Date.now() / 1000)) {
+      console.log(payload.nbf, '>=', Math.floor(Date.now() / 1000));
+      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
+    }
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {

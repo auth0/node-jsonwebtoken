@@ -88,6 +88,45 @@ describe('RS256', function() {
     });
   });
 
+  describe('when signing a token with not before', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: -10 * 3600 });
+
+    it('should be valid expiration', function(done) {
+      jwt.verify(token, pub, function(err, decoded) {
+        console.log(token);
+        console.dir(arguments);
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
+    it('should be invalid', function(done) {
+      // not active token
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: '10m' });
+
+      jwt.verify(token, pub, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'NotBeforeError');
+        assert.instanceOf(err.date, Date);
+        assert.instanceOf(err, jwt.NotBeforeError);
+        done();
+      });
+    });
+
+    it('should NOT be invalid', function(done) {
+      // not active token
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBeforeMinutes: 10 });
+
+      jwt.verify(token, pub, { ignoreNotBefore: true }, function(err, decoded) {
+        assert.ok(decoded.foo);
+        assert.equal('bar', decoded.foo);
+        done();
+      });
+    });
+  });
+
   describe('when signing a token with audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', audience: 'urn:foo' });
 
@@ -228,6 +267,72 @@ describe('RS256', function() {
 
     it('should check issuer', function() {
       jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token with subject', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', subject: 'subject' });
+
+    it('should check subject', function() {
+      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+      });
+    });
+
+    it('should throw when invalid subject', function() {
+      jwt.verify(token, pub, { issuer: 'wrongSubject' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token without subject', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check subject', function() {
+      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token with jwt id', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', jwtid: 'jwtid' });
+
+    it('should check jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+      });
+    });
+
+    it('should throw when invalid jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'wrongJwtid' }, function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.instanceOf(err, jwt.JsonWebTokenError);
+      });
+    });
+  });
+
+  describe('when signing a token without jwt id', function() {
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+
+    it('should check jwt id', function() {
+      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');

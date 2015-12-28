@@ -28,16 +28,19 @@ encoded private key for RSA and ECDSA.
 
 * `algorithm` (default: `HS256`)
 * `expiresIn`: expressed in seconds or an string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
+* `notBefore`: expressed in seconds or an string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
 * `subject`
 * `issuer`
+* `jwtid`
+* `subject`
 * `noTimestamp`
 * `headers`
 
 If `payload` is not a buffer or a string, it will be coerced into a string
 using `JSON.stringify`.
 
-If any `expiresIn`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
+If any `expiresIn`, `notBeforeMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
 
 Additional headers can be provided via the `headers` object.
 
@@ -77,7 +80,8 @@ encoded public key for RSA and ECDSA.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
-* `maxAge`: optional sets an expiration based on the `iat` field. Eg `2h`
+* `ignoreNotBefore`...
+* `subject`: if you want to check subject (`sub`), provide a value here
 
 ```js
 // verify a token symmetric - synchronous
@@ -118,6 +122,18 @@ jwt.verify(token, cert, { audience: 'urn:foo' }, function(err, decoded) {
 var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(err, decoded) {
   // if issuer mismatch, err == invalid issuer
+});
+
+// verify jwt id
+var cert = fs.readFileSync('public.pem');  // get public key
+jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwtid' }, function(err, decoded) {
+  // if jwt id mismatch, err == invalid jwt id
+});
+
+// verify subject
+var cert = fs.readFileSync('public.pem');  // get public key
+jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwtid', subject: 'subject' }, function(err, decoded) {
+  // if subject mismatch, err == invalid subject
 });
 
 // alg mismatch
@@ -191,6 +207,8 @@ Error object:
   * 'invalid signature'
   * 'jwt audience invalid. expected: [OPTIONS AUDIENCE]'
   * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
+  * 'jwt id invalid. expected: [OPTIONS JWT ID]'
+  * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
 
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {
