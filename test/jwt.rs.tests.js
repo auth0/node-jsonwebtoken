@@ -89,10 +89,12 @@ describe('RS256', function() {
   });
 
   describe('when signing a token with not before', function() {
-    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBeforeMinutes: -10 });
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: -10 * 3600 });
 
     it('should be valid expiration', function(done) {
       jwt.verify(token, pub, function(err, decoded) {
+        console.log(token);
+        console.dir(arguments);
         assert.isNotNull(decoded);
         assert.isNull(err);
         done();
@@ -101,7 +103,7 @@ describe('RS256', function() {
 
     it('should be invalid', function(done) {
       // not active token
-      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBeforeMinutes: 10 });
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: '10m' });
 
       jwt.verify(token, pub, function(err, decoded) {
         assert.isUndefined(decoded);

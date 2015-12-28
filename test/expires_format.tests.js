@@ -27,7 +27,7 @@ describe('expires option', function() {
   it('should throw if expires has a bad string format', function () {
     expect(function () {
       jwt.sign({foo: 123}, '123', { expiresIn: '1 monkey' });
-    }).to.throw(/bad "expiresIn" format: 1 monkey/);
+    }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
   });
 
   it('should throw if expires is not an string or number', function () {

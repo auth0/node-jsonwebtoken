@@ -28,7 +28,7 @@ encoded private key for RSA and ECDSA.
 
 * `algorithm` (default: `HS256`)
 * `expiresIn`: expressed in seconds or an string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
-* `notBeforeMinutes` or `notBeforeSeconds`
+* `notBefore`: expressed in seconds or an string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
 * `subject`
 * `issuer`
@@ -80,8 +80,7 @@ encoded public key for RSA and ECDSA.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer`: if you want to check issuer (`iss`), provide a value here
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
-*  `ignoreNotBefore`...
-* `jwtid`: if you want to check JWT ID (`jti`), provide a value here
+* `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 
 ```js
