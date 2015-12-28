@@ -4,6 +4,7 @@ var ms = require('ms');
 var JWT = module.exports;
 
 var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
+var NotBeforeError = module.exports.NotBeforeError = require('./lib/NotBeforeError');
 var TokenExpiredError = JWT.TokenExpiredError = require('./lib/TokenExpiredError');
 
 JWT.decode = function (jwt, options) {
@@ -56,6 +57,14 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
   if (!options.noTimestamp) {
     payload.iat = payload.iat || timestamp;
   }
+  
+  var notBeforeSeconds = options.notBeforeMinutes ?
+      options.notBeforeMinutes * 60 :
+      options.notBeforeSeconds;
+  
+  if (notBeforeSeconds) {
+      payload.nbf = timestamp + notBeforeSeconds;
+  }
 
   if (options.expiresInSeconds || options.expiresInMinutes) {
     var deprecated_line;
@@ -95,6 +104,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
 
   if (options.subject)
     payload.sub = options.subject;
+
+  if (options.jwtid)
+    payload.jti = options.jwtid;
 
   var encoding = 'utf8';
   if (options.encoding) {
@@ -198,6 +210,14 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     payload = JWT.decode(jwtString);
   } catch(err) {
     return done(err);
+  }
+    
+  if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
+    if (typeof payload.nbf !== 'number') {
+      return done(new JsonWebTokenError('invalid nbf value'));
+    }
+    if (payload.nbf >= Math.floor(Date.now() / 1000))
+      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
