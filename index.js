@@ -46,6 +46,10 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     header.typ = 'JWT';
   }
 
+  if (payload.constructor !== Object && options.keys.length) {
+    console.warn("jsonwebtoken: payload is not an object literal. expiresIn, audience, subject, and issuer may not persist!");
+  }
+
   header.alg = options.algorithm || 'HS256';
 
   if (options.headers) {
