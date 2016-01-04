@@ -1,6 +1,7 @@
 var jws = require('jws');
 var ms = require('ms');
 var timespan = require('./lib/timespan');
+var xtend = require('xtend');
 
 var JWT = module.exports;
 
@@ -39,7 +40,7 @@ JWT.decode = function (jwt, options) {
 
 JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
   options = options || {};
-
+  payload = typeof payload === 'object' ? xtend(payload) : payload;
   var header = {};
 
   if (typeof payload === 'object') {
