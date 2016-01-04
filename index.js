@@ -38,14 +38,32 @@ JWT.decode = function (jwt, options) {
   return payload;
 };
 
+var payload_options = [
+  'expiresIn',
+  'notBefore',
+  'expiresInMinutes',
+  'expiresInSeconds',
+  'audience',
+  'issuer',
+  'subject',
+  'jwtid'
+];
+
 JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
   options = options || {};
-  payload = typeof payload === 'object' ? xtend(payload) : payload;
   var header = {};
 
   if (typeof payload === 'object') {
     header.typ = 'JWT';
+    payload = xtend(payload);
+  } else {
+    var invalid_option = payload_options.filter(function (key) {
+      return typeof options[key] !== 'undefined';
+    })[0];
+
+    console.warn('invalid "' + invalid_option + '" option for ' + (typeof payload) + ' payload');
   }
+
 
   header.alg = options.algorithm || 'HS256';
 
