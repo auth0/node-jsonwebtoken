@@ -1,7 +1,7 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
 
-describe('signing with a sealed payload', function() {
+describe('issue 147 - signing with a sealed payload', function() {
 
   it('should put the expiration claim', function () {
     var token = jwt.sign(Object.seal({foo: 123}), '123', { expiresIn: 10 });
