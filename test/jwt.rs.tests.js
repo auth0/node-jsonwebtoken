@@ -115,6 +115,20 @@ describe('RS256', function() {
       });
     });
 
+
+    it('should valid when date are equals', function(done) {
+      Date.fix(1451908031);
+
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: 0 });
+
+      jwt.verify(token, pub, function(err, decoded) {
+        assert.isNull(err);
+        assert.isNotNull(decoded);
+        Date.unfix();
+        done();
+      });
+    });
+
     it('should NOT be invalid', function(done) {
       // not active token
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBeforeMinutes: 10 });

@@ -59,7 +59,7 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     payload.iat = payload.iat || timestamp;
   }
 
-  if (options.notBefore) {
+  if (typeof options.notBefore !== 'undefined') {
     payload.nbf = timespan(options.notBefore);
     if (typeof payload.nbf === 'undefined') {
       throw new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
@@ -82,7 +82,7 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
         options.expiresInSeconds;
 
     payload.exp = timestamp + expiresInSeconds;
-  } else if (options.expiresIn) {
+  } else if (typeof options.expiresIn !== 'undefined') {
     payload.exp = timespan(options.expiresIn);
     if (typeof payload.exp === 'undefined') {
       throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
@@ -209,8 +209,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.nbf !== 'number') {
       return done(new JsonWebTokenError('invalid nbf value'));
     }
-    if (payload.nbf >= Math.floor(Date.now() / 1000)) {
-      console.log(payload.nbf, '>=', Math.floor(Date.now() / 1000));
+    if (payload.nbf > Math.floor(Date.now() / 1000)) {
       return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
     }
   }
