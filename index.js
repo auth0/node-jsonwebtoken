@@ -61,7 +61,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
       return typeof options[key] !== 'undefined';
     })[0];
 
-    console.warn('invalid "' + invalid_option + '" option for ' + (typeof payload) + ' payload');
+    if (invalid_option) {
+      console.warn('invalid "' + invalid_option + '" option for ' + (typeof payload) + ' payload');
+    }
   }
 
 
