@@ -127,15 +127,20 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     encoding = options.encoding;
   }
 
-  if(typeof callback === 'function') {
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: JSON.stringify(payload)
-    }).on('done', callback);
-  } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
+  var signature = jws.sign({
+    header: header,
+    payload: payload,
+    secret: secretOrPrivateKey,
+    encoding: encoding
+  });
+
+  if (typeof callback === 'function') {
+    process.nextTick(function() {
+      callback(signature);
+    });
   }
+
+  return signature;
 };
 
 JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
