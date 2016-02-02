@@ -270,3 +270,40 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
 
   return done(null, payload);
 };
+
+/**
+*
+*/
+JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
+    var optionMapping = {
+        exp: 'expiresIn',
+        aud: 'audience',
+        nbf: 'notBefore',
+        iss: 'issuer',
+        sub: 'subject',
+        jti: 'jwtid',
+        alg: 'algorithm'
+    };
+    var newToken;
+    var obj = {};
+    var options = {};
+
+    for (var key in token) {
+        if (Object.keys(optionMapping).indexOf(key) === -1) {
+            obj[key] = token[key];
+        }
+        else {
+            options[optionMapping[key]] = token[key];
+        }
+    }
+
+    if (!token.iat) {
+        options['noTimestamp'] = true;
+    }
+
+    options['expiresIn'] = expiresIn;
+
+    newToken = JWT.sign(obj, secretOrPrivateKey, options);
+    return newToken;
+    //callback(null, newToken);
+};
