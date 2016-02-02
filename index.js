@@ -275,6 +275,9 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
 *
 */
 JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
+    //TODO: if token is {complete: true}, then need to get header, payload and signature,
+    // if not, then we're just getting the payload
+
     var optionMapping = {
         exp: 'expiresIn',
         aud: 'audience',
@@ -289,6 +292,7 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     var options = {};
 
     for (var key in token) {
+        console.log('key : ' + key + ' -- ' + Object.keys(optionMapping));
         if (Object.keys(optionMapping).indexOf(key) === -1) {
             obj[key] = token[key];
         }
@@ -296,6 +300,8 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
             options[optionMapping[key]] = token[key];
         }
     }
+
+    console.log('options: ' + JSON.stringify(options));
 
     if (!token.iat) {
         options['noTimestamp'] = true;

@@ -50,9 +50,17 @@ describe('Refresh Token Testing', function() {
   });
 
   it('Should be able to refresh the token', function (done) {
-      var refreshed = jwt.refresh(token, 3600, secret);
-      console.log(JSON.stringify(refreshed));
+      var refreshed = jwt.refresh(jwt.decode(token, {complete: true}), 3600, secret);
+    //   console.log(JSON.stringify(refreshed));
       assert.ok(refreshed);
+      done();
+  });
+
+  it('Decoded version of a refreshed token should be the same, except for timing data', function (done) {
+      var refreshed = jwt.refresh(jwt.decode(token, {complete: true}), 3600, secret);
+      var decoded = jwt.decode(refreshed, {complete: true});
+    //   console.log(JSON.stringify(decoded));
+      assert.ok(decoded);
       done();
   });
 });
