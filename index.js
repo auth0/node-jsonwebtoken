@@ -275,8 +275,20 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
 *
 */
 JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
-    //TODO: if token is {complete: true}, then need to get header, payload and signature,
-    // if not, then we're just getting the payload
+
+    var header;
+    var payload;
+
+    if (token.header) {
+        header = token['header'];
+        payload = token['payload'];
+    }
+    else {
+        payload = token;
+    }
+
+    console.log('header: ' + JSON.stringify(header));
+    console.log('payload: ' + JSON.stringify(payload));
 
     var optionMapping = {
         exp: 'expiresIn',
@@ -291,14 +303,30 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     var obj = {};
     var options = {};
 
-    for (var key in token) {
-        console.log('key : ' + key + ' -- ' + Object.keys(optionMapping));
+    for (var key in payload) {
         if (Object.keys(optionMapping).indexOf(key) === -1) {
-            obj[key] = token[key];
+            obj[key] = payload[key];
         }
         else {
-            options[optionMapping[key]] = token[key];
+            options[optionMapping[key]] = payload[key];
         }
+    }
+
+    if(header) {
+        options.headers = { };
+        for (var key in header) {
+            if (key !== 'typ') {    //don't care about typ -> always JWT
+                if (Object.keys(optionMapping).indexOf(key) === -1) {
+                    options.headers[key] = header[key];
+                }
+                else {
+                    options[optionMapping[key]] = header[key];
+                }
+            }
+        }
+    }
+    else {
+        console.log('No algorithm was defined for token refresh - using default');
     }
 
     console.log('options: ' + JSON.stringify(options));

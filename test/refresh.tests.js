@@ -6,6 +6,37 @@ var sinon = require('sinon');
 
 var assert = require('chai').assert;
 
+var equal = (first, second, last) => {
+    var noCompare = ['iat', 'exp'];
+    var areEqual = true;
+
+    if (first.header) {
+        var equalHeader = equal(first.header, second.header);
+        var equalPayload = equal(first.payload, second.payload);
+        areEqual = (equalHeader && equalPayload);
+    }
+    else {
+        for (var key in first) {
+            if (noCompare.indexOf(key) === -1) {
+                console.log(key + ' -> ' + first[key] + ' : ' + second[key]);
+                if (first[key] !== second[key]) {
+                    areEqual = false;
+                    break;
+                }
+            }
+            else {
+                //not caring about iat and exp
+            }
+        }
+    }
+
+    if (!last) {
+        areEqual = equal(second, first, true);
+    }
+
+    return areEqual;
+}
+
 describe('Refresh Token Testing', function() {
 
     var secret = 'ssshhhh';
@@ -57,10 +88,17 @@ describe('Refresh Token Testing', function() {
   });
 
   it('Decoded version of a refreshed token should be the same, except for timing data', function (done) {
-      var refreshed = jwt.refresh(jwt.decode(token, {complete: true}), 3600, secret);
-      var decoded = jwt.decode(refreshed, {complete: true});
-    //   console.log(JSON.stringify(decoded));
-      assert.ok(decoded);
+      var originalDecoded = jwt.decode(token, {complete: true});
+      var refreshed = jwt.refresh(originalDecoded, 3600, secret);
+      var refreshDecoded = jwt.decode(refreshed, {complete: true});
+
+      var comparison = equal(originalDecoded, refreshDecoded);
+      console.log('comparison : ' + comparison);
+
+      assert.ok(comparison);
+      assert.ok(refreshDecoded);
+
+      //test that the refreshed token has a time in the future.
       done();
   });
 });
