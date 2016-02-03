@@ -19,7 +19,7 @@ var assert = require('chai').assert;
 *               the symmetric test.
 * @return boolean - true if the tokens match.
 */
-var equal = (first, second, last) => {
+var equal = function (first, second, last) {
     var noCompare = ['iat', 'exp'];
     var areEqual = true;
 
