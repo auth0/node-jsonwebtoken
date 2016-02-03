@@ -118,10 +118,10 @@ describe('Refresh Token Testing', function() {
   });
 
   it('Refreshed token should have a later expiery time then the original', function (done) {
-      var originalExpiery = originalDecoded.payload.exp;
-      var refreshedExpiery = refreshDecoded.payload.exp;
+      var originalExpiry = originalDecoded.payload.exp;
+      var refreshedExpiry = refreshDecoded.payload.exp;
 
-      assert.isTrue((refreshedExpiery > originalExpiery), 'Refreshed expiery time is above original time');
+      assert.isTrue((refreshedExpiry > originalExpiry), 'Refreshed expiry time is above original time');
       done();
   });
 });

@@ -272,10 +272,19 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
 };
 
 /**
+* Will refresh the given token.  The token is expected to be decoded and valid. No checks will be
+* performed on the token.  The function will copy the values of the token, give it a new
+* expiry time based on the given 'expiresIn' time and will return a new signed token.
 *
+* @param token
+* @param expiresIn
+* @param secretOrPrivateKey
+* @param callback
+* @return New signed JWT token
 */
 JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
-
+    //TODO: check if token is not good, if so return error ie: no payload, not required fields, etc.
+    //TODO: asynchronus function.
     var header;
     var payload;
 
