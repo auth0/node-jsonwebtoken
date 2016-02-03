@@ -6,6 +6,19 @@ var sinon = require('sinon');
 
 var assert = require('chai').assert;
 
+/**
+* Method to verify if first token is euqal to second token.  This is a symmetric
+* test.  Will check that first = second, and that second = first.
+*
+* All properties are tested, except for the 'iat' and 'exp' values since we do not
+* care for those as we are expecting them to be different.
+*
+* @param first - The first decoded token
+* @param second - The second decoded token
+* @param last - boolean value to state that this is the last test and no need to rerun
+*               the symmetric test.
+* @return boolean - true if the tokens match.
+*/
 var equal = (first, second, last) => {
     var noCompare = ['iat', 'exp'];
     var areEqual = true;
@@ -18,7 +31,6 @@ var equal = (first, second, last) => {
     else {
         for (var key in first) {
             if (noCompare.indexOf(key) === -1) {
-                console.log(key + ' -> ' + first[key] + ' : ' + second[key]);
                 if (first[key] !== second[key]) {
                     areEqual = false;
                     break;
@@ -82,23 +94,34 @@ describe('Refresh Token Testing', function() {
 
   it('Should be able to refresh the token', function (done) {
       var refreshed = jwt.refresh(jwt.decode(token, {complete: true}), 3600, secret);
-    //   console.log(JSON.stringify(refreshed));
       assert.ok(refreshed);
       done();
   });
 
-  it('Decoded version of a refreshed token should be the same, except for timing data', function (done) {
-      var originalDecoded = jwt.decode(token, {complete: true});
-      var refreshed = jwt.refresh(originalDecoded, 3600, secret);
-      var refreshDecoded = jwt.decode(refreshed, {complete: true});
+  var originalDecoded = jwt.decode(token, {complete: true});
+  var refreshed = jwt.refresh(originalDecoded, 3600, secret);
+  var refreshDecoded = jwt.decode(refreshed, {complete: true});
 
+  it('Sub-test to ensure that the compare method works', function (done) {
+      var originalMatch = equal(originalDecoded, originalDecoded);
+      var refreshMatch = equal(refreshDecoded, refreshDecoded);
+
+      assert.equal(originalMatch, refreshMatch);
+      done();
+  });
+
+  it('Decoded version of a refreshed token should be the same, except for timing data', function (done) {
       var comparison = equal(originalDecoded, refreshDecoded);
-      console.log('comparison : ' + comparison);
 
       assert.ok(comparison);
-      assert.ok(refreshDecoded);
+      done();
+  });
 
-      //test that the refreshed token has a time in the future.
+  it('Refreshed token should have a later expiery time then the original', function (done) {
+      var originalExpiery = originalDecoded.payload.exp;
+      var refreshedExpiery = refreshDecoded.payload.exp;
+
+      assert.isTrue((refreshedExpiery > originalExpiery), 'Refreshed expiery time is above original time');
       done();
   });
 });

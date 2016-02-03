@@ -287,9 +287,6 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
         payload = token;
     }
 
-    console.log('header: ' + JSON.stringify(header));
-    console.log('payload: ' + JSON.stringify(payload));
-
     var optionMapping = {
         exp: 'expiresIn',
         aud: 'audience',
@@ -328,8 +325,6 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     else {
         console.log('No algorithm was defined for token refresh - using default');
     }
-
-    console.log('options: ' + JSON.stringify(options));
 
     if (!token.iat) {
         options['noTimestamp'] = true;
