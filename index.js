@@ -284,7 +284,26 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
 */
 JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     //TODO: check if token is not good, if so return error ie: no payload, not required fields, etc.
-    //TODO: asynchronus function.
+
+    var done;
+    if (callback) {
+        done = function() {
+            var args = Array.prototype.slice.call(arguments, 0);
+            return process.nextTick(function() {
+                callback.apply(null, args);
+            });
+        };
+    }
+    else {
+        done = function(err, data) {
+            if (err) {
+                console.log('err : ' + err);
+                throw err;
+            }
+            return data;
+        };
+    }
+
     var header;
     var payload;
 
@@ -342,6 +361,5 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     options['expiresIn'] = expiresIn;
 
     newToken = JWT.sign(obj, secretOrPrivateKey, options);
-    return newToken;
-    //callback(null, newToken);
+    return done(null, newToken);
 };
