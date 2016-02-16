@@ -103,7 +103,7 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
         options.expiresInSeconds;
 
     payload.exp = timestamp + expiresInSeconds;
-  } else if (typeof options.expiresIn !== 'undefined') {
+  } else if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
     payload.exp = timespan(options.expiresIn);
     if (typeof payload.exp === 'undefined') {
       throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
