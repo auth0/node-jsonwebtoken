@@ -26,6 +26,7 @@
   "devDependencies": {
     "atob": "^1.1.2",
     "chai": "^1.10.0",
+    "conventional-changelog": "~1.1.0",
     "mocha": "^2.1.0",
     "sinon": "^1.15.4"
   },

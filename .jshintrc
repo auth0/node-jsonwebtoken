@@ -10,6 +10,7 @@
   "laxcomma": true,
   "node": true,
   "browser": false,
+  "esnext": true,
   "globals": {
     "describe": true,
     "it": true,
