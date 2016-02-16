@@ -258,6 +258,18 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
       return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
   }
 
+  if (options.subject) {
+    if (payload.sub !== options.subject) {
+      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
+    }
+  }
+
+  if (options.jwtid) {
+    if (payload.jti !== options.jwtid) {
+      return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+    }
+  }
+
   if (options.maxAge) {
     var maxAge = ms(options.maxAge);
     if (typeof payload.iat !== 'number') {
