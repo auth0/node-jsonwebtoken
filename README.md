@@ -78,7 +78,7 @@ encoded public key for RSA and ECDSA.
 
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here
-* `issuer`: if you want to check issuer (`iss`), provide a value here
+* `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here

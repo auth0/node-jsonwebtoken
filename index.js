@@ -254,8 +254,13 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
   }
 
   if (options.issuer) {
-    if (payload.iss !== options.issuer)
+    var invalid_issuer =
+        (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
+        (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
+
+    if (invalid_issuer) {
       return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+    }
   }
 
   if (options.subject) {

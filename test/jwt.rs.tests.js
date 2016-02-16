@@ -267,6 +267,14 @@ describe('RS256', function() {
       });
     });
 
+    it('should check the issuer when providing a list of valid issuers', function(done) {
+      jwt.verify(token, pub, { issuer: [ 'urn:foo', 'urn:bar' ] }, function(err, decoded) {
+        assert.isNotNull(decoded);
+        assert.isNull(err);
+        done();
+      });
+    });
+
     it('should throw when invalid issuer', function(done) {
       jwt.verify(token, pub, { issuer: 'urn:wrong' }, function(err, decoded) {
         assert.isUndefined(decoded);
