@@ -1,6 +1,6 @@
 {
   "name": "jsonwebtoken",
-  "version": "5.6.0",
+  "version": "5.6.1",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
