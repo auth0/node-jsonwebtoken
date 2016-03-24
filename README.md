@@ -44,7 +44,7 @@ If any `expiresIn`, `notBeforeMinutes`, `audience`, `subject`, `issuer` are not 
 
 Additional headers can be provided via the `headers` object.
 
-Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
+Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real payload, which can be useful if you want your JWTs to be verified by servers having a slightly backdated clock.
 
 Example
 
@@ -52,6 +52,8 @@ Example
 // sign with default (HMAC SHA256)
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+//backdate a jwt 30 seconds
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh'); 
 
 // sign with RSA SHA256
 var cert = fs.readFileSync('private.key');  // get private key
