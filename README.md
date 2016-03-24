@@ -44,7 +44,7 @@ If any `expiresIn`, `notBeforeMinutes`, `audience`, `subject`, `issuer` are not 
 
 Additional headers can be provided via the `headers` object.
 
-Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real payload, which can be useful if you want your JWTs to be verified by servers having a slightly backdated clock.
+Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp, which can be useful if you want your JWTs to be verified by servers having a slightly backdated clock.
 
 Example
 
