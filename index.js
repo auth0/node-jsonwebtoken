@@ -77,6 +77,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
 
   var timestamp = Math.floor(Date.now() / 1000);
   if (!options.noTimestamp) {
+    if (typeof payload.iat !== 'undefined' && typeof payload.iat !== 'number') {
+      throw new Error('"iat" if present should be a number');
+    }
     payload.iat = payload.iat || timestamp;
   }
 
