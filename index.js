@@ -233,7 +233,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.nbf !== 'number') {
       return done(new JsonWebTokenError('invalid nbf value'));
     }
-    if (payload.nbf > Math.floor(Date.now() / 1000)) {
+    if (payload.nbf > Math.floor(Date.now() / 1000) + (options.clockTolerance || 0)) {
       return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
     }
   }
@@ -242,7 +242,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.exp !== 'number') {
       return done(new JsonWebTokenError('invalid exp value'));
     }
-    if (Math.floor(Date.now() / 1000) >= payload.exp)
+    if (Math.floor(Date.now() / 1000) >= payload.exp + (options.clockTolerance || 0))
       return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
   }
 
