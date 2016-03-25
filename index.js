@@ -172,12 +172,18 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt malformed'));
   }
 
-  if (parts[2].trim() === '' && secretOrPublicKey){
+  var hasSignature = parts[2].trim() !== '';
+
+  if (!hasSignature && secretOrPublicKey){
     return done(new JsonWebTokenError('jwt signature is required'));
   }
 
-  if (!secretOrPublicKey) {
+  if (hasSignature && !secretOrPublicKey) {
     return done(new JsonWebTokenError('secret or public key must be provided'));
+  }
+
+  if (!hasSignature && !options.algorithms) {
+    options.algorithms = ['none'];
   }
 
   if (!options.algorithms) {

@@ -28,6 +28,24 @@ describe('verify', function() {
     });
   });
 
+  it('should be able to validate unsigned token', function (done) {
+    var header = { alg: 'none' };
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+    var signed = jws.sign({
+      header: header,
+      payload: payload,
+      secret: priv,
+      encoding: 'utf8'
+    });
+
+    jwt.verify(signed, null, {typ: 'JWT'}, function(err, p) {
+      assert.isNull(err);
+      assert.deepEqual(p, payload);
+      done();
+    });
+  });
+
   describe('expiration', function () {
     // { foo: 'bar', iat: 1437018582, exp: 1437018583 }
     var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
