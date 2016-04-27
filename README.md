@@ -30,7 +30,6 @@ encoded private key for RSA and ECDSA.
 * `expiresIn`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `notBefore`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
-* `subject`
 * `issuer`
 * `jwtid`
 * `subject`
