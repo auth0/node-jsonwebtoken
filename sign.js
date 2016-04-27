@@ -23,6 +23,16 @@ var options_to_payload = {
   'jwtid':    'jti'
 };
 
+var options_for_objects = [
+  'expiresIn',
+  'notBefore',
+  'noTimestamp',
+  'audience',
+  'issuer',
+  'subject',
+  'jwtid',
+];
+
 module.exports = function(payload, secretOrPrivateKey, options, callback) {
   options = options || {};
 
@@ -35,6 +45,14 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
     throw new Error('payload is required');
   } else if (typeof payload === 'object') {
     payload = xtend(payload);
+  } else if (typeof payload !== 'object') {
+    var invalid_options = options_for_objects.filter(function (opt) {
+      return typeof options[opt] !== 'undefined';
+    });
+
+    if (invalid_options.length > 0) {
+      throw new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload' );
+    }
   }
 
   if (typeof payload.exp !== 'undefined' && typeof options.expiresIn !== 'undefined') {
