@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.0.0 - 2016-04-27
+
+ - Change .sign to standard async callback ([50873c7d45d2733244d5da8afef3d1872e657a60](https://github.com/auth0/node-jsonwebtoken/commit/50873c7d45d2733244d5da8afef3d1872e657a60))
+ - Improved the options for the `sign` method ([53c3987b3cc34e95eb396b26fc9b051276e2f6f9](https://github.com/auth0/node-jsonwebtoken/commit/53c3987b3cc34e95eb396b26fc9b051276e2f6f9))
+
+    -  `expiresInMinutes` and `expiresInSeconds` are deprecated and no longer supported.
+    -  `notBeforeInMinutes` and `notBeforeInSeconds` are deprecated and no longer supported.
+    -  `options` are strongly validated.
+    -  `options.expiresIn`, `options.notBefore`, `options.audience`, `options.issuer`, `options.subject` and `options.jwtid` are mutually exclusive with `payload.exp`, `payload.nbf`, `payload.aud`, `payload.iss`
+    -  `options.algorithm` is properly validated.
+    -  `options.headers` is renamed to `options.header`.
+
+ - update CHANGELOG to reflect most of the changes. closes #136 ([b87a1a8d2e2533fbfab518765a54f00077918eb7](https://github.com/auth0/node-jsonwebtoken/commit/b87a1a8d2e2533fbfab518765a54f00077918eb7)), closes [#136](https://github.com/auth0/node-jsonwebtoken/issues/136)
+ - update readme ([53a88ecf4494e30e1d62a1cf3cc354650349f486](https://github.com/auth0/node-jsonwebtoken/commit/53a88ecf4494e30e1d62a1cf3cc354650349f486))
+
 ## 5.7.0 - 2016-02-16
 
 
