@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.1.0 - 2016-04-27
+
+ - verify unsigned tokens ([ec880791c10ed5ef7c8df7bf28ebb95c810479ed](https://github.com/auth0/node-jsonwebtoken/commit/ec880791c10ed5ef7c8df7bf28ebb95c810479ed))
+
 ## 6.0.1 - 2016-04-27
 
 This was an immediate change after publishing 6.0.0.
