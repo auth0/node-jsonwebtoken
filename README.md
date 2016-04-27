@@ -26,7 +26,7 @@ encoded private key for RSA and ECDSA.
 
 `options`:
 
-* `algorithm` (default: `HS256`)
+* `algorithm` or `alg` (default: `HS256`)
 * `expiresIn`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `notBefore`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
@@ -35,16 +35,16 @@ encoded private key for RSA and ECDSA.
 * `jwtid`
 * `subject`
 * `noTimestamp`
-* `headers`
+* `header`
 
-If `payload` is not a buffer or a string, it will be coerced into a string
-using `JSON.stringify`.
+If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-If any `expiresIn`, `notBeforeMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
+There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`. These claims can also be provided in the payload directly with `exp`, `nbf`, `aud` and `sub` respectively, but you can't include in both places.
 
-Additional headers can be provided via the `headers` object.
 
-Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
+The header can be customized via the `option.header` object.
+
+Generated JWTs will include an `iat` claim by default unless `noTimestamp` is specified.
 
 Example
 

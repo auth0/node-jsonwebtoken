@@ -4,6 +4,7 @@ var path = require('path');
 
 var expect = require('chai').expect;
 var assert = require('chai').assert;
+var ms = require('ms');
 
 describe('RS256', function() {
   var pub = fs.readFileSync(path.join(__dirname, 'pub.pem'));
@@ -52,7 +53,7 @@ describe('RS256', function() {
   });
 
   describe('when signing a token with expiration', function() {
-    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: 10 });
+    var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: '10m' });
 
     it('should be valid expiration', function(done) {
       jwt.verify(token, pub, function(err, decoded) {
@@ -64,7 +65,7 @@ describe('RS256', function() {
 
     it('should be invalid', function(done) {
       // expired token
-      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: -10 });
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: -1 * ms('10m') });
 
       jwt.verify(token, pub, function(err, decoded) {
         assert.isUndefined(decoded);
@@ -78,7 +79,7 @@ describe('RS256', function() {
 
     it('should NOT be invalid', function(done) {
       // expired token
-      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresInMinutes: -10 });
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: -1 * ms('10m') });
 
       jwt.verify(token, pub, { ignoreExpiration: true }, function(err, decoded) {
         assert.ok(decoded.foo);
@@ -93,8 +94,6 @@ describe('RS256', function() {
 
     it('should be valid expiration', function(done) {
       jwt.verify(token, pub, function(err, decoded) {
-        console.log(token);
-        console.dir(arguments);
         assert.isNotNull(decoded);
         assert.isNull(err);
         done();
@@ -131,7 +130,7 @@ describe('RS256', function() {
 
     it('should NOT be invalid', function(done) {
       // not active token
-      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBeforeMinutes: 10 });
+      token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: '10m' });
 
       jwt.verify(token, pub, { ignoreNotBefore: true }, function(err, decoded) {
         assert.ok(decoded.foo);
