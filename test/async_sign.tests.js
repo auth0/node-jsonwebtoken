@@ -10,6 +10,7 @@ describe('signing a token asynchronously', function() {
 
     it('should return the same result as singing synchronously', function(done) {
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' }, function (err, asyncToken) {
+        if (err) return done(err);
         expect(asyncToken).to.be.a('string');
         expect(asyncToken.split('.')).to.have.length(3);
         expect(asyncToken).to.equal(syncToken);

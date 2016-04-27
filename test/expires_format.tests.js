@@ -36,4 +36,10 @@ describe('expires option', function() {
     }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
   });
 
+  it('should throw an error if expiresIn and exp are provided', function () {
+    expect(function () {
+      jwt.sign({ foo: 123, exp: 839218392183 }, '123', { expiresIn: '5h' });
+    }).to.throw(/Bad "options.expiresIn" option the payload already has an "exp" property./);
+  });
+
 });

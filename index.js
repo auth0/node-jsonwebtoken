@@ -66,6 +66,9 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
     }
   }
 
+  if (typeof payload.exp !== 'undefined' && typeof options.expiresIn !== 'undefined') {
+    throw new Error('Bad "options.expiresIn" option the payload already has an "exp" property.');
+  }
 
   header.alg = options.algorithm || 'HS256';
 
