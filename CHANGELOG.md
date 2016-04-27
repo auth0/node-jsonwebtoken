@@ -3,11 +3,18 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.0.1 - 2016-04-27
+
+This was an immediate change after publishing 6.0.0.
+
+ - throw error on invalid options when the payload is not an object ([304f1b33075f79ed66f784e27dc4f5307aa39e27](https://github.com/auth0/node-jsonwebtoken/commit/304f1b33075f79ed66f784e27dc4f5307aa39e27))
+
 ## 6.0.0 - 2016-04-27
 
  - Change .sign to standard async callback ([50873c7d45d2733244d5da8afef3d1872e657a60](https://github.com/auth0/node-jsonwebtoken/commit/50873c7d45d2733244d5da8afef3d1872e657a60))
  - Improved the options for the `sign` method ([53c3987b3cc34e95eb396b26fc9b051276e2f6f9](https://github.com/auth0/node-jsonwebtoken/commit/53c3987b3cc34e95eb396b26fc9b051276e2f6f9))
 
+    -  throw error on invalid options like `expiresIn` when the payload is not an object ([304f1b33075f79ed66f784e27dc4f5307aa39e27](https://github.com/auth0/node-jsonwebtoken/commit/304f1b33075f79ed66f784e27dc4f5307aa39e27))
     -  `expiresInMinutes` and `expiresInSeconds` are deprecated and no longer supported.
     -  `notBeforeInMinutes` and `notBeforeInSeconds` are deprecated and no longer supported.
     -  `options` are strongly validated.
