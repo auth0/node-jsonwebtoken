@@ -132,7 +132,11 @@ JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
       header: header,
       privateKey: secretOrPrivateKey,
       payload: JSON.stringify(payload)
-    }).on('done', callback);
+    })
+    .on('error', callback)
+    .on('done', function(signature) {
+      callback(null, signature);
+    });
   } else {
     return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
   }
