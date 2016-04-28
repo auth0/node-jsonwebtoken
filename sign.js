@@ -93,10 +93,12 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
 
   Object.keys(options_to_payload).forEach(function (key) {
     var claim = options_to_payload[key];
-    if (typeof options[key] !== 'undefined' && typeof payload[claim] !== 'undefined') {
-      throw new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.');
+    if (typeof options[key] !== 'undefined') {
+      if (typeof payload[claim] !== 'undefined') {
+        throw new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.');
+      }
+      payload[claim] = options[key];
     }
-    payload[claim] = options[key];
   });
 
   var encoding = options.encoding || 'utf8';
