@@ -16,6 +16,13 @@ var sign_options_schema = Joi.object().keys({
   noTimestamp: Joi.boolean()
 });
 
+var registered_claims_schema = Joi.object().keys({
+  iat: Joi.number(),
+  exp: Joi.number(),
+  nbf: Joi.number()
+}).unknown();
+
+
 var options_to_payload = {
   'audience': 'aud',
   'issuer':   'iss',
@@ -44,6 +51,12 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
   if (typeof payload === 'undefined') {
     throw new Error('payload is required');
   } else if (typeof payload === 'object') {
+    var payload_validation_result = registered_claims_schema.validate(payload);
+
+    if (payload_validation_result.error) {
+      throw payload_validation_result.error;
+    }
+
     payload = xtend(payload);
   } else if (typeof payload !== 'object') {
     var invalid_options = options_for_objects.filter(function (opt) {
