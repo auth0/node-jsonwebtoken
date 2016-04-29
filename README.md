@@ -43,7 +43,7 @@ There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`,
 
 The header can be customized via the `option.header` object.
 
-Generated JWTs will include an `iat` claim by default unless `noTimestamp` is specified.
+Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
 Example
 
@@ -51,6 +51,8 @@ Example
 // sign with default (HMAC SHA256)
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+//backdate a jwt 30 seconds
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh'); 
 
 // sign with RSA SHA256
 var cert = fs.readFileSync('private.key');  // get private key
@@ -81,6 +83,8 @@ encoded public key for RSA and ECDSA.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
+* `clockTolerance`: number of second to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
+
 
 ```js
 // verify a token symmetric - synchronous
