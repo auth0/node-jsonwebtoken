@@ -3,3 +3,4 @@ before_install: npm i -g npm@1.4.28
 node_js:
   - "5"
   - "4"
+  - "0.12"

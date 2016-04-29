@@ -19,7 +19,7 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
-    "joi": "~8.0.5",
+    "joi": "~6.10.1",
     "jws": "^3.0.0",
     "ms": "^0.7.1",
     "xtend": "^4.0.1"
@@ -32,6 +32,7 @@
     "sinon": "^1.15.4"
   },
   "engines": {
-    "npm": ">=1.4.28"
+    "npm": ">=1.4.28",
+    "node": ">=0.12"
   }
 }
