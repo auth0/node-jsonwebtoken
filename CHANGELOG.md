@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.2.0 - 2016-04-29
+
+ - add support for `options.clockTolerance` to `jwt.verify` ([65ddea934f226bf06bc9d6a55be9587515cfc38d](https://github.com/auth0/node-jsonwebtoken/commit/65ddea934f226bf06bc9d6a55be9587515cfc38d))
+
+## 6.1.2 - 2016-04-29
+
+ - fix sign method for node.js 0.12. closes #193 ([9c38374142d3929be3c9314b5e9bc5d963c5955f](https://github.com/auth0/node-jsonwebtoken/commit/9c38374142d3929be3c9314b5e9bc5d963c5955f)), closes [#193](https://github.com/auth0/node-jsonwebtoken/issues/193)
+ - improve async test ([7b0981380ddc40a5f1208df520631785b5ffb85a](https://github.com/auth0/node-jsonwebtoken/commit/7b0981380ddc40a5f1208df520631785b5ffb85a))
+
 ## 6.1.0 - 2016-04-27
 
  - verify unsigned tokens ([ec880791c10ed5ef7c8df7bf28ebb95c810479ed](https://github.com/auth0/node-jsonwebtoken/commit/ec880791c10ed5ef7c8df7bf28ebb95c810479ed))
