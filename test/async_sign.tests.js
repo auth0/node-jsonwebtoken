@@ -17,10 +17,26 @@ describe('signing a token asynchronously', function() {
       });
     });
 
-    it('should throw error', function(done) {
+    it('should return error when secret is not a cert for RS256', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'RS256' }, function (err) {
         expect(err).to.be.ok();
+        done();
+      });
+    });
+
+    it('should return error on wrong arguments', function(done) {
+      //this throw an error because the secret is not a cert and RS256 requires a cert.
+      jwt.sign({ foo: 'bar' }, secret, { notBefore: {} }, function (err) {
+        expect(err).to.be.ok();
+        done();
+      });
+    });
+
+    it('should return error on wrong arguments (2)', function(done) {
+      jwt.sign('string', 'secret', {noTimestamp: true}, function (err) {
+        expect(err).to.be.ok();
+        expect(err).to.be.instanceof(Error);
         done();
       });
     });

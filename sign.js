@@ -48,13 +48,20 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
     typ: typeof payload === 'object' ? 'JWT' : undefined
   }, options.header);
 
+  function failure (err) {
+    if (callback) {
+      return callback(err);
+    }
+    throw err;
+  }
+
   if (typeof payload === 'undefined') {
-    throw new Error('payload is required');
+    return failure(new Error('payload is required'));
   } else if (typeof payload === 'object') {
     var payload_validation_result = registered_claims_schema.validate(payload);
 
     if (payload_validation_result.error) {
-      throw payload_validation_result.error;
+      return failure(payload_validation_result.error);
     }
 
     payload = xtend(payload);
@@ -64,22 +71,22 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
     });
 
     if (invalid_options.length > 0) {
-      throw new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload' );
+      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload' ));
     }
   }
 
   if (typeof payload.exp !== 'undefined' && typeof options.expiresIn !== 'undefined') {
-    throw new Error('Bad "options.expiresIn" option the payload already has an "exp" property.');
+    return failure(new Error('Bad "options.expiresIn" option the payload already has an "exp" property.'));
   }
 
   if (typeof payload.nbf !== 'undefined' && typeof options.notBefore !== 'undefined') {
-    throw new Error('Bad "options.notBefore" option the payload already has an "nbf" property.');
+    return failure(new Error('Bad "options.notBefore" option the payload already has an "nbf" property.'));
   }
 
   var validation_result = sign_options_schema.validate(options);
 
   if (validation_result.error) {
-    throw validation_result.error;
+   return failure(validation_result.error);
   }
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);
@@ -93,14 +100,14 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
   if (typeof options.notBefore !== 'undefined') {
     payload.nbf = timespan(options.notBefore);
     if (typeof payload.nbf === 'undefined') {
-      throw new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
+      return failure(new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
   }
 
   if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
     payload.exp = timespan(options.expiresIn);
     if (typeof payload.exp === 'undefined') {
-      throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
+      return failure(new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
   }
 
@@ -108,7 +115,7 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
     var claim = options_to_payload[key];
     if (typeof options[key] !== 'undefined') {
       if (typeof payload[claim] !== 'undefined') {
-        throw new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.');
+        return failure(new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.'));
       }
       payload[claim] = options[key];
     }
