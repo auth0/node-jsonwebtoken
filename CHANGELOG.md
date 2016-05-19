@@ -1,7 +1,12 @@
 # Change Log
 
+
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
+
+## 7.0.0 - 2016-05-19
+
+ - change jwt.sign to return errors on callback instead of throwing errors ([1e46c5a42aa3dab8478efa4081d8f8f5c5485d56](https://github.com/auth0/node-jsonwebtoken/commit/1e46c5a42aa3dab8478efa4081d8f8f5c5485d56))
 
 ## 6.2.0 - 2016-04-29
 
