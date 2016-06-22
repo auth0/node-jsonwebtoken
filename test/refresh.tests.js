@@ -3,7 +3,6 @@ var jws = require('jws');
 var fs = require('fs');
 var path = require('path');
 var sinon = require('sinon');
-
 var assert = require('chai').assert;
 
 /**
@@ -57,7 +56,7 @@ describe('Refresh Token Testing', function() {
         expiresIn: '3600',
         subject: 'Testing Refresh',
         issuer: 'node-jsonwebtoken',
-        headers: {
+        header: {
             a: 'header'
         }
     };
@@ -167,8 +166,8 @@ describe('Refresh Token Testing', function() {
       try {
           var failRefresh = jwt.refresh(notReallyAToken, null, secret);
       } catch (err) {
-          assert.equal(err.name, 'Error');
-          assert.equal(err.message, '"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
+          assert.equal(err.name, 'ValidationError');
+          assert.equal(err.message, 'child "expiresIn" fails because ["expiresIn" must be a number, "expiresIn" must be a string]');
       }
 
       assert.notOk(failRefresh);

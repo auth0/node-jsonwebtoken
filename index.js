@@ -261,11 +261,11 @@ JWT.refresh = function(token, expiresIn, secretOrPrivateKey, callback) {
     }
 
     if(header) {
-        options.headers = { };
+        options.header = { };
         for (var key in header) {
             if (key !== 'typ') {    //don't care about typ -> always JWT
                 if (Object.keys(optionMapping).indexOf(key) === -1) {
-                    options.headers[key] = header[key];
+                    options.header[key] = header[key];
                 }
                 else {
                     options[optionMapping[key]] = header[key];
