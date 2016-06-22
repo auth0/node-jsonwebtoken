@@ -15,16 +15,34 @@ describe('verify', function() {
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     var signed = jws.sign({
-        header: header,
+      header: header,
         payload: payload,
         secret: priv,
         encoding: 'utf8'
     });
 
     jwt.verify(signed, pub, {typ: 'JWT'}, function(err, p) {
-        assert.isNull(err);
-        assert.deepEqual(p, payload);
-        done();
+      assert.isNull(err);
+      assert.deepEqual(p, payload);
+      done();
+    });
+  });
+
+  it('should be able to validate unsigned token', function (done) {
+    var header = { alg: 'none' };
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+    var signed = jws.sign({
+      header: header,
+      payload: payload,
+      secret: priv,
+      encoding: 'utf8'
+    });
+
+    jwt.verify(signed, null, {typ: 'JWT'}, function(err, p) {
+      assert.isNull(err);
+      assert.deepEqual(p, payload);
+      done();
     });
   });
 
@@ -32,7 +50,7 @@ describe('verify', function() {
     // { foo: 'bar', iat: 1437018582, exp: 1437018583 }
     var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
     var key = 'key';
-      
+
     var clock;
     afterEach(function () {
       try { clock.restore(); } catch (e) {}
@@ -52,9 +70,20 @@ describe('verify', function() {
       });
     });
 
-    it('should not error on unexpired token', function (done) {
-      clock = sinon.useFakeTimers(1437018582000);
-      var options = {algorithms: ['HS256']}
+    it('should not error on expired token within clockTolerance interval', function (done) {
+      clock = sinon.useFakeTimers(1437018584000);
+      var options = {algorithms: ['HS256'], clockTolerance: 100}
+
+      jwt.verify(token, key, options, function (err, p) {
+        assert.isNull(err);
+        assert.equal(p.foo, 'bar');
+        done();
+      });
+    });
+
+    it('should not error if within maxAge timespan', function (done) {
+      clock = sinon.useFakeTimers(1437018582500);
+      var options = {algorithms: ['HS256'], maxAge: '600ms'};
 
       jwt.verify(token, key, options, function (err, p) {
         assert.isNull(err);
@@ -77,10 +106,22 @@ describe('verify', function() {
           done();
         });
       });
+
+      it('should not error for claims issued before a certain timespan but still inside clockTolerance timespan', function (done) {
+        clock = sinon.useFakeTimers(1437018582500);
+        var options = {algorithms: ['HS256'], maxAge: '321ms', clockTolerance: 100};
+
+        jwt.verify(token, key, options, function (err, p) {
+          assert.isNull(err);
+          assert.equal(p.foo, 'bar');
+          done();
+        });
+      });
+
       it('should not error if within maxAge timespan', function (done) {
         clock = sinon.useFakeTimers(1437018582500);
         var options = {algorithms: ['HS256'], maxAge: '600ms'};
-        
+
         jwt.verify(token, key, options, function (err, p) {
           assert.isNull(err);
           assert.equal(p.foo, 'bar');
@@ -90,7 +131,7 @@ describe('verify', function() {
       it('can be more restrictive than expiration', function (done) {
         clock = sinon.useFakeTimers(1437018582900);
         var options = {algorithms: ['HS256'], maxAge: '800ms'};
-        
+
         jwt.verify(token, key, options, function (err, p) {
           assert.equal(err.name, 'TokenExpiredError');
           assert.equal(err.message, 'maxAge exceeded');
@@ -103,7 +144,7 @@ describe('verify', function() {
       it('cannot be more permissive than expiration', function (done) {
         clock = sinon.useFakeTimers(1437018583100);
         var options = {algorithms: ['HS256'], maxAge: '1200ms'};
-        
+
         jwt.verify(token, key, options, function (err, p) {
           // maxAge not exceded, but still expired
           assert.equal(err.name, 'TokenExpiredError');
@@ -118,7 +159,7 @@ describe('verify', function() {
         clock = sinon.useFakeTimers(1437018582900);
         var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIifQ.0MBPd4Bru9-fK_HY3xmuDAc6N_embknmNuhdb9bKL_U';
         var options = {algorithms: ['HS256'], maxAge: '1s'};
-        
+
         jwt.verify(token, key, options, function (err, p) {
           assert.equal(err.name, 'JsonWebTokenError');
           assert.equal(err.message, 'iat required when maxAge is specified');

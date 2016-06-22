@@ -1,7 +1,47 @@
 # Change Log
 
+
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
+
+## 7.0.0 - 2016-05-19
+
+ - change jwt.sign to return errors on callback instead of throwing errors ([1e46c5a42aa3dab8478efa4081d8f8f5c5485d56](https://github.com/auth0/node-jsonwebtoken/commit/1e46c5a42aa3dab8478efa4081d8f8f5c5485d56))
+
+## 6.2.0 - 2016-04-29
+
+ - add support for `options.clockTolerance` to `jwt.verify` ([65ddea934f226bf06bc9d6a55be9587515cfc38d](https://github.com/auth0/node-jsonwebtoken/commit/65ddea934f226bf06bc9d6a55be9587515cfc38d))
+
+## 6.1.2 - 2016-04-29
+
+ - fix sign method for node.js 0.12. closes #193 ([9c38374142d3929be3c9314b5e9bc5d963c5955f](https://github.com/auth0/node-jsonwebtoken/commit/9c38374142d3929be3c9314b5e9bc5d963c5955f)), closes [#193](https://github.com/auth0/node-jsonwebtoken/issues/193)
+ - improve async test ([7b0981380ddc40a5f1208df520631785b5ffb85a](https://github.com/auth0/node-jsonwebtoken/commit/7b0981380ddc40a5f1208df520631785b5ffb85a))
+
+## 6.1.0 - 2016-04-27
+
+ - verify unsigned tokens ([ec880791c10ed5ef7c8df7bf28ebb95c810479ed](https://github.com/auth0/node-jsonwebtoken/commit/ec880791c10ed5ef7c8df7bf28ebb95c810479ed))
+
+## 6.0.1 - 2016-04-27
+
+This was an immediate change after publishing 6.0.0.
+
+ - throw error on invalid options when the payload is not an object ([304f1b33075f79ed66f784e27dc4f5307aa39e27](https://github.com/auth0/node-jsonwebtoken/commit/304f1b33075f79ed66f784e27dc4f5307aa39e27))
+
+## 6.0.0 - 2016-04-27
+
+ - Change .sign to standard async callback ([50873c7d45d2733244d5da8afef3d1872e657a60](https://github.com/auth0/node-jsonwebtoken/commit/50873c7d45d2733244d5da8afef3d1872e657a60))
+ - Improved the options for the `sign` method ([53c3987b3cc34e95eb396b26fc9b051276e2f6f9](https://github.com/auth0/node-jsonwebtoken/commit/53c3987b3cc34e95eb396b26fc9b051276e2f6f9))
+
+    -  throw error on invalid options like `expiresIn` when the payload is not an object ([304f1b33075f79ed66f784e27dc4f5307aa39e27](https://github.com/auth0/node-jsonwebtoken/commit/304f1b33075f79ed66f784e27dc4f5307aa39e27))
+    -  `expiresInMinutes` and `expiresInSeconds` are deprecated and no longer supported.
+    -  `notBeforeInMinutes` and `notBeforeInSeconds` are deprecated and no longer supported.
+    -  `options` are strongly validated.
+    -  `options.expiresIn`, `options.notBefore`, `options.audience`, `options.issuer`, `options.subject` and `options.jwtid` are mutually exclusive with `payload.exp`, `payload.nbf`, `payload.aud`, `payload.iss`
+    -  `options.algorithm` is properly validated.
+    -  `options.headers` is renamed to `options.header`.
+
+ - update CHANGELOG to reflect most of the changes. closes #136 ([b87a1a8d2e2533fbfab518765a54f00077918eb7](https://github.com/auth0/node-jsonwebtoken/commit/b87a1a8d2e2533fbfab518765a54f00077918eb7)), closes [#136](https://github.com/auth0/node-jsonwebtoken/issues/136)
+ - update readme ([53a88ecf4494e30e1d62a1cf3cc354650349f486](https://github.com/auth0/node-jsonwebtoken/commit/53a88ecf4494e30e1d62a1cf3cc354650349f486))
 
 ## 5.7.0 - 2016-02-16
 

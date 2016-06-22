@@ -15,7 +15,7 @@ $ npm install jsonwebtoken
 
 ### jwt.sign(payload, secretOrPrivateKey, options, [callback])
 
-(Asynchronous) If a callback is supplied, callback is called with the JsonWebToken string
+(Asynchronous) If a callback is supplied, callback is called with the `err` or the JWT.
 
 (Synchronous) Returns the JsonWebToken as string
 
@@ -30,21 +30,20 @@ encoded private key for RSA and ECDSA.
 * `expiresIn`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `notBefore`: expressed in seconds or a string describing a time span [rauchg/ms](https://github.com/rauchg/ms.js). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `audience`
-* `subject`
 * `issuer`
 * `jwtid`
 * `subject`
 * `noTimestamp`
-* `headers`
+* `header`
 
-If `payload` is not a buffer or a string, it will be coerced into a string
-using `JSON.stringify`.
+If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-If any `expiresIn`, `notBeforeMinutes`, `audience`, `subject`, `issuer` are not provided, there is no default. The jwt generated won't include those properties in the payload.
+There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`. These claims can also be provided in the payload directly with `exp`, `nbf`, `aud` and `sub` respectively, but you can't include in both places.
 
-Additional headers can be provided via the `headers` object.
 
-Generated jwts will include an `iat` claim by default unless `noTimestamp` is specified.
+The header can be customized via the `option.header` object.
+
+Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
 Example
 
@@ -52,13 +51,15 @@ Example
 // sign with default (HMAC SHA256)
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+//backdate a jwt 30 seconds
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
 
 // sign with RSA SHA256
 var cert = fs.readFileSync('private.key');  // get private key
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 
 // sign asynchronously
-jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(token) {
+jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
 ```
@@ -82,6 +83,8 @@ encoded public key for RSA and ECDSA.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
+* `clockTolerance`: number of second to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
+
 
 ```js
 // verify a token symmetric - synchronous

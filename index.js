@@ -1,8 +1,5 @@
 var jws = require('jws');
 var ms = require('ms');
-var timespan = require('./lib/timespan');
-var xtend = require('xtend');
-
 var JWT = module.exports;
 
 var JsonWebTokenError = JWT.JsonWebTokenError = require('./lib/JsonWebTokenError');
@@ -38,105 +35,7 @@ JWT.decode = function (jwt, options) {
   return payload;
 };
 
-var payload_options = [
-  'expiresIn',
-  'notBefore',
-  'expiresInMinutes',
-  'expiresInSeconds',
-  'audience',
-  'issuer',
-  'subject',
-  'jwtid'
-];
-
-JWT.sign = function(payload, secretOrPrivateKey, options, callback) {
-  options = options || {};
-  var header = {};
-
-  if (typeof payload === 'object') {
-    header.typ = 'JWT';
-    payload = xtend(payload);
-  } else {
-    var invalid_option = payload_options.filter(function (key) {
-      return typeof options[key] !== 'undefined';
-    })[0];
-
-    if (invalid_option) {
-      console.warn('invalid "' + invalid_option + '" option for ' + (typeof payload) + ' payload');
-    }
-  }
-
-
-  header.alg = options.algorithm || 'HS256';
-
-  if (options.headers) {
-    Object.keys(options.headers).forEach(function (k) {
-      header[k] = options.headers[k];
-    });
-  }
-
-  var timestamp = Math.floor(Date.now() / 1000);
-  if (!options.noTimestamp) {
-    payload.iat = payload.iat || timestamp;
-  }
-
-  if (typeof options.notBefore !== 'undefined') {
-    payload.nbf = timespan(options.notBefore);
-    if (typeof payload.nbf === 'undefined') {
-      throw new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
-    }
-  }
-
-  if (options.expiresInSeconds || options.expiresInMinutes) {
-    var deprecated_line;
-    try {
-      deprecated_line = /.*\((.*)\).*/.exec((new Error()).stack.split('\n')[2])[1];
-    } catch(err) {
-      deprecated_line = '';
-    }
-
-    console.warn('jsonwebtoken: expiresInMinutes and expiresInSeconds is deprecated. (' + deprecated_line + ')\n' +
-                 'Use "expiresIn" expressed in seconds.');
-
-    var expiresInSeconds = options.expiresInMinutes ?
-        options.expiresInMinutes * 60 :
-        options.expiresInSeconds;
-
-    payload.exp = timestamp + expiresInSeconds;
-  } else if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
-    payload.exp = timespan(options.expiresIn);
-    if (typeof payload.exp === 'undefined') {
-      throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
-    }
-  }
-
-  if (options.audience)
-    payload.aud = options.audience;
-
-  if (options.issuer)
-    payload.iss = options.issuer;
-
-  if (options.subject)
-    payload.sub = options.subject;
-
-  if (options.jwtid)
-    payload.jti = options.jwtid;
-
-  var encoding = 'utf8';
-  if (options.encoding) {
-    encoding = options.encoding;
-  }
-
-  if(typeof callback === 'function') {
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: JSON.stringify(payload)
-    }).on('done', callback);
-  } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
-  }
-};
+JWT.sign = require('./sign');
 
 JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -172,12 +71,18 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt malformed'));
   }
 
-  if (parts[2].trim() === '' && secretOrPublicKey){
+  var hasSignature = parts[2].trim() !== '';
+
+  if (!hasSignature && secretOrPublicKey){
     return done(new JsonWebTokenError('jwt signature is required'));
   }
 
-  if (!secretOrPublicKey) {
+  if (hasSignature && !secretOrPublicKey) {
     return done(new JsonWebTokenError('secret or public key must be provided'));
+  }
+
+  if (!hasSignature && !options.algorithms) {
+    options.algorithms = ['none'];
   }
 
   if (!options.algorithms) {
@@ -230,7 +135,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.nbf !== 'number') {
       return done(new JsonWebTokenError('invalid nbf value'));
     }
-    if (payload.nbf > Math.floor(Date.now() / 1000)) {
+    if (payload.nbf > Math.floor(Date.now() / 1000) + (options.clockTolerance || 0)) {
       return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
     }
   }
@@ -239,8 +144,9 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.exp !== 'number') {
       return done(new JsonWebTokenError('invalid exp value'));
     }
-    if (Math.floor(Date.now() / 1000) >= payload.exp)
+    if (Math.floor(Date.now() / 1000) >= payload.exp + (options.clockTolerance || 0)) {
       return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+    }
   }
 
   if (options.audience) {
@@ -280,7 +186,7 @@ JWT.verify = function(jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.iat !== 'number') {
       return done(new JsonWebTokenError('iat required when maxAge is specified'));
     }
-    if (Date.now() - (payload.iat * 1000) > maxAge) {
+    if (Date.now() - (payload.iat * 1000) > maxAge + (options.clockTolerance || 0) * 1000) {
       return done(new TokenExpiredError('maxAge exceeded', new Date(payload.iat * 1000 + maxAge)));
     }
   }

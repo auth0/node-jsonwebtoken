@@ -11,7 +11,7 @@ describe('non_object_values values', function() {
   });
 
   //v6 version will throw in this case:
-  it.skip('should throw with expiresIn', function () {
+  it('should throw with expiresIn', function () {
     expect(function () {
       jwt.sign('hello', '123', { expiresIn: '12h' });
     }).to.throw(/invalid expiresIn option for string payload/);
