@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.2 - 2016-07-12
+
+ - do not stringify the payload when signing async - closes #224 ([084f537d3dfbcef2bea411cc0a1515899cc8aa21](https://github.com/auth0/node-jsonwebtoken/commit/084f537d3dfbcef2bea411cc0a1515899cc8aa21)), closes [#224](https://github.com/auth0/node-jsonwebtoken/issues/224)
+
 ## 7.1.1 - 2016-07-12
 
  - do not mutate options in jwt.verify, closes #227 ([63263a28a268624dab0927b9ad86fffa44a10f84](https://github.com/auth0/node-jsonwebtoken/commit/63263a28a268624dab0927b9ad86fffa44a10f84)), closes [#227](https://github.com/auth0/node-jsonwebtoken/issues/227)
