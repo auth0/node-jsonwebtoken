@@ -4,6 +4,11 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.1 - 2016-07-12
+
+ - do not mutate options in jwt.verify, closes #227 ([63263a28a268624dab0927b9ad86fffa44a10f84](https://github.com/auth0/node-jsonwebtoken/commit/63263a28a268624dab0927b9ad86fffa44a10f84)), closes [#227](https://github.com/auth0/node-jsonwebtoken/issues/227)
+ - refactor into multiple files ([e11d505207fa33501298300c9accbfb809d8748d](https://github.com/auth0/node-jsonwebtoken/commit/e11d505207fa33501298300c9accbfb809d8748d))
+
 ## 7.1.0 - 2016-07-12
 
  - Exp calculated based on iat. fix #217 ([757a16e0e35ad19f9e456820f55d5d9f3fc76aee](https://github.com/auth0/node-jsonwebtoken/commit/757a16e0e35ad19f9e456820f55d5d9f3fc76aee)), closes [#217](https://github.com/auth0/node-jsonwebtoken/issues/217)
