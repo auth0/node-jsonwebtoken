@@ -127,10 +127,9 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     jws.createSign({
       header: header,
       privateKey: secretOrPrivateKey,
-      payload: JSON.stringify(payload),
+      payload: payload,
       encoding: encoding
-    })
-      .once('error', callback)
+    }).once('error', callback)
       .once('done', function (signature) {
         callback(null, signature);
       });

@@ -1,5 +1,6 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
+var jws = require('jws');
 
 describe('signing a token asynchronously', function() {
 
@@ -37,6 +38,14 @@ describe('signing a token asynchronously', function() {
       jwt.sign('string', 'secret', {noTimestamp: true}, function (err) {
         expect(err).to.be.ok();
         expect(err).to.be.instanceof(Error);
+        done();
+      });
+    });
+
+    it('should not stringify the payload', function (done) {
+      jwt.sign('string', 'secret', {}, function (err, token) {
+        if (err) { return done(err); }
+        expect(jws.decode(token).payload).to.equal('string');
         done();
       });
     });
