@@ -18,6 +18,13 @@ describe('signing a token asynchronously', function() {
       });
     });
 
+    it('should work', function (done) {
+      jwt.sign({abc: 1}, "secret", {}, function (err, res) {
+         expect(err).to.not.exist();
+         done();
+      });
+    });
+
     it('should return error when secret is not a cert for RS256', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'RS256' }, function (err) {
