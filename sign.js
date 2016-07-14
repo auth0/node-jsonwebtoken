@@ -2,6 +2,7 @@ var Joi = require('joi');
 var timespan = require('./lib/timespan');
 var xtend = require('xtend');
 var jws = require('jws');
+var cb = require('cb');
 
 var sign_options_schema = Joi.object().keys({
   expiresIn: [Joi.number().integer(), Joi.string()],
@@ -124,6 +125,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   var encoding = options.encoding || 'utf8';
 
   if (typeof callback === 'function') {
+    callback = callback && cb(callback).once();
+
     jws.createSign({
       header: header,
       privateKey: secretOrPrivateKey,

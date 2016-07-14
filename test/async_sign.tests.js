@@ -20,8 +20,8 @@ describe('signing a token asynchronously', function() {
 
     it('should work', function (done) {
       jwt.sign({abc: 1}, "secret", {}, function (err, res) {
-         expect(err).to.not.exist();
-         done();
+        expect(err).to.be.null();
+        done();
       });
     });
 
