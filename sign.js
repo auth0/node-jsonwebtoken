@@ -44,9 +44,12 @@ var options_for_objects = [
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
   options = options || {};
 
+  var isObjectPayload = typeof payload === 'object' &&
+                        !Buffer.isBuffer(payload);
+
   var header = xtend({
     alg: options.algorithm || 'HS256',
-    typ: typeof payload === 'object' ? 'JWT' : undefined
+    typ: isObjectPayload ? 'JWT' : undefined
   }, options.header);
 
   function failure(err) {
@@ -56,9 +59,10 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     throw err;
   }
 
+
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
-  } else if (typeof payload === 'object') {
+  } else if (isObjectPayload) {
     var payload_validation_result = registered_claims_schema.validate(payload);
 
     if (payload_validation_result.error) {
@@ -66,7 +70,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
 
     payload = xtend(payload);
-  } else if (typeof payload !== 'object') {
+  } else {
     var invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
     });
