@@ -4,6 +4,38 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.7 - 2016-07-29
+
+ - Use lodash.once instead of unlicensed/unmaintained cb ([3ac95ad93ef3068a64e03d8d14deff231b1ed529](https://github.com/auth0/node-jsonwebtoken/commit/3ac95ad93ef3068a64e03d8d14deff231b1ed529))
+
+## 7.1.6 - 2016-07-15
+
+ - fix issue with buffer payload. closes #216 ([6b50ff324b4dfd2cb0e49b666f14a6672d015b22](https://github.com/auth0/node-jsonwebtoken/commit/6b50ff324b4dfd2cb0e49b666f14a6672d015b22)), closes [#216](https://github.com/auth0/node-jsonwebtoken/issues/216)
+
+
+## 7.1.5 - 2016-07-15
+
+ - update jws in package.json ([b6260951eefc68aae5f4ede359210761f901ff7a](https://github.com/auth0/node-jsonwebtoken/commit/b6260951eefc68aae5f4ede359210761f901ff7a))
+
+
+## 7.1.4 - 2016-07-14
+
+ - add redundant test ([bece8816096f324511c3efcb8db0e64b75d757a1](https://github.com/auth0/node-jsonwebtoken/commit/bece8816096f324511c3efcb8db0e64b75d757a1))
+ - fix an issue of double callback on error ([758ca5eeca2f1b06c32c9fce70642bf488b2e52b](https://github.com/auth0/node-jsonwebtoken/commit/758ca5eeca2f1b06c32c9fce70642bf488b2e52b))
+
+## 7.1.2 - 2016-07-12
+
+ - do not stringify the payload when signing async - closes #224 ([084f537d3dfbcef2bea411cc0a1515899cc8aa21](https://github.com/auth0/node-jsonwebtoken/commit/084f537d3dfbcef2bea411cc0a1515899cc8aa21)), closes [#224](https://github.com/auth0/node-jsonwebtoken/issues/224)
+
+## 7.1.1 - 2016-07-12
+
+ - do not mutate options in jwt.verify, closes #227 ([63263a28a268624dab0927b9ad86fffa44a10f84](https://github.com/auth0/node-jsonwebtoken/commit/63263a28a268624dab0927b9ad86fffa44a10f84)), closes [#227](https://github.com/auth0/node-jsonwebtoken/issues/227)
+ - refactor into multiple files ([e11d505207fa33501298300c9accbfb809d8748d](https://github.com/auth0/node-jsonwebtoken/commit/e11d505207fa33501298300c9accbfb809d8748d))
+
+## 7.1.0 - 2016-07-12
+
+ - Exp calculated based on iat. fix #217 ([757a16e0e35ad19f9e456820f55d5d9f3fc76aee](https://github.com/auth0/node-jsonwebtoken/commit/757a16e0e35ad19f9e456820f55d5d9f3fc76aee)), closes [#217](https://github.com/auth0/node-jsonwebtoken/issues/217)
+
 ## 7.0.0 - 2016-05-19
 
  - change jwt.sign to return errors on callback instead of throwing errors ([1e46c5a42aa3dab8478efa4081d8f8f5c5485d56](https://github.com/auth0/node-jsonwebtoken/commit/1e46c5a42aa3dab8478efa4081d8f8f5c5485d56))

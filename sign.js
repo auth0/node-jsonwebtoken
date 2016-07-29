@@ -2,17 +2,18 @@ var Joi = require('joi');
 var timespan = require('./lib/timespan');
 var xtend = require('xtend');
 var jws = require('jws');
+var once = require('lodash.once');
 
 var sign_options_schema = Joi.object().keys({
   expiresIn: [Joi.number().integer(), Joi.string()],
   notBefore: [Joi.number().integer(), Joi.string()],
-  audience:  [Joi.string(), Joi.array()],
-  algorithm: Joi.string().valid('RS256','RS384','RS512','ES256','ES384','ES512','HS256','HS384','HS512','none'),
-  header:    Joi.object(),
-  encoding:  Joi.string(),
-  issuer:    Joi.string(),
-  subject:   Joi.string(),
-  jwtid:     Joi.string(),
+  audience: [Joi.string(), Joi.array()],
+  algorithm: Joi.string().valid('RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'),
+  header: Joi.object(),
+  encoding: Joi.string(),
+  issuer: Joi.string(),
+  subject: Joi.string(),
+  jwtid: Joi.string(),
   noTimestamp: Joi.boolean()
 });
 
@@ -25,9 +26,9 @@ var registered_claims_schema = Joi.object().keys({
 
 var options_to_payload = {
   'audience': 'aud',
-  'issuer':   'iss',
-  'subject':  'sub',
-  'jwtid':    'jti'
+  'issuer': 'iss',
+  'subject': 'sub',
+  'jwtid': 'jti'
 };
 
 var options_for_objects = [
@@ -40,24 +41,28 @@ var options_for_objects = [
   'jwtid',
 ];
 
-module.exports = function(payload, secretOrPrivateKey, options, callback) {
+module.exports = function (payload, secretOrPrivateKey, options, callback) {
   options = options || {};
+
+  var isObjectPayload = typeof payload === 'object' &&
+                        !Buffer.isBuffer(payload);
 
   var header = xtend({
     alg: options.algorithm || 'HS256',
-    typ: typeof payload === 'object' ? 'JWT' : undefined
+    typ: isObjectPayload ? 'JWT' : undefined
   }, options.header);
 
-  function failure (err) {
+  function failure(err) {
     if (callback) {
       return callback(err);
     }
     throw err;
   }
 
+
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
-  } else if (typeof payload === 'object') {
+  } else if (isObjectPayload) {
     var payload_validation_result = registered_claims_schema.validate(payload);
 
     if (payload_validation_result.error) {
@@ -65,13 +70,13 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
     }
 
     payload = xtend(payload);
-  } else if (typeof payload !== 'object') {
+  } else {
     var invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
     });
 
     if (invalid_options.length > 0) {
-      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload' ));
+      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload'));
     }
   }
 
@@ -86,7 +91,7 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
   var validation_result = sign_options_schema.validate(options);
 
   if (validation_result.error) {
-   return failure(validation_result.error);
+    return failure(validation_result.error);
   }
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);
@@ -105,7 +110,7 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
   }
 
   if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
-    payload.exp = timespan(options.expiresIn);
+    payload.exp = timespan(options.expiresIn, timestamp);
     if (typeof payload.exp === 'undefined') {
       return failure(new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
@@ -123,17 +128,18 @@ module.exports = function(payload, secretOrPrivateKey, options, callback) {
 
   var encoding = options.encoding || 'utf8';
 
-  if(typeof callback === 'function') {
+  if (typeof callback === 'function') {
+    callback = callback && once(callback);
+
     jws.createSign({
       header: header,
       privateKey: secretOrPrivateKey,
-      payload: JSON.stringify(payload),
+      payload: payload,
       encoding: encoding
-    })
-    .once('error', callback)
-    .once('done', function(signature) {
-      callback(null, signature);
-    });
+    }).once('error', callback)
+      .once('done', function (signature) {
+        callback(null, signature);
+      });
   } else {
     return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
   }
