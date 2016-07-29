@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.7 - 2016-07-29
+
+ - Use lodash.once instead of unlicensed/unmaintained cb ([3ac95ad93ef3068a64e03d8d14deff231b1ed529](https://github.com/auth0/node-jsonwebtoken/commit/3ac95ad93ef3068a64e03d8d14deff231b1ed529))
+
 ## 7.1.6 - 2016-07-15
 
  - fix issue with buffer payload. closes #216 ([6b50ff324b4dfd2cb0e49b666f14a6672d015b22](https://github.com/auth0/node-jsonwebtoken/commit/6b50ff324b4dfd2cb0e49b666f14a6672d015b22)), closes [#216](https://github.com/auth0/node-jsonwebtoken/issues/216)
