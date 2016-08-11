@@ -96,7 +96,13 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if (!valid)
     return done(new JsonWebTokenError('invalid signature'));
 
-  var payload=decodedToken.payload;
+  var payload;
+
+  try {
+    payload = decode(jwtString);
+  } catch(err) {
+    return done(err);
+  }
 
   if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
     if (typeof payload.nbf !== 'number') {

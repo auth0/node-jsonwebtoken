@@ -11,7 +11,7 @@ describe('verify', function() {
   var priv = fs.readFileSync(path.join(__dirname, 'priv.pem'));
 
   it('should first assume JSON claim set', function (done) {
-    var header = { typ: 'JWT', alg: 'RS256' };
+    var header = { alg: 'RS256' };
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     var signed = jws.sign({
@@ -21,7 +21,7 @@ describe('verify', function() {
         encoding: 'utf8'
     });
 
-    jwt.verify(signed, pub, function(err, p) {
+    jwt.verify(signed, pub, {typ: 'JWT'}, function(err, p) {
       assert.isNull(err);
       assert.deepEqual(p, payload);
       done();
@@ -29,7 +29,7 @@ describe('verify', function() {
   });
 
   it('should be able to validate unsigned token', function (done) {
-    var header = { typ: 'JWT', alg: 'none' };
+    var header = { alg: 'none' };
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     var signed = jws.sign({
@@ -39,7 +39,7 @@ describe('verify', function() {
       encoding: 'utf8'
     });
 
-    jwt.verify(signed, null, function(err, p) {
+    jwt.verify(signed, null, {typ: 'JWT'}, function(err, p) {
       assert.isNull(err);
       assert.deepEqual(p, payload);
       done();
@@ -93,7 +93,7 @@ describe('verify', function() {
 
     it('should not error on expired token within clockTolerance interval', function (done) {
       clock = sinon.useFakeTimers(1437018584000);
-      var options = {algorithms: ['HS256'], clockTolerance: 100};
+      var options = {algorithms: ['HS256'], clockTolerance: 100}
 
       jwt.verify(token, key, options, function (err, p) {
         assert.isNull(err);
