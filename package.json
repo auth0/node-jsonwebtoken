@@ -3,6 +3,13 @@
   "version": "7.1.9",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
+  "files": [
+    "lib/",
+    "decode.js",
+    "index.js",
+    "sign.js",
+    "verify.js"
+  ],
   "scripts": {
     "test": "mocha --require test/util/fakeDate"
   },
