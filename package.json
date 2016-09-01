@@ -1,5 +1,5 @@
 {
-  "name": "jsonwebtoken",
+  "name": "dorongrinstein_jsonwebtoken",
   "version": "7.1.9",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/auth0/node-jsonwebtoken"
+    "url": "https://github.com/dorongrinstein/node-jsonwebtoken"
   },
   "keywords": [
     "jwt"
   ],
-  "author": "auth0",
+  "author": "auth0i and Doron Grinstein",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/auth0/node-jsonwebtoken/issues"
+    "url": "https://github.com/dorongrinstein/node-jsonwebtoken/issues"
   },
   "dependencies": {
     "joi": "^6.10.1",
