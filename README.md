@@ -1,4 +1,6 @@
-# jsonwebtoken [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken)[![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken)
+# jsonwebtoken
+
+[![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken)[![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken)
 
 
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
@@ -62,6 +64,37 @@ var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
+```
+
+#### Token Expiration (exp claim)
+
+The standard for JWT defines an `exp` claim for expiration. The expiration is represented as a **NumericDate**:
+
+> A JSON numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds.  This is equivalent to the IEEE Std 1003.1, 2013 Edition [POSIX.1] definition "Seconds Since the Epoch", in which each day is accounted for by exactly 86400 seconds, other than that non-integer values can be represented.  See RFC 3339 [RFC3339] for details regarding date/times in general and UTC in particular.
+
+This means that the `exp` field should contain the number of seconds since the epoch.
+
+Signing a token with 1 hour of expiration:
+
+```javascript
+jwt.sign({
+  exp: Math.floor(Date.now() / 1000) + (60 * 60)
+  data: 'foobar'
+}, 'secret');
+```
+
+Another way to generate a token like this with this library is:
+
+```javascript
+jwt.sign({
+  data: 'foobar'
+}, 'secret', { expiresIn: 60 * 60 });
+
+//or even better:
+
+jwt.sign({
+  data: 'foobar'
+}, 'secret', { expiresIn: '1h' });
 ```
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
