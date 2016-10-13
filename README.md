@@ -114,6 +114,7 @@ encoded public key for RSA and ECDSA.
 * `audience`: if you want to check audience (`aud`), provide a value here
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
+* `expirationRequired` if `true`, an expiration must be specified. May become default in the future.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 * `clockTolerance`: number of second to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers

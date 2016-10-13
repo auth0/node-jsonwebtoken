@@ -113,7 +113,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
   }
 
-  if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
+  if (!options.ignoreExpiration) {
+    if (typeof payload.exp === 'undefined' && options.expirationRequired) {
+      return done(new JsonWebTokenError('exp required when expirationRequired is true'));
+    }
     if (typeof payload.exp !== 'number') {
       return done(new JsonWebTokenError('invalid exp value'));
     }
