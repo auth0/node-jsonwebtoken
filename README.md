@@ -21,7 +21,7 @@ $ npm install jsonwebtoken
 
 (Synchronous) Returns the JsonWebToken as string
 
-`payload` could be an object literal, buffer or string. *Please note that* `exp` is only set if the payload is an object literal.
+`payload` could be an object literal, buffer or string. *Please note that* `exp` is only set if the payload is an object literal. `payload` can be used interchangeably with claim.
 
 `secretOrPrivateKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded private key for RSA and ECDSA.
