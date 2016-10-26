@@ -6,7 +6,7 @@ var assert = require('chai').assert;
 describe('HS256', function() {
 
   describe('when signing a token', function() {
-    var secret = 'shhhhhh';
+    var secret = 'shhhhh';
 
     var token = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
 
@@ -16,17 +16,19 @@ describe('HS256', function() {
     });
 
     it('should without options', function(done) {
-      var callback = function(err, decoded) {
+      var callback = function(decoded) {
         assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         done();
       };
       callback.issuer = "shouldn't affect";
-      jwt.verify(token, secret, callback );
+      jwt.verify(token, secret)
+      .then(callback);
     });
 
     it('should validate with secret', function(done) {
-      jwt.verify(token, secret, function(err, decoded) {
+      jwt.verify(token, secret)
+      .then(function(decoded) {
         assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         done();
@@ -34,7 +36,8 @@ describe('HS256', function() {
     });
 
     it('should throw with invalid secret', function(done) {
-      jwt.verify(token, 'invalid secret', function(err, decoded) {
+      jwt.verify(token, 'invalid secret')
+      .catch(function(err){
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
@@ -44,7 +47,8 @@ describe('HS256', function() {
     it('should throw with secret and token not signed', function(done) {
       var signed = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'none' });
       var unsigned = signed.split('.')[0] + '.' + signed.split('.')[1] + '.';
-      jwt.verify(unsigned, 'secret', function(err, decoded) {
+      jwt.verify(unsigned, 'secret')
+      .catch(function(err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
@@ -52,7 +56,8 @@ describe('HS256', function() {
     });
 
     it('should throw when verifying null', function(done) {
-      jwt.verify(null, 'secret', function(err, decoded) {
+      jwt.verify(null, 'secret')
+      .catch(function(err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
@@ -70,13 +75,13 @@ describe('HS256', function() {
 
     it('should NOT return an error when the token is expired with "ignoreExpiration"', function(done) {
       var token = jwt.sign({ exp: 1, foo: 'bar' }, secret, { algorithm: 'HS256' });
-      jwt.verify(token, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err, decoded) {
+      jwt.verify(token, secret, { algorithm: 'HS256', ignoreExpiration: true })
+      .then(function(decoded) {
         assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         assert.isNull(err);
         done();
       });
     });
-
   });
 });
