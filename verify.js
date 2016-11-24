@@ -34,6 +34,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     };
   }
 
+  if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
+    return done(new JsonWebTokenError('clockTimestamp must be a number'));
+  }
+
+  var clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+
   if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
   }
@@ -112,7 +118,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.nbf !== 'number') {
       return done(new JsonWebTokenError('invalid nbf value'));
     }
-    if (payload.nbf > Math.floor(Date.now() / 1000) + (options.clockTolerance || 0)) {
+    if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
       return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
     }
   }
@@ -121,7 +127,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.exp !== 'number') {
       return done(new JsonWebTokenError('invalid exp value'));
     }
-    if (Math.floor(Date.now() / 1000) >= payload.exp + (options.clockTolerance || 0)) {
+    if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
       return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
     }
   }
@@ -163,7 +169,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (typeof payload.iat !== 'number') {
       return done(new JsonWebTokenError('iat required when maxAge is specified'));
     }
-    if (Date.now() - (payload.iat * 1000) > maxAge + (options.clockTolerance || 0) * 1000) {
+    // We have to compare against either options.clockTimestamp or the currentDate _with_ millis
+    // to not change behaviour (version 7.2.1). Should be resolve somehow for next major.
+    var nowOrClockTimestamp = ((options.clockTimestamp || 0) * 1000) || Date.now();
+    if (nowOrClockTimestamp - (payload.iat * 1000) > maxAge + (options.clockTolerance || 0) * 1000) {
       return done(new TokenExpiredError('maxAge exceeded', new Date(payload.iat * 1000 + maxAge)));
     }
   }

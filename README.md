@@ -117,6 +117,8 @@ encoded public key for RSA and ECDSA.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
+* `maxAge`: the maximum allowed age in milliseconds for tokens to still be valid. We advise against using milliseconds precision, though, since JWTs can only contain seconds. The maximum precision might be reduced to seconds in the future
+* `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons (also against `maxAge`, so our advise is to avoid using `clockTimestamp` and a `maxAge` in milliseconds together)
 
 
 ```js
