@@ -19,24 +19,6 @@ describe('RS256', function() {
       expect(token.split('.')).to.have.length(3);
     });
 
-    context('asynchronous', function() {
-      it('should validate with public key', function(done) {
-        jwt.verify(token, pub, function(err, decoded) {
-          assert.ok(decoded.foo);
-          assert.equal('bar', decoded.foo);
-          done();
-        });
-      });
-
-      it('should throw with invalid public key', function(done) {
-        jwt.verify(token, invalid_pub, function(err, decoded) {
-          assert.isUndefined(decoded);
-          assert.isNotNull(err);
-          done();
-        });
-      });
-    });
-
     context('synchronous', function() {
       it('should validate with public key', function() {
         var decoded = jwt.verify(token, pub);
@@ -55,177 +37,153 @@ describe('RS256', function() {
   describe('when signing a token with expiration', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: '10m' });
 
-    it('should be valid expiration', function(done) {
-      jwt.verify(token, pub, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should be valid expiration', function() {
+      var decoded = jwt.verify(token, pub);
+      assert.isNotNull(decoded);
     });
 
-    it('should be invalid', function(done) {
+    it('should be invalid', function() {
       // expired token
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: -1 * ms('10m') });
-
-      jwt.verify(token, pub, function(err, decoded) {
+      try {
+        var decoded = jwt.verify(token, pub);
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'TokenExpiredError');
         assert.instanceOf(err.expiredAt, Date);
         assert.instanceOf(err, jwt.TokenExpiredError);
-        done();
-      });
+      }
     });
 
-    it('should NOT be invalid', function(done) {
+    it('should NOT be invalid', function() {
       // expired token
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', expiresIn: -1 * ms('10m') });
 
-      jwt.verify(token, pub, { ignoreExpiration: true }, function(err, decoded) {
-        assert.ok(decoded.foo);
-        assert.equal('bar', decoded.foo);
-        done();
-      });
+      var decoded = jwt.verify(token, pub, { ignoreExpiration: true });
+      assert.ok(decoded.foo);
+      assert.equal('bar', decoded.foo);
     });
   });
 
   describe('when signing a token with not before', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: -10 * 3600 });
 
-    it('should be valid expiration', function(done) {
-      jwt.verify(token, pub, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should be valid expiration', function() {
+      var decoded = jwt.verify(token, pub);
+      assert.isNotNull(decoded);
     });
 
-    it('should be invalid', function(done) {
+    it('should be invalid', function() {
       // not active token
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: '10m' });
 
-      jwt.verify(token, pub, function(err, decoded) {
+      try {
+        var decoded = jwt.verify(token, pub);
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'NotBeforeError');
         assert.instanceOf(err.date, Date);
         assert.instanceOf(err, jwt.NotBeforeError);
-        done();
-      });
+      }
     });
 
 
-    it('should valid when date are equals', function(done) {
+    it('should valid when date are equals', function() {
       Date.fix(1451908031);
 
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: 0 });
 
-      jwt.verify(token, pub, function(err, decoded) {
-        assert.isNull(err);
-        assert.isNotNull(decoded);
-        Date.unfix();
-        done();
-      });
+      var decoded = jwt.verify(token, pub);
+      assert.isNotNull(decoded);
+      Date.unfix();
     });
 
-    it('should NOT be invalid', function(done) {
+    it('should NOT be invalid', function() {
       // not active token
       token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', notBefore: '10m' });
 
-      jwt.verify(token, pub, { ignoreNotBefore: true }, function(err, decoded) {
-        assert.ok(decoded.foo);
-        assert.equal('bar', decoded.foo);
-        done();
-      });
+      var decoded = jwt.verify(token, pub, { ignoreNotBefore: true });
+      assert.ok(decoded.foo);
+      assert.equal('bar', decoded.foo);
     });
   });
 
   describe('when signing a token with audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', audience: 'urn:foo' });
 
-    it('should check audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:foo' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check audience', function() {
+      var decoded = jwt.verify(token, pub, { audience: 'urn:foo' });
+      assert.isNotNull(decoded);
     });
 
-    it('should check audience in array', function(done) {
-      jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check audience in array', function() {
+      var decoded = jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] });
+      assert.isNotNull(decoded);
     });
 
-    it('should throw when invalid audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+    it('should throw when invalid audience', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: 'urn:wrong' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
 
-    it('should throw when invalid audience in array', function(done) {
-      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
+    it('should throw when invalid audience in array', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
-
   });
 
   describe('when signing a token with array audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', audience: [ 'urn:foo', 'urn:bar' ] });
 
-    it('should check audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:foo' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check audience', function() {
+      var decoded = jwt.verify(token, pub, { audience: 'urn:foo' });
+      assert.isNotNull(decoded);
     });
 
-    it('should check other audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:bar' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check other audience', function() {
+      var decoded = jwt.verify(token, pub, { audience: 'urn:bar' });
+      assert.isNotNull(decoded);
     });
 
-    it('should check audience in array', function(done) {
-      jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check audience in array', function() {
+      var decoded = jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] });
+      assert.isNotNull(decoded);
     });
 
-    it('should throw when invalid audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+    it('should throw when invalid audience', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: 'urn:wrong' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
 
-    it('should throw when invalid audience in array', function(done) {
-      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
+    it('should throw when invalid audience in array', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
 
   });
@@ -233,24 +191,26 @@ describe('RS256', function() {
   describe('when signing a token without audience', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
-    it('should check audience', function(done) {
-      jwt.verify(token, pub, { audience: 'urn:wrong' }, function(err, decoded) {
+    it('should check audience', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: 'urn:wrong' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
 
-    it('should check audience in array', function(done) {
-      jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function(err, decoded) {
+    it('should check audience in array', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
 
   });
@@ -258,166 +218,159 @@ describe('RS256', function() {
   describe('when signing a token with issuer', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', issuer: 'urn:foo' });
 
-    it('should check issuer', function(done) {
-      jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check issuer', function() {
+      var decoded = jwt.verify(token, pub, { issuer: 'urn:foo' });
+      assert.isNotNull(decoded);
     });
 
-    it('should check the issuer when providing a list of valid issuers', function(done) {
-      jwt.verify(token, pub, { issuer: [ 'urn:foo', 'urn:bar' ] }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check the issuer when providing a list of valid issuers', function() {
+      var decoded = jwt.verify(token, pub, { issuer: [ 'urn:foo', 'urn:bar' ] });
+      assert.isNotNull(decoded);
     });
 
-    it('should throw when invalid issuer', function(done) {
-      jwt.verify(token, pub, { issuer: 'urn:wrong' }, function(err, decoded) {
+    it('should throw when invalid issuer', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { issuer: 'urn:wrong' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when signing a token without issuer', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
-    it('should check issuer', function(done) {
-      jwt.verify(token, pub, { issuer: 'urn:foo' }, function(err, decoded) {
+    it('should check issuer', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { issuer: 'urn:foo' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when signing a token with subject', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', subject: 'subject' });
 
-    it('should check subject', function(done) {
-      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check subject', function() {
+      var decoded = jwt.verify(token, pub, { subject: 'subject' });
+      assert.isNotNull(decoded);
     });
 
-    it('should throw when invalid subject', function(done) {
-      jwt.verify(token, pub, { subject: 'wrongSubject' }, function(err, decoded) {
+    it('should throw when invalid subject', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { subject: 'wrongSubject' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when signing a token without subject', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
-    it('should check subject', function(done) {
-      jwt.verify(token, pub, { subject: 'subject' }, function(err, decoded) {
+    it('should check subject', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { subject: 'subject' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when signing a token with jwt id', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256', jwtid: 'jwtid' });
 
-    it('should check jwt id', function(done) {
-      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
-        assert.isNotNull(decoded);
-        assert.isNull(err);
-        done();
-      });
+    it('should check jwt id', function() {
+      var decoded = jwt.verify(token, pub, { jwtid: 'jwtid' });
+      assert.isNotNull(decoded);
     });
 
-    it('should throw when invalid jwt id', function(done) {
-      jwt.verify(token, pub, { jwtid: 'wrongJwtid' }, function(err, decoded) {
+    it('should throw when invalid jwt id', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { jwtid: 'wrongJwtid' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when signing a token without jwt id', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
-    it('should check jwt id', function(done) {
-      jwt.verify(token, pub, { jwtid: 'jwtid' }, function(err, decoded) {
+    it('should check jwt id', function() {
+      try {
+        var decoded = jwt.verify(token, pub, { jwtid: 'jwtid' });
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
         assert.instanceOf(err, jwt.JsonWebTokenError);
-        done();
-      });
+      }
     });
   });
 
   describe('when verifying a malformed token', function() {
-    it('should throw', function(done) {
-      jwt.verify('fruit.fruit.fruit', pub, function(err, decoded) {
+    it('should throw', function() {
+      try {
+        var decoded = jwt.verify('fruit.fruit.fruit', pub);
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         assert.equal(err.name, 'JsonWebTokenError');
-        done();
-      });
+      }
     });
   });
 
   describe('when decoding a jwt token with additional parts', function() {
     var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
 
-    it('should throw', function(done) {
-      jwt.verify(token + '.foo', pub, function(err, decoded) {
+    it('should throw', function() {
+      try {
+        var decoded = jwt.verify(token + '.foo', pub);
+      } catch (err) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
-        done();
-      });
+      }
     });
   });
 
   describe('when decoding a invalid jwt token', function() {
-    it('should return null', function(done) {
+    it('should return null', function() {
       var payload = jwt.decode('whatever.token');
       assert.isNull(payload);
-      done();
     });
   });
 
   describe('when decoding a valid jwt token', function() {
-    it('should return the payload', function(done) {
+    it('should return the payload', function() {
       var obj     = { foo: 'bar' };
       var token   = jwt.sign(obj, priv, { algorithm: 'RS256' });
       var payload = jwt.decode(token);
       assert.equal(payload.foo, obj.foo);
-      done();
     });
-    it('should return the header and payload and signature if complete option is set', function(done) {
+    it('should return the header and payload and signature if complete option is set', function() {
       var obj     = { foo: 'bar' };
       var token   = jwt.sign(obj, priv, { algorithm: 'RS256' });
       var decoded = jwt.decode(token, { complete: true });
       assert.equal(decoded.payload.foo, obj.foo);
       assert.deepEqual(decoded.header, { typ: 'JWT', alg: 'RS256' });
       assert.ok(typeof decoded.signature == 'string');
-      done();
     });
   });
 });
