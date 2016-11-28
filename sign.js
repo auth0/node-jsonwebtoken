@@ -14,7 +14,8 @@ var sign_options_schema = Joi.object().keys({
   issuer: Joi.string(),
   subject: Joi.string(),
   jwtid: Joi.string(),
-  noTimestamp: Joi.boolean()
+  noTimestamp: Joi.boolean(),
+  keyid: Joi.string()
 });
 
 var registered_claims_schema = Joi.object().keys({
@@ -49,7 +50,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
 
   var header = xtend({
     alg: options.algorithm || 'HS256',
-    typ: isObjectPayload ? 'JWT' : undefined
+    typ: isObjectPayload ? 'JWT' : undefined,
+    kid: options.keyid
   }, options.header);
 
   function failure(err) {
