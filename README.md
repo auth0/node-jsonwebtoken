@@ -40,7 +40,7 @@ encoded private key for RSA and ECDSA.
 
 If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`. These claims can also be provided in the payload directly with `exp`, `nbf`, `aud` and `sub` respectively, but you can't include in both places.
+There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`. These claims can also be provided in the payload directly with `exp`, `nbf`, `aud`, `sub` and `iss` respectively, but you can't include in both places.
 
 
 The header can be customized via the `option.header` object.
