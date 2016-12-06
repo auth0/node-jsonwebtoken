@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.2.0 - 2016-12-06
+
+ - improve the documentation for expiration ([771e0b5f9bed90771fb79140eb38e51a3ecac8f0](https://github.com/auth0/node-jsonwebtoken/commit/771e0b5f9bed90771fb79140eb38e51a3ecac8f0))
+ - Restructured a sentence ([ccc7610187a862f7a50177eadc9152eef26cd065](https://github.com/auth0/node-jsonwebtoken/commit/ccc7610187a862f7a50177eadc9152eef26cd065))
+ - Allow `keyid` on `sign`. ([b412be91b89acb3a742bb609d3b54e47e1dfc441](https://github.com/auth0/node-jsonwebtoken/commit/b412be91b89acb3a742bb609d3b54e47e1dfc441))
+ - upgrade joi ([715e3d928023d414d45c6dc3f096a7c8448139ae](https://github.com/auth0/node-jsonwebtoken/commit/715e3d928023d414d45c6dc3f096a7c8448139ae))
+ - upgrade to latest nodes and Travis infrastructure ([3febcc1dd23ecdec1abbf89313959941d15eb47a](https://github.com/auth0/node-jsonwebtoken/commit/3febcc1dd23ecdec1abbf89313959941d15eb47a))
+
+
 ## 7.1.10 - 2016-12-06
 
  - Bump node-jws version number ([07813dd7194630c9f452684279178af76464a759](https://github.com/auth0/node-jsonwebtoken/commit/07813dd7194630c9f452684279178af76464a759))
