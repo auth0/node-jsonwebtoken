@@ -4,6 +4,24 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.10 - 2016-12-06
+
+ - Bump node-jws version number ([07813dd7194630c9f452684279178af76464a759](https://github.com/auth0/node-jsonwebtoken/commit/07813dd7194630c9f452684279178af76464a759))
+ - improve the documentation for expiration ([771e0b5f9bed90771fb79140eb38e51a3ecac8f0](https://github.com/auth0/node-jsonwebtoken/commit/771e0b5f9bed90771fb79140eb38e51a3ecac8f0))
+
+## 7.1.9 - 2016-08-11
+
+ - Revert "Merge branch 'venatir-master'" ([d06359ef3b4e619680e043ee7c16adda16598f52](https://github.com/auth0/node-jsonwebtoken/commit/d06359ef3b4e619680e043ee7c16adda16598f52))
+
+
+
+## 7.1.8 - 2016-08-10
+
+ - Fixed tests, however typ: 'JWT' should not be in the options at all, so please review other tests ([01903bcdc61b4ed429acbbd1fe0ffe0db364473b](https://github.com/auth0/node-jsonwebtoken/commit/01903bcdc61b4ed429acbbd1fe0ffe0db364473b))
+ - Removing unnecessary extra decoding. jwtString is already verified as valid and signature checked ([55d5834f7b637011e1d8b927ff78a92a5fd521cf](https://github.com/auth0/node-jsonwebtoken/commit/55d5834f7b637011e1d8b927ff78a92a5fd521cf))
+ - update changelog ([5117aacd0118a10331889a64e61d8186112d8a23](https://github.com/auth0/node-jsonwebtoken/commit/5117aacd0118a10331889a64e61d8186112d8a23))
+
+
 ## 7.1.7 - 2016-07-29
 
  - Use lodash.once instead of unlicensed/unmaintained cb ([3ac95ad93ef3068a64e03d8d14deff231b1ed529](https://github.com/auth0/node-jsonwebtoken/commit/3ac95ad93ef3068a64e03d8d14deff231b1ed529))
