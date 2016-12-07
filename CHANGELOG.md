@@ -4,6 +4,11 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.2.1 - 2016-12-07
+
+ - add nsp check to find vulnerabilities on npm test ([4219c34b5346811c07f520f10516cc495bcc70dd](https://github.com/auth0/node-jsonwebtoken/commit/4219c34b5346811c07f520f10516cc495bcc70dd))
+ - revert to joi@^6 to keep ES5 compatibility ([51d4796c07344bf817687f7ccfeef78f00bf5b4f](https://github.com/auth0/node-jsonwebtoken/commit/51d4796c07344bf817687f7ccfeef78f00bf5b4f))
+
 ## 7.2.0 - 2016-12-06
 
  - improve the documentation for expiration ([771e0b5f9bed90771fb79140eb38e51a3ecac8f0](https://github.com/auth0/node-jsonwebtoken/commit/771e0b5f9bed90771fb79140eb38e51a3ecac8f0))
