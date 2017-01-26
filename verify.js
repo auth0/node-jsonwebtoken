@@ -21,12 +21,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   var done;
 
   if (callback) {
-    done = function() {
-      var args = Array.prototype.slice.call(arguments, 0);
-      return process.nextTick(function() {
-        callback.apply(null, args);
-      });
-    };
+    done = callback;
   } else {
     done = function(err, data) {
       if (err) throw err;
