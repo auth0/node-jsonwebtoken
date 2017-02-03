@@ -78,7 +78,7 @@ Signing a token with 1 hour of expiration:
 
 ```javascript
 jwt.sign({
-  exp: Math.floor(Date.now() / 1000) + (60 * 60)
+  exp: Math.floor(Date.now() / 1000) + (60 * 60),
   data: 'foobar'
 }, 'secret');
 ```
