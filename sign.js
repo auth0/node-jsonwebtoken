@@ -45,6 +45,10 @@ var options_for_objects = [
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
   options = options || {};
 
+  if(secretOrPrivateKey.length < 8){
+    console.warn("The key must be 8 characters or more")
+  }
+
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
