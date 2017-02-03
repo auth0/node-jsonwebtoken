@@ -38,6 +38,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt must be provided'));
   }
 
+  if (typeof jwtString !== 'string') {
+    return done(new JsonWebTokenError('jwt must be a string'));
+  }
+
   var parts = jwtString.split('.');
 
   if (parts.length !== 3){
