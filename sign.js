@@ -42,7 +42,7 @@ var options_for_objects = [
   'jwtid',
 ];
 
-module.exports = function (payload, secretOrPrivateKey, options, callback) {
+module.exports = function (payload, secretOrPrivateKey, options) {
   options = options || {};
 
   var isObjectPayload = typeof payload === 'object' &&
@@ -54,21 +54,13 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     kid: options.keyid
   }, options.header);
 
-  function failure(err) {
-    if (callback) {
-      return callback(err);
-    }
-    throw err;
-  }
-
-
   if (typeof payload === 'undefined') {
-    return failure(new Error('payload is required'));
+    throw new Error('payload is required');
   } else if (isObjectPayload) {
     var payload_validation_result = registered_claims_schema.validate(payload);
 
     if (payload_validation_result.error) {
-      return failure(payload_validation_result.error);
+      throw payload_validation_result.error;
     }
 
     payload = xtend(payload);
@@ -78,22 +70,22 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     });
 
     if (invalid_options.length > 0) {
-      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload'));
+      throw new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload');
     }
   }
 
   if (typeof payload.exp !== 'undefined' && typeof options.expiresIn !== 'undefined') {
-    return failure(new Error('Bad "options.expiresIn" option the payload already has an "exp" property.'));
+    throw new Error('Bad "options.expiresIn" option the payload already has an "exp" property.');
   }
 
   if (typeof payload.nbf !== 'undefined' && typeof options.notBefore !== 'undefined') {
-    return failure(new Error('Bad "options.notBefore" option the payload already has an "nbf" property.'));
+    throw new Error('Bad "options.notBefore" option the payload already has an "nbf" property.');
   }
 
   var validation_result = sign_options_schema.validate(options);
 
   if (validation_result.error) {
-    return failure(validation_result.error);
+    throw validation_result.error;
   }
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);
@@ -107,14 +99,14 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   if (typeof options.notBefore !== 'undefined') {
     payload.nbf = timespan(options.notBefore);
     if (typeof payload.nbf === 'undefined') {
-      return failure(new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+      throw new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
     }
   }
 
   if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
     payload.exp = timespan(options.expiresIn, timestamp);
     if (typeof payload.exp === 'undefined') {
-      return failure(new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+      throw new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
     }
   }
 
@@ -122,7 +114,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     var claim = options_to_payload[key];
     if (typeof options[key] !== 'undefined') {
       if (typeof payload[claim] !== 'undefined') {
-        return failure(new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.'));
+        throw new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.');
       }
       payload[claim] = options[key];
     }
@@ -130,19 +122,5 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
 
   var encoding = options.encoding || 'utf8';
 
-  if (typeof callback === 'function') {
-    callback = callback && once(callback);
-
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: payload,
-      encoding: encoding
-    }).once('error', callback)
-      .once('done', function (signature) {
-        callback(null, signature);
-      });
-  } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
-  }
+  return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
 };
