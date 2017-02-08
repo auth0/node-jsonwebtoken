@@ -68,15 +68,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   }
 
-  var decodedToken;
-  try {
-    decodedToken = jws.decode(jwtString);
-  } catch(err) {
-    return done(new JsonWebTokenError('jws threw an exception while decoding the token'));
-  }
+  var decodedToken = jws.decode(jwtString);
 
   if (!decodedToken) {
-    return done(new JsonWebTokenError('jws failed to decode the token'));
+    return done(new JsonWebTokenError('invalid token'));
   }
 
   var header = decodedToken.header;
