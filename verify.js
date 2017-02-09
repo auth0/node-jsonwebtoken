@@ -76,7 +76,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   try {
     decodedToken = jws.decode(jwtString);
   } catch(err) {
-    return done(new JsonWebTokenError('invalid token'));
+    return done(err);
   }
 
   if (!decodedToken) {

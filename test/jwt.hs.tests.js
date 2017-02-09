@@ -77,6 +77,21 @@ describe('HS256', function() {
         done();
       });
     });
-
   });
+
+  describe('should fail verification gracefully with trailing space in the jwt', function() {
+    var secret = 'shhhhhh';
+    var token  = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
+
+    it('should return the "invalid token" error', function(done) {
+      var malformedToken = token + ' '; // corrupt the token by adding a space
+      jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err, decoded) {
+        assert.isNotNull(err);
+        assert.equal('JsonWebTokenError', err.name);
+        assert.equal('invalid token', err.message);
+        done();
+      });
+    });
+  });
+
 });
