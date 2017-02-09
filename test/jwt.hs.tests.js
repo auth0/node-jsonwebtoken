@@ -79,7 +79,7 @@ describe('HS256', function() {
     });
   });
 
-  describe('should fail verification graceflly with trailing space in the jwt', function() {
+  describe('should fail verification gracefully with trailing space in the jwt', function() {
     var secret = 'shhhhhh';
     var token  = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
 
