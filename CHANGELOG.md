@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.3.0 - 2017-02-13
+
+ - Add more information to `maxAge` option in README ([1b0592e99cc8def293eed177e2575fa7f1cf7aa5](https://github.com/auth0/node-jsonwebtoken/commit/1b0592e99cc8def293eed177e2575fa7f1cf7aa5))
+ - Add `clockTimestamp` option to `verify()` you can set the current time in seconds with it (#274) ([8fdc1504f4325e7003894ffea078da9cba5208d9](https://github.com/auth0/node-jsonwebtoken/commit/8fdc1504f4325e7003894ffea078da9cba5208d9))
+ - Fix handling non string tokens on `verify()` input (#305) ([1b6ec8d466504f58c5a6e2dae3360c828bad92fb](https://github.com/auth0/node-jsonwebtoken/commit/1b6ec8d466504f58c5a6e2dae3360c828bad92fb)), closes [#305](https://github.com/auth0/node-jsonwebtoken/issues/305)
+ - Fixed a simple typo in docs (#287) ([a54240384e24e18c00e75884295306db311d0cb7](https://github.com/auth0/node-jsonwebtoken/commit/a54240384e24e18c00e75884295306db311d0cb7)), closes [#287](https://github.com/auth0/node-jsonwebtoken/issues/287)
+ - Raise jws.decode error to avoid confusion with "invalid token" error  (#294) ([7f68fe06c88d5c5653785bd66bc68c5b20e1bd8e](https://github.com/auth0/node-jsonwebtoken/commit/7f68fe06c88d5c5653785bd66bc68c5b20e1bd8e))
+ - rauchg/ms.js changed to zeit/ms (#303) ([35d84152a6b716d757cb5b1dd3c79fe3a1bc0628](https://github.com/auth0/node-jsonwebtoken/commit/35d84152a6b716d757cb5b1dd3c79fe3a1bc0628))
+
 ## 7.2.1 - 2016-12-07
 
  - add nsp check to find vulnerabilities on npm test ([4219c34b5346811c07f520f10516cc495bcc70dd](https://github.com/auth0/node-jsonwebtoken/commit/4219c34b5346811c07f520f10516cc495bcc70dd))
