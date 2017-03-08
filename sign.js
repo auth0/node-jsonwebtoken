@@ -43,7 +43,12 @@ var options_for_objects = [
 ];
 
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
-  options = options || {};
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
+  } else {
+    options = options || {};
+  }
 
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);

@@ -15,7 +15,7 @@ $ npm install jsonwebtoken
 
 # Usage
 
-### jwt.sign(payload, secretOrPrivateKey, options, [callback])
+### jwt.sign(payload, secretOrPrivateKey, [options, callback])
 
 (Asynchronous) If a callback is supplied, callback is called with the `err` or the JWT.
 
