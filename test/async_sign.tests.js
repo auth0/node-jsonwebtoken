@@ -18,8 +18,15 @@ describe('signing a token asynchronously', function() {
       });
     });
 
-    it('should work', function (done) {
+    it('should work with empty options', function (done) {
       jwt.sign({abc: 1}, "secret", {}, function (err, res) {
+        expect(err).to.be.null();
+        done();
+      });
+    });
+
+    it('should work without options object at all', function (done) {
+      jwt.sign({abc: 1}, "secret", function (err, res) {
         expect(err).to.be.null();
         done();
       });

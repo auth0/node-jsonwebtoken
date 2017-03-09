@@ -15,7 +15,7 @@ describe('HS256', function() {
       expect(token.split('.')).to.have.length(3);
     });
 
-    it('should without options', function(done) {
+    it('should be able to validate without options', function(done) {
       var callback = function(err, decoded) {
         assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
@@ -76,6 +76,13 @@ describe('HS256', function() {
         assert.isNull(err);
         done();
       });
+    });
+
+    it('should default to HS256 algorithm when no options are passed', function() {
+      var token = jwt.sign({ foo: 'bar' }, secret);
+      var verifiedToken = jwt.verify(token, secret);
+      assert.ok(verifiedToken.foo);
+      assert.equal('bar', verifiedToken.foo);
     });
   });
 
