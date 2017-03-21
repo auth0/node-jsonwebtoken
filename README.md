@@ -42,6 +42,8 @@ If `payload` is not a buffer or a string, it will be coerced into a string using
 
 There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`. These claims can also be provided in the payload directly with `exp`, `nbf`, `aud`, `sub` and `iss` respectively, but you can't include in both places.
 
+Remember that `exp`, `nbf` and `iat` are **NumericDate**, see related [Token Expiration (exp claim)](#token-expiration-exp-claim)
+
 
 The header can be customized via the `option.header` object.
 
