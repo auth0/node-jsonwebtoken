@@ -4,5 +4,4 @@ before_install: npm i -g npm
 node_js:
   - "7"
   - "6"
-  - "5"
   - "4"
