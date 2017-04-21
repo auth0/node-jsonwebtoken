@@ -164,6 +164,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
   }
 
+  if (options.nonce) {
+    if (payload.nonce !== options.nonce) {
+      return done(new JsonWebTokenError('jwt nonce invalid. expected: ' + options.nonce));
+    }
+  }
+
   if (options.maxAge) {
     var maxAge = ms(options.maxAge);
     if (typeof payload.iat !== 'number') {
