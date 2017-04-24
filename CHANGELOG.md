@@ -4,6 +4,11 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.4.0 - 2017-04-24
+
+ - Add docs about numeric date fields ([659f73119900a4d837650d9b3f5af4e64a2f843b](https://github.com/auth0/node-jsonwebtoken/commit/659f73119900a4d837650d9b3f5af4e64a2f843b))
+ - Make Options object optional for callback-ish sign ([e202c4fd00c35a24e9ab606eab89186ade13d0cc](https://github.com/auth0/node-jsonwebtoken/commit/e202c4fd00c35a24e9ab606eab89186ade13d0cc))
+
 ## 7.3.0 - 2017-02-13
 
  - Add more information to `maxAge` option in README ([1b0592e99cc8def293eed177e2575fa7f1cf7aa5](https://github.com/auth0/node-jsonwebtoken/commit/1b0592e99cc8def293eed177e2575fa7f1cf7aa5))
