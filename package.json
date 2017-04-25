@@ -10,6 +10,11 @@
     "type": "git",
     "url": "https://github.com/auth0/node-jsonwebtoken"
   },
+  "files": [
+    "lib",
+    "index.js",
+    "sign.js"
+  ],
   "keywords": [
     "jwt"
   ],
