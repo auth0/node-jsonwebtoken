@@ -128,7 +128,7 @@ encoded public key for RSA and ECDSA.
 var decoded = jwt.verify(token, 'shhhhh');
 console.log(decoded.foo) // bar
 
-// verify a token symmetric
+// verify a token asymmetric
 jwt.verify(token, 'shhhhh', function(err, decoded) {
   console.log(decoded.foo) // bar
 });
