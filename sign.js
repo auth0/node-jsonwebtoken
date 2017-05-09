@@ -1,29 +1,52 @@
-var Joi = require('joi');
 var timespan = require('./lib/timespan');
 var xtend = require('xtend');
 var jws = require('jws');
+var includes = require('lodash.includes');
+var isArray = require('lodash.isarray');
+var isBoolean = require('lodash.isboolean');
+var isInteger = require('lodash.isinteger');
+var isNumber = require('lodash.isnumber');
+var isPlainObject = require('lodash.isplainobject');
+var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
-var sign_options_schema = Joi.object().keys({
-  expiresIn: [Joi.number().integer(), Joi.string()],
-  notBefore: [Joi.number().integer(), Joi.string()],
-  audience: [Joi.string(), Joi.array()],
-  algorithm: Joi.string().valid('RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'),
-  header: Joi.object(),
-  encoding: Joi.string(),
-  issuer: Joi.string(),
-  subject: Joi.string(),
-  jwtid: Joi.string(),
-  noTimestamp: Joi.boolean(),
-  keyid: Joi.string()
-});
+var sign_options_schema = {
+  expiresIn: function(value) { return isInteger(value) || isString(value); },
+  notBefore: function(value) { return isInteger(value) || isString(value); },
+  audience: function(value) { return isString(value) || isArray(value); },
+  algorithm: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']),
+  header: isPlainObject,
+  encoding: isString,
+  issuer: isString,
+  subject: isString,
+  jwtid: isString,
+  noTimestamp: isBoolean,
+  keyid: isString
+};
 
-var registered_claims_schema = Joi.object().keys({
-  iat: Joi.number(),
-  exp: Joi.number(),
-  nbf: Joi.number()
-}).unknown();
+var registered_claims_schema = {
+  iat: isNumber,
+  exp: isNumber,
+  nbf: isNumber
+};
 
+function validate(schema, unknown, object) {
+  if (!isPlainObject(object)) {
+    throw new Error('Expected object');
+  }
+  Object.keys(object)
+    .forEach(function(key) {
+      if (schema[key] == null) {
+        if (!unknown) {
+          throw new Error('"' + key + '" is not allowed');
+        }
+        return;
+      }
+      if (!schema[key](object[key])) {
+        throw new Error('"' + key + '" is not the correct type');
+      }
+    });
+}
 
 var options_to_payload = {
   'audience': 'aud',
@@ -73,12 +96,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
   } else if (isObjectPayload) {
-    var payload_validation_result = registered_claims_schema.validate(payload);
-
-    if (payload_validation_result.error) {
-      return failure(payload_validation_result.error);
+    try {
+      validate(registered_claims_schema, true, payload);
     }
-
+    catch (error) {
+      return failure(error);
+    }
     payload = xtend(payload);
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
@@ -98,10 +121,11 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('Bad "options.notBefore" option the payload already has an "nbf" property.'));
   }
 
-  var validation_result = sign_options_schema.validate(options);
-
-  if (validation_result.error) {
-    return failure(validation_result.error);
+  try {
+    validate(sign_options_schema, false, options);
+  }
+  catch (error) {
+    return failure(error);
   }
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);

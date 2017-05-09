@@ -16,7 +16,7 @@ describe('iat', function () {
   it('should throw if iat is not a number', function () {
     expect(function () {
       jwt.sign({foo: 123, iat: 'hello'}, '123');
-    }).to.throw(/"iat" must be a number/);
+    }).to.throw(/"iat" is not the correct type/);
   });
 
 });
