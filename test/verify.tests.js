@@ -68,8 +68,8 @@ describe('verify', function() {
   });
 
   describe('expiration', function () {
-    // { foo: 'bar', iat: 1437018582, exp: 1437018583 }
-    var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU4M30.NmMv7sXjM1dW0eALNXud8LoXknZ0mH14GtnFclwJv0s';
+    // { foo: 'bar', iat: 1437018582, exp: 1437018592 }
+    var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU5Mn0.3aR3vocmgRpG05rsI9MpR6z2T_BGtMQaPq2YR6QaroU';
     var key = 'key';
 
     var clock;
@@ -78,22 +78,22 @@ describe('verify', function() {
     });
 
     it('should error on expired token', function (done) {
-      clock = sinon.useFakeTimers(1437018650000);
+      clock = sinon.useFakeTimers(1437018650000); // iat + 58s, exp + 48s
       var options = {algorithms: ['HS256']};
 
       jwt.verify(token, key, options, function (err, p) {
         assert.equal(err.name, 'TokenExpiredError');
         assert.equal(err.message, 'jwt expired');
         assert.equal(err.expiredAt.constructor.name, 'Date');
-        assert.equal(Number(err.expiredAt), 1437018583000);
+        assert.equal(Number(err.expiredAt), 1437018592000);
         assert.isUndefined(p);
         done();
       });
     });
 
     it('should not error on expired token within clockTolerance interval', function (done) {
-      clock = sinon.useFakeTimers(1437018584000);
-      var options = {algorithms: ['HS256'], clockTolerance: 100}
+      clock = sinon.useFakeTimers(1437018594000); // iat + 12s, exp + 2s
+      var options = {algorithms: ['HS256'], clockTolerance: 5 }
 
       jwt.verify(token, key, options, function (err, p) {
         assert.isNull(err);
@@ -103,8 +103,8 @@ describe('verify', function() {
     });
 
     it('should not error if within maxAge timespan', function (done) {
-      clock = sinon.useFakeTimers(1437018582500);
-      var options = {algorithms: ['HS256'], maxAge: '600ms'};
+      clock = sinon.useFakeTimers(1437018587500); // iat + 5.5s, exp - 4.5s
+      var options = {algorithms: ['HS256'], maxAge: '6s'};
 
       jwt.verify(token, key, options, function (err, p) {
         assert.isNull(err);
@@ -114,70 +114,83 @@ describe('verify', function() {
     });
 
     describe('option: maxAge', function () {
-      it('should error for claims issued before a certain timespan', function (done) {
-        clock = sinon.useFakeTimers(1437018582500);
-        var options = {algorithms: ['HS256'], maxAge: '321ms'};
 
-        jwt.verify(token, key, options, function (err, p) {
-          assert.equal(err.name, 'TokenExpiredError');
-          assert.equal(err.message, 'maxAge exceeded');
-          assert.equal(err.expiredAt.constructor.name, 'Date');
-          assert.equal(Number(err.expiredAt), 1437018582321);
-          assert.isUndefined(p);
-          done();
+      ['3s', 3].forEach(function(maxAge) {
+        it(`should error for claims issued before a certain timespan (${typeof maxAge} type)`, function (done) {
+          clock = sinon.useFakeTimers(1437018587000); // iat + 5s, exp - 5s
+          var options = {algorithms: ['HS256'], maxAge: maxAge};
+
+          jwt.verify(token, key, options, function (err, p) {
+            assert.equal(err.name, 'TokenExpiredError');
+            assert.equal(err.message, 'maxAge exceeded');
+            assert.equal(err.expiredAt.constructor.name, 'Date');
+            assert.equal(Number(err.expiredAt), 1437018585000);
+            assert.isUndefined(p);
+            done();
+          });
         });
       });
 
-      it('should not error for claims issued before a certain timespan but still inside clockTolerance timespan', function (done) {
-        clock = sinon.useFakeTimers(1437018582500);
-        var options = {algorithms: ['HS256'], maxAge: '321ms', clockTolerance: 100};
+      ['5s', 5].forEach(function (maxAge) {
+        it(`should not error for claims issued before a certain timespan but still inside clockTolerance timespan (${typeof maxAge} type)`, function (done) {
+          clock = sinon.useFakeTimers(1437018587500); // iat + 5.5s, exp - 4.5s
+          var options = {algorithms: ['HS256'], maxAge: maxAge, clockTolerance: 1 };
 
-        jwt.verify(token, key, options, function (err, p) {
-          assert.isNull(err);
-          assert.equal(p.foo, 'bar');
-          done();
+          jwt.verify(token, key, options, function (err, p) {
+            assert.isNull(err);
+            assert.equal(p.foo, 'bar');
+            done();
+          });
         });
       });
 
-      it('should not error if within maxAge timespan', function (done) {
-        clock = sinon.useFakeTimers(1437018582500);
-        var options = {algorithms: ['HS256'], maxAge: '600ms'};
+      ['6s', 6].forEach(function (maxAge) {
+        it(`should not error if within maxAge timespan (${typeof maxAge} type)`, function (done) {
+          clock = sinon.useFakeTimers(1437018587500);// iat + 5.5s, exp - 4.5s
+          var options = {algorithms: ['HS256'], maxAge: maxAge};
 
-        jwt.verify(token, key, options, function (err, p) {
-          assert.isNull(err);
-          assert.equal(p.foo, 'bar');
-          done();
+          jwt.verify(token, key, options, function (err, p) {
+            assert.isNull(err);
+            assert.equal(p.foo, 'bar');
+            done();
+          });
         });
       });
-      it('can be more restrictive than expiration', function (done) {
-        clock = sinon.useFakeTimers(1437018582900);
-        var options = {algorithms: ['HS256'], maxAge: '800ms'};
 
-        jwt.verify(token, key, options, function (err, p) {
-          assert.equal(err.name, 'TokenExpiredError');
-          assert.equal(err.message, 'maxAge exceeded');
-          assert.equal(err.expiredAt.constructor.name, 'Date');
-          assert.equal(Number(err.expiredAt), 1437018582800);
-          assert.isUndefined(p);
-          done();
+      ['8s', 8].forEach(function (maxAge) {
+        it(`can be more restrictive than expiration (${typeof maxAge} type)`, function (done) {
+          clock = sinon.useFakeTimers(1437018591900); // iat + 9.9s, exp - 0.1s
+          var options = {algorithms: ['HS256'], maxAge: maxAge };
+
+          jwt.verify(token, key, options, function (err, p) {
+            assert.equal(err.name, 'TokenExpiredError');
+            assert.equal(err.message, 'maxAge exceeded');
+            assert.equal(err.expiredAt.constructor.name, 'Date');
+            assert.equal(Number(err.expiredAt), 1437018590000);
+            assert.isUndefined(p);
+            done();
+          });
         });
       });
-      it('cannot be more permissive than expiration', function (done) {
-        clock = sinon.useFakeTimers(1437018583100);
-        var options = {algorithms: ['HS256'], maxAge: '1200ms'};
 
-        jwt.verify(token, key, options, function (err, p) {
-          // maxAge not exceded, but still expired
-          assert.equal(err.name, 'TokenExpiredError');
-          assert.equal(err.message, 'jwt expired');
-          assert.equal(err.expiredAt.constructor.name, 'Date');
-          assert.equal(Number(err.expiredAt), 1437018583000);
-          assert.isUndefined(p);
-          done();
+      ['12s', 12].forEach(function (maxAge) {
+        it(`cannot be more permissive than expiration (${typeof maxAge} type)`, function (done) {
+          clock = sinon.useFakeTimers(1437018593000); // iat + 11s, exp + 1s
+          var options = {algorithms: ['HS256'], maxAge: '12s'};
+
+          jwt.verify(token, key, options, function (err, p) {
+            // maxAge not exceded, but still expired
+            assert.equal(err.name, 'TokenExpiredError');
+            assert.equal(err.message, 'jwt expired');
+            assert.equal(err.expiredAt.constructor.name, 'Date');
+            assert.equal(Number(err.expiredAt), 1437018592000);
+            assert.isUndefined(p);
+            done();
+          });
         });
       });
+
       it('should error if maxAge is specified but there is no iat claim', function (done) {
-        clock = sinon.useFakeTimers(1437018582900);
         var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmb28iOiJiYXIifQ.0MBPd4Bru9-fK_HY3xmuDAc6N_embknmNuhdb9bKL_U';
         var options = {algorithms: ['HS256'], maxAge: '1s'};
 
@@ -249,7 +262,7 @@ describe('verify', function() {
     });
 
     describe('option: maxAge and clockTimestamp', function () {
-      // { foo: 'bar', iat: 1437018582, exp: 1437018800 }
+      // { foo: 'bar', iat: 1437018582, exp: 1437018800 } exp = iat + 218s
       var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODgwMH0.AVOsNC7TiT-XVSpCpkwB1240izzCIJ33Lp07gjnXVpA';
       it('should error for claims issued before a certain timespan', function (done) {
         var clockTimestamp = 1437018682;
@@ -265,12 +278,12 @@ describe('verify', function() {
         });
       });
       it('should not error for claims issued before a certain timespan but still inside clockTolerance timespan', function (done) {
-        var clockTimestamp = 1437018582;
+        var clockTimestamp = 1437018592; // iat + 10s
         var options = {
           algorithms: ['HS256'],
           clockTimestamp: clockTimestamp,
-          maxAge: '321ms',
-          clockTolerance: 100
+          maxAge: '3s',
+          clockTolerance: 10
         };
 
         jwt.verify(token, key, options, function (err, p) {
@@ -280,8 +293,8 @@ describe('verify', function() {
         });
       });
       it('should not error if within maxAge timespan', function (done) {
-        var clockTimestamp = 1437018582;
-        var options = {algorithms: ['HS256'], clockTimestamp: clockTimestamp, maxAge: '600ms'};
+        var clockTimestamp = 1437018587; // iat + 5s
+        var options = {algorithms: ['HS256'], clockTimestamp: clockTimestamp, maxAge: '6s'};
 
         jwt.verify(token, key, options, function (err, p) {
           assert.isNull(err);
@@ -290,7 +303,7 @@ describe('verify', function() {
         });
       });
       it('can be more restrictive than expiration', function (done) {
-        var clockTimestamp = 1437018588;
+        var clockTimestamp = 1437018588; // iat + 6s
         var options = {algorithms: ['HS256'], clockTimestamp: clockTimestamp, maxAge: '5s'};
 
         jwt.verify(token, key, options, function (err, p) {
@@ -303,7 +316,7 @@ describe('verify', function() {
         });
       });
       it('cannot be more permissive than expiration', function (done) {
-        var clockTimestamp = 1437018900;
+        var clockTimestamp = 1437018900;  // iat + 318s (exp: iat + 218s)
         var options = {algorithms: ['HS256'], clockTimestamp: clockTimestamp, maxAge: '1000y'};
 
         jwt.verify(token, key, options, function (err, p) {

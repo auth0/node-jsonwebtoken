@@ -2,8 +2,8 @@ var JsonWebTokenError = require('./lib/JsonWebTokenError');
 var NotBeforeError    = require('./lib/NotBeforeError');
 var TokenExpiredError = require('./lib/TokenExpiredError');
 var decode            = require('./decode');
+var timespan          = require('./lib/timespan');
 var jws               = require('jws');
-var ms                = require('ms');
 var xtend             = require('xtend');
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
@@ -165,15 +165,13 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   if (options.maxAge) {
-    var maxAge = ms(options.maxAge);
     if (typeof payload.iat !== 'number') {
       return done(new JsonWebTokenError('iat required when maxAge is specified'));
     }
-    // We have to compare against either options.clockTimestamp or the currentDate _with_ millis
-    // to not change behaviour (version 7.2.1). Should be resolve somehow for next major.
-    var nowOrClockTimestamp = ((options.clockTimestamp || 0) * 1000) || Date.now();
-    if (nowOrClockTimestamp - (payload.iat * 1000) > maxAge + (options.clockTolerance || 0) * 1000) {
-      return done(new TokenExpiredError('maxAge exceeded', new Date(payload.iat * 1000 + maxAge)));
+
+    var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
+    if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
+      return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
     }
   }
 
