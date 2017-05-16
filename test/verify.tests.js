@@ -115,7 +115,7 @@ describe('verify', function() {
 
     describe('option: maxAge', function () {
 
-      ['3s', 3].forEach(function(maxAge) {
+      [String('3s'), '3s', 3].forEach(function(maxAge) {
         it(`should error for claims issued before a certain timespan (${typeof maxAge} type)`, function (done) {
           clock = sinon.useFakeTimers(1437018587000); // iat + 5s, exp - 5s
           var options = {algorithms: ['HS256'], maxAge: maxAge};
@@ -131,7 +131,7 @@ describe('verify', function() {
         });
       });
 
-      ['5s', 5].forEach(function (maxAge) {
+      [String('5s'), '5s', 5].forEach(function (maxAge) {
         it(`should not error for claims issued before a certain timespan but still inside clockTolerance timespan (${typeof maxAge} type)`, function (done) {
           clock = sinon.useFakeTimers(1437018587500); // iat + 5.5s, exp - 4.5s
           var options = {algorithms: ['HS256'], maxAge: maxAge, clockTolerance: 1 };
@@ -144,7 +144,7 @@ describe('verify', function() {
         });
       });
 
-      ['6s', 6].forEach(function (maxAge) {
+      [String('6s'), '6s', 6].forEach(function (maxAge) {
         it(`should not error if within maxAge timespan (${typeof maxAge} type)`, function (done) {
           clock = sinon.useFakeTimers(1437018587500);// iat + 5.5s, exp - 4.5s
           var options = {algorithms: ['HS256'], maxAge: maxAge};
@@ -157,7 +157,7 @@ describe('verify', function() {
         });
       });
 
-      ['8s', 8].forEach(function (maxAge) {
+      [String('8s'), '8s', 8].forEach(function (maxAge) {
         it(`can be more restrictive than expiration (${typeof maxAge} type)`, function (done) {
           clock = sinon.useFakeTimers(1437018591900); // iat + 9.9s, exp - 0.1s
           var options = {algorithms: ['HS256'], maxAge: maxAge };
@@ -173,7 +173,7 @@ describe('verify', function() {
         });
       });
 
-      ['12s', 12].forEach(function (maxAge) {
+      [String('12s'), '12s', 12].forEach(function (maxAge) {
         it(`cannot be more permissive than expiration (${typeof maxAge} type)`, function (done) {
           clock = sinon.useFakeTimers(1437018593000); // iat + 11s, exp + 1s
           var options = {algorithms: ['HS256'], maxAge: '12s'};
@@ -184,6 +184,20 @@ describe('verify', function() {
             assert.equal(err.message, 'jwt expired');
             assert.equal(err.expiredAt.constructor.name, 'Date');
             assert.equal(Number(err.expiredAt), 1437018592000);
+            assert.isUndefined(p);
+            done();
+          });
+        });
+      });
+
+      [new String('1s'), 'no-timespan-string'].forEach(function (maxAge){
+        it(`should error if maxAge is specified with a wrong string format/type (value: ${maxAge}, type: ${typeof maxAge})`, function (done) {
+          clock = sinon.useFakeTimers(1437018587000); // iat + 5s, exp - 5s
+          var options = { algorithms: ['HS256'], maxAge: maxAge };
+
+          jwt.verify(token, key, options, function (err, p) {
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.equal(err.message, '"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60');
             assert.isUndefined(p);
             done();
           });
@@ -201,6 +215,7 @@ describe('verify', function() {
           done();
         });
       });
+
     });
 
     describe('option: clockTimestamp', function () {

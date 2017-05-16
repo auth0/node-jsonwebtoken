@@ -170,6 +170,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
+    if (typeof maxAgeTimestamp === 'undefined') {
+      return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+    }
     if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
       return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
     }
