@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.4.1 - 2017-05-17
+
+ - bump ms to v2 due a ReDoS vulnerability (#352) ([adcfd6ae4088c838769d169f8cd9154265aa13e0](https://github.com/auth0/node-jsonwebtoken/commit/adcfd6ae4088c838769d169f8cd9154265aa13e0))
+
 ## 7.4.0 - 2017-04-24
 
  - Add docs about numeric date fields ([659f73119900a4d837650d9b3f5af4e64a2f843b](https://github.com/auth0/node-jsonwebtoken/commit/659f73119900a4d837650d9b3f5af4e64a2f843b))
