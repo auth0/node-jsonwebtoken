@@ -23,8 +23,8 @@ $ npm install jsonwebtoken
 
 `payload` could be an object literal, buffer or string. *Please note that* `exp` is only set if the payload is an object literal.
 
-`secretOrPrivateKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
-encoded private key for RSA and ECDSA.
+`secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
+encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
 
 `options`:
 
