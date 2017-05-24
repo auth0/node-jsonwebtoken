@@ -63,7 +63,7 @@ var cert = fs.readFileSync('private.key');  // get private key
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 
 // sign asynchronously
-jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
+jwt.sign({ foo: 'bar' }, cert, { algorithm: 'HS256' }, function(err, token) {
   console.log(token);
 });
 ```
