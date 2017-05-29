@@ -19,7 +19,7 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
-    "joi": "^6.10.1",
+    "joi": "^10.1.0",
     "jws": "^3.1.4",
     "lodash.once": "^4.0.0",
     "ms": "^2.0.0",
