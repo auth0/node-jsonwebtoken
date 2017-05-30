@@ -97,6 +97,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   var valid;
 
+  console.log(`TOKEN ${jwtString}`);
+  console.log(`Algo ${header.algo}`);
+  console.log(`SECRET ${secretOrPublicKey}`);
+
   try {
     valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
   } catch (e) {
