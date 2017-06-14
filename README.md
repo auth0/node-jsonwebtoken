@@ -37,6 +37,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `subject`
 * `noTimestamp`
 * `header`
+* `keyid`
 
 If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
