@@ -212,6 +212,28 @@ console.log(decoded.header);
 console.log(decoded.payload)
 ```
 
+### jwt.refresh(token, expiresIn, secretOrPrivateKey [, callback])
+
+Will refresh the given token.  The token is __expected__ to be *decoded* and *valid*. No checks will be performed on the token.  The function will copy the values of the token, give it a new expiry time based on the given `expiresIn` parameter and will return a new signed token using the `sign` function and given secretOrPrivateKey.
+
+* `token`: is the *decoded* JsonWebToken string
+* `expiresIn` : New value to set when the token will expire.
+* `secretOrPrivateKey` : is a string or buffer containing either the secret for HMAC algorithms, or the PEM
+encoded private key for RSA and ECDSA.
+* `callback` : If a callback is supplied, callback is called with the newly refreshed JsonWebToken string
+
+Example
+
+```js
+// ...
+var originalDecoded = jwt.decode(token, {complete: true});
+var refreshed = jwt.refresh(originalDecoded, 3600, secret);
+
+console.log(JSON.stringify(originalDecoded));
+// new 'exp' value is later in the future.
+console.log(JSON.stringify(jwt.decode(refreshed, {complete: true})));
+```
+
 ## Errors & Codes
 Possible thrown errors during verification.
 Error is the first argument of the verification callback.
