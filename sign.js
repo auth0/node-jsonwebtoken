@@ -66,6 +66,9 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     throw err;
   }
 
+  if (!secretOrPrivateKey) {
+    return failure(new Error('secretOrPrivateKey must have a value'));
+  }
 
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
