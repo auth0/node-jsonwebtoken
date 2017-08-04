@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.4.2 - 2017-08-04
+
+ - bugfix: sign: add check to be sure secret has a value ([c584d1cbc34b788977b36f17cd57ab2212f1230e](https://github.com/auth0/node-jsonwebtoken/commit/c584d1cbc34b788977b36f17cd57ab2212f1230e))
+ - docs: about refreshing tokens ([016fc10b847bfbb76b82171cb530f32d7da2001b](https://github.com/auth0/node-jsonwebtoken/commit/016fc10b847bfbb76b82171cb530f32d7da2001b))
+ - docs: verifying with base64 encoded secrets ([c25e9906801f89605080cc71b3ee23a5e45a5811](https://github.com/auth0/node-jsonwebtoken/commit/c25e9906801f89605080cc71b3ee23a5e45a5811))
+ - tests: Add tests for ES256 ([89900ea00735f76b04f437c9f542285b420fa9cb](https://github.com/auth0/node-jsonwebtoken/commit/89900ea00735f76b04f437c9f542285b420fa9cb))
+ - docs: document keyid as option (#361) ([00086c2c006d7fc1a47bae02fa87d194d79aa558](https://github.com/auth0/node-jsonwebtoken/commit/00086c2c006d7fc1a47bae02fa87d194d79aa558))
+ - docs: readme: Using private key with passpharase (#353) ([27a7f1d4f35b662426ff0270526d48658da4c8b7](https://github.com/auth0/node-jsonwebtoken/commit/27a7f1d4f35b662426ff0270526d48658da4c8b7))
+
 ## 7.4.1 - 2017-05-17
 
  - bump ms to v2 due a ReDoS vulnerability (#352) ([adcfd6ae4088c838769d169f8cd9154265aa13e0](https://github.com/auth0/node-jsonwebtoken/commit/adcfd6ae4088c838769d169f8cd9154265aa13e0))
