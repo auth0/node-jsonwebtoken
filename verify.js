@@ -89,16 +89,21 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('invalid token'));
   }
 
+  // To support Microsoft's JwtSecurityTokenHandler
   var header = decodedToken.header;
+  var headerAlg = {
+    'http://www.w3.org/2001/04/xmldsig-more#hmac-sha256': 'HS256',
+    'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256': 'RS256'
+  }[header.alg] || header.alg;
 
-  if (!~options.algorithms.indexOf(header.alg)) {
+  if (!~options.algorithms.indexOf(headerAlg)) {
     return done(new JsonWebTokenError('invalid algorithm'));
   }
 
   var valid;
 
   try {
-    valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
+    valid = jws.verify(jwtString, headerAlg, secretOrPublicKey);
   } catch (e) {
     return done(e);
   }
