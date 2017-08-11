@@ -46,7 +46,7 @@ There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`,
 Remember that `exp`, `nbf` and `iat` are **NumericDate**, see related [Token Expiration (exp claim)](#token-expiration-exp-claim)
 
 
-The header can be customized via the `option.header` object.
+The header can be customized via the `options.header` object.
 
 Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
@@ -111,7 +111,7 @@ jwt.sign({
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
 
-As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `new Buffer(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
+As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
 `options`
 
