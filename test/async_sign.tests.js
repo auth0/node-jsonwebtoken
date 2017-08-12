@@ -33,7 +33,7 @@ describe('signing a token asynchronously', function() {
     });
 
     it('should work with none algorithm where secret is set', function(done) {
-      jwt.sign({ foo: 'bar' }, undefined, { algorithm: 'none' }, function(err, token) {
+      jwt.sign({ foo: 'bar' }, 'secret', { algorithm: 'none' }, function(err, token) {
         expect(token).to.be.a('string');
         expect(token.split('.')).to.have.length(3);
         done();
