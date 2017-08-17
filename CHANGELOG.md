@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.4.3 - 2017-08-17
+
+ - Fix breaking change on 7.4.2 for empty secret + "none" algorithm (sync code style) ([PR 386](https://github.com/auth0/node-jsonwebtoken/pull/386))
+
 ## 7.4.2 - 2017-08-04
 
  - bugfix: sign: add check to be sure secret has a value ([c584d1cbc34b788977b36f17cd57ab2212f1230e](https://github.com/auth0/node-jsonwebtoken/commit/c584d1cbc34b788977b36f17cd57ab2212f1230e))
