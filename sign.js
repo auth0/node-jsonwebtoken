@@ -66,12 +66,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     throw err;
   }
 
-  if (!secretOrPrivateKey) {
-    if (options.algorithm === 'none') {
-      secretOrPrivateKey = 'Fix for https://github.com/auth0/node-jsonwebtoken/issues/381';
-    } else {
-      return failure(new Error('secretOrPrivateKey must have a value'));
-    }
+  if (!secretOrPrivateKey && options.algorithm !== 'none') {
+    return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
   if (typeof payload === 'undefined') {
