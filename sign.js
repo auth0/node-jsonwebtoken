@@ -66,7 +66,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     throw err;
   }
 
-  if (!secretOrPrivateKey) {
+  if (!secretOrPrivateKey && options.algorithm !== 'none') {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 

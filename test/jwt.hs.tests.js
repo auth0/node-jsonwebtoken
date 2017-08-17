@@ -51,6 +51,16 @@ describe('HS256', function() {
       });
     });
 
+    it('should work with falsy secret and token not signed', function(done) {
+      var signed = jwt.sign({ foo: 'bar' }, null, { algorithm: 'none' });
+      var unsigned = signed.split('.')[0] + '.' + signed.split('.')[1] + '.';
+      jwt.verify(unsigned, 'secret', function(err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        done();
+      });
+    });
+
     it('should throw when verifying null', function(done) {
       jwt.verify(null, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);

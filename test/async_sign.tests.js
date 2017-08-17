@@ -32,6 +32,24 @@ describe('signing a token asynchronously', function() {
       });
     });
 
+    it('should work with none algorithm where secret is set', function(done) {
+      jwt.sign({ foo: 'bar' }, 'secret', { algorithm: 'none' }, function(err, token) {
+        expect(token).to.be.a('string');
+        expect(token.split('.')).to.have.length(3);
+        done();
+      });
+    });
+
+    //Known bug: https://github.com/brianloveswords/node-jws/issues/62
+    //If you need this use case, you need to go for the non-callback-ish code style.
+    it.skip('should work with none algorithm where secret is falsy', function(done) {
+      jwt.sign({ foo: 'bar' }, undefined, { algorithm: 'none' }, function(err, token) {
+        expect(token).to.be.a('string');
+        expect(token.split('.')).to.have.length(3);
+        done();
+      });
+    });
+
     it('should return error when secret is not a cert for RS256', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'RS256' }, function (err) {
@@ -66,7 +84,7 @@ describe('signing a token asynchronously', function() {
 
     describe('secret must have a value', function(){
       [undefined, '', 0].forEach(function(secret){
-        it('should return an error if the secret is falsy: ' + (typeof secret === 'string' ? '(empty string)' : secret), function(done) {
+        it('should return an error if the secret is falsy and algorithm is not set to none: ' + (typeof secret === 'string' ? '(empty string)' : secret), function(done) {
         // This is needed since jws will not answer for falsy secrets
           jwt.sign('string', secret, {}, function(err, token) {
             expect(err).to.be.exist();
