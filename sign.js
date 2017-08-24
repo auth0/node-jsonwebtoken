@@ -11,23 +11,23 @@ var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
 var sign_options_schema = {
-  expiresIn: function(value) { return isInteger(value) || isString(value); },
-  notBefore: function(value) { return isInteger(value) || isString(value); },
-  audience: function(value) { return isString(value) || isArray(value); },
-  algorithm: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']),
-  header: isPlainObject,
-  encoding: isString,
-  issuer: isString,
-  subject: isString,
-  jwtid: isString,
-  noTimestamp: isBoolean,
-  keyid: isString
+  expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
+  notBefore: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
+  audience: { isValid: function(value) { return isString(value) || isArray(value); }, message: '"audience" must be a string or array' },
+  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
+  header: { isValid: isPlainObject, message: '"header" must be an object' },
+  encoding: { isValid: isString, message: '"encoding" must be a string' },
+  issuer: { isValid: isString, message: '"issuer" must be a string' },
+  subject: { isValid: isString, message: '"subject" must be a string' },
+  jwtid: { isValid: isString, message: '"jwtid" must be a string' },
+  noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
+  keyid: { isValid: isString, message: '"keyid" must be a string' },
 };
 
 var registered_claims_schema = {
-  iat: isNumber,
-  exp: isNumber,
-  nbf: isNumber
+  iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
+  exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
+  nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
 };
 
 function validate(schema, unknown, object) {
@@ -36,14 +36,15 @@ function validate(schema, unknown, object) {
   }
   Object.keys(object)
     .forEach(function(key) {
-      if (schema[key] == null) {
+      var validator = schema[key];
+      if (!validator) {
         if (!unknown) {
           throw new Error('"' + key + '" is not allowed');
         }
         return;
       }
-      if (!schema[key](object[key])) {
-        throw new Error('"' + key + '" is not the correct type');
+      if (!validator.isValid(object[key])) {
+        throw new Error(validator.message);
       }
     });
 }

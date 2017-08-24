@@ -33,7 +33,7 @@ describe('expires option', function() {
   it('should throw if expires is not an string or number', function () {
     expect(function () {
       jwt.sign({foo: 123}, '123', { expiresIn: { crazy : 213 } });
-    }).to.throw(/"expiresIn" is not the correct type/);
+    }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
   });
 
   it('should throw an error if expiresIn and exp are provided', function () {
