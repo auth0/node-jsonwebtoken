@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.0.0 - 2017-09-06
+  
+  **Breaking changes: See [Migration notes from v7](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)**
+
+ - docs: readme, migration notes ([12cd8f7f47224f904f6b8f39d1dee73775de4f6f](https://github.com/auth0/node-jsonwebtoken/commit/12cd8f7f47224f904f6b8f39d1dee73775de4f6f))
+ - verify: remove process.nextTick (#302) ([3305cf04e3f674b9fb7e27c9b14ddd159650ff82](https://github.com/auth0/node-jsonwebtoken/commit/3305cf04e3f674b9fb7e27c9b14ddd159650ff82))
+ - Reduce size of NPM package (#347) ([0be5409ac6592eeaae373dce91ec992fa101bd8a](https://github.com/auth0/node-jsonwebtoken/commit/0be5409ac6592eeaae373dce91ec992fa101bd8a))
+ - Remove joi to shrink module size (#348) ([2e7e68dbd59e845cdd940afae0a296f48438445f](https://github.com/auth0/node-jsonwebtoken/commit/2e7e68dbd59e845cdd940afae0a296f48438445f))
+ - maxAge: Add validation to timespan result ([66a4f8b996c8357727ce62a84605a005b2f5eb18](https://github.com/auth0/node-jsonwebtoken/commit/66a4f8b996c8357727ce62a84605a005b2f5eb18))
+
 ## 7.4.3 - 2017-08-17
 
  - Fix breaking change on 7.4.2 for empty secret + "none" algorithm (sync code style) ([PR 386](https://github.com/auth0/node-jsonwebtoken/pull/386))
