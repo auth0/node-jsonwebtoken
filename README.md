@@ -122,8 +122,8 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
-* `maxAge`: the maximum allowed age for tokens to still be valid. Currently it is expressed in milliseconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. **We advise against using milliseconds precision, though, since JWTs can only contain seconds. The maximum precision might be reduced to seconds in the future.**
-* `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons (also against `maxAge`, so our advise is to avoid using `clockTimestamp` and a `maxAge` in milliseconds together)
+* `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`.
+* `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 
 
 ```js
