@@ -13,6 +13,10 @@ This was developed against `draft-ietf-oauth-json-web-token-08`. It makes use of
 $ npm install jsonwebtoken
 ```
 
+# Migration notes
+
+* [From v7 to v8](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)
+
 # Usage
 
 ### jwt.sign(payload, secretOrPrivateKey, [options, callback])
