@@ -1,29 +1,53 @@
-var Joi = require('joi');
 var timespan = require('./lib/timespan');
 var xtend = require('xtend');
 var jws = require('jws');
+var includes = require('lodash.includes');
+var isArray = require('lodash.isarray');
+var isBoolean = require('lodash.isboolean');
+var isInteger = require('lodash.isinteger');
+var isNumber = require('lodash.isnumber');
+var isPlainObject = require('lodash.isplainobject');
+var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
-var sign_options_schema = Joi.object().keys({
-  expiresIn: [Joi.number().integer(), Joi.string()],
-  notBefore: [Joi.number().integer(), Joi.string()],
-  audience: [Joi.string(), Joi.array()],
-  algorithm: Joi.string().valid('RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'),
-  header: Joi.object(),
-  encoding: Joi.string(),
-  issuer: Joi.string(),
-  subject: Joi.string(),
-  jwtid: Joi.string(),
-  noTimestamp: Joi.boolean(),
-  keyid: Joi.string()
-});
+var sign_options_schema = {
+  expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
+  notBefore: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
+  audience: { isValid: function(value) { return isString(value) || isArray(value); }, message: '"audience" must be a string or array' },
+  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
+  header: { isValid: isPlainObject, message: '"header" must be an object' },
+  encoding: { isValid: isString, message: '"encoding" must be a string' },
+  issuer: { isValid: isString, message: '"issuer" must be a string' },
+  subject: { isValid: isString, message: '"subject" must be a string' },
+  jwtid: { isValid: isString, message: '"jwtid" must be a string' },
+  noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
+  keyid: { isValid: isString, message: '"keyid" must be a string' },
+};
 
-var registered_claims_schema = Joi.object().keys({
-  iat: Joi.number(),
-  exp: Joi.number(),
-  nbf: Joi.number()
-}).unknown();
+var registered_claims_schema = {
+  iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
+  exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
+  nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
+};
 
+function validate(schema, unknown, object) {
+  if (!isPlainObject(object)) {
+    throw new Error('Expected object');
+  }
+  Object.keys(object)
+    .forEach(function(key) {
+      var validator = schema[key];
+      if (!validator) {
+        if (!unknown) {
+          throw new Error('"' + key + '" is not allowed');
+        }
+        return;
+      }
+      if (!validator.isValid(object[key])) {
+        throw new Error(validator.message);
+      }
+    });
+}
 
 var options_to_payload = {
   'audience': 'aud',
@@ -73,12 +97,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
   } else if (isObjectPayload) {
-    var payload_validation_result = registered_claims_schema.validate(payload);
-
-    if (payload_validation_result.error) {
-      return failure(payload_validation_result.error);
+    try {
+      validate(registered_claims_schema, true, payload);
     }
-
+    catch (error) {
+      return failure(error);
+    }
     payload = xtend(payload);
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
@@ -98,10 +122,11 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('Bad "options.notBefore" option the payload already has an "nbf" property.'));
   }
 
-  var validation_result = sign_options_schema.validate(options);
-
-  if (validation_result.error) {
-    return failure(validation_result.error);
+  try {
+    validate(sign_options_schema, false, options);
+  }
+  catch (error) {
+    return failure(error);
   }
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);

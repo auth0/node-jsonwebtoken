@@ -4,7 +4,7 @@
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require test/util/fakeDate && nsp check"
+    "test": "mocha --require test/util/fakeDate && nsp check && cost-of-modules"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,14 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
-    "joi": "^6.10.1",
     "jws": "^3.1.4",
+    "lodash.includes": "^4.3.0",
+    "lodash.isarray": "^4.0.0",
+    "lodash.isboolean": "^3.0.3",
+    "lodash.isinteger": "^4.0.4",
+    "lodash.isnumber": "^3.0.3",
+    "lodash.isplainobject": "^4.0.6",
+    "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
     "ms": "^2.0.0",
     "xtend": "^4.0.1"
@@ -29,6 +35,7 @@
     "atob": "^1.1.2",
     "chai": "^1.10.0",
     "conventional-changelog": "~1.1.0",
+    "cost-of-modules": "^1.0.1",
     "mocha": "^2.1.0",
     "nsp": "^2.6.2",
     "sinon": "^1.15.4"

@@ -12,11 +12,4 @@ describe('iat', function () {
     expect(result.exp).to.be.closeTo(iat + expiresIn, 0.2);
   });
 
-
-  it('should throw if iat is not a number', function () {
-    expect(function () {
-      jwt.sign({foo: 123, iat: 'hello'}, '123');
-    }).to.throw(/"iat" must be a number/);
-  });
-
 });
