@@ -43,5 +43,11 @@
   "engines": {
     "npm": ">=1.4.28",
     "node": ">=0.12"
-  }
+  },
+  "files": [
+    "lib",
+    "decode.js",
+    "sign.js",
+    "verify.js"
+  ]
 }
