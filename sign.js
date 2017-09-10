@@ -2,7 +2,6 @@ var timespan = require('./lib/timespan');
 var xtend = require('xtend');
 var jws = require('jws');
 var includes = require('lodash.includes');
-var isArray = require('lodash.isarray');
 var isBoolean = require('lodash.isboolean');
 var isInteger = require('lodash.isinteger');
 var isNumber = require('lodash.isnumber');
@@ -13,7 +12,7 @@ var once = require('lodash.once');
 var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
   notBefore: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
-  audience: { isValid: function(value) { return isString(value) || isArray(value); }, message: '"audience" must be a string or array' },
+  audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
   algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
