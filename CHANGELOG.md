@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.0.1 - 2017-09-12
+
+ - Remove `lodash.isarray` dependency (#394) ([7508e8957cb1c778f72fa9a363a7b135b3c9c36d](https://github.com/auth0/node-jsonwebtoken/commit/7508e8957cb1c778f72fa9a363a7b135b3c9c36d))
+
 ## 8.0.0 - 2017-09-06
   
   **Breaking changes: See [Migration notes from v7](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)**
