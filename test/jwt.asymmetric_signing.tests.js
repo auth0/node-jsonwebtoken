@@ -175,8 +175,24 @@ describe('Asymmetric Algorithms', function(){
           });
         });
 
+        it('should check audience using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: /urn:f[o]{2}/  }, function (err, decoded) {
+            assert.isNotNull(decoded);
+            assert.isNull(err);
+            done();
+          });
+        });
+
         it('should check audience in array', function (done) {
           jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
+            assert.isNotNull(decoded);
+            assert.isNull(err);
+            done();
+          });
+        });
+
+        it('should check audience in array using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: ['urn:bar', /urn:f[o]{2}/, 'urn:other'] }, function (err, decoded) {
             assert.isNotNull(decoded);
             assert.isNull(err);
             done();
@@ -193,8 +209,18 @@ describe('Asymmetric Algorithms', function(){
           });
         });
 
+        it('should throw when invalid audience using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: /urn:bar/ }, function (err, decoded) {
+            assert.isUndefined(decoded);
+            assert.isNotNull(err);
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.instanceOf(err, jwt.JsonWebTokenError);
+            done();
+          });
+        });
+
         it('should throw when invalid audience in array', function (done) {
-          jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function (err, decoded) {
+          jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong', /urn:bar/] }, function (err, decoded) {
             assert.isUndefined(decoded);
             assert.isNotNull(err);
             assert.equal(err.name, 'JsonWebTokenError');
@@ -224,8 +250,24 @@ describe('Asymmetric Algorithms', function(){
           });
         });
 
+        it('should check audience using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: /urn:f[o]{2}/ }, function (err, decoded) {
+            assert.isNotNull(decoded);
+            assert.isNull(err);
+            done();
+          });
+        });
+
         it('should check audience in array', function (done) {
           jwt.verify(token, pub, { audience: ['urn:foo', 'urn:other'] }, function (err, decoded) {
+            assert.isNotNull(decoded);
+            assert.isNull(err);
+            done();
+          });
+        });
+
+        it('should check audience in array using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: ['urn:one', 'urn:other', /urn:f[o]{2}/] }, function (err, decoded) {
             assert.isNotNull(decoded);
             assert.isNull(err);
             done();
@@ -242,8 +284,28 @@ describe('Asymmetric Algorithms', function(){
           });
         });
 
+        it('should throw when invalid audience using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: /urn:wrong/ }, function (err, decoded) {
+            assert.isUndefined(decoded);
+            assert.isNotNull(err);
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.instanceOf(err, jwt.JsonWebTokenError);
+            done();
+          });
+        });
+
         it('should throw when invalid audience in array', function (done) {
           jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function (err, decoded) {
+            assert.isUndefined(decoded);
+            assert.isNotNull(err);
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.instanceOf(err, jwt.JsonWebTokenError);
+            done();
+          });
+        });
+
+        it('should throw when invalid audience in array', function (done) {
+          jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong', /urn:alsowrong/] }, function (err, decoded) {
             assert.isUndefined(decoded);
             assert.isNotNull(err);
             assert.equal(err.name, 'JsonWebTokenError');
@@ -267,8 +329,18 @@ describe('Asymmetric Algorithms', function(){
           });
         });
 
+        it('should check audience using RegExp', function (done) {
+          jwt.verify(token, pub, { audience: /urn:wrong/ }, function (err, decoded) {
+            assert.isUndefined(decoded);
+            assert.isNotNull(err);
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.instanceOf(err, jwt.JsonWebTokenError);
+            done();
+          });
+        });
+
         it('should check audience in array', function (done) {
-          jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong'] }, function (err, decoded) {
+          jwt.verify(token, pub, { audience: ['urn:wrong', 'urn:morewrong', /urn:alsowrong/] }, function (err, decoded) {
             assert.isUndefined(decoded);
             assert.isNotNull(err);
             assert.equal(err.name, 'JsonWebTokenError');
