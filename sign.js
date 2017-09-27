@@ -31,7 +31,7 @@ var registered_claims_schema = {
 
 function validate(schema, unknown, object) {
   if (!isPlainObject(object)) {
-    throw new Error('Expected object');
+    throw new Error('Expected payload to be a plain object.');
   }
   Object.keys(object)
     .forEach(function(key) {
