@@ -197,7 +197,7 @@ Example verify token with fetching public key from Keycloak server
 var KeyCloakCerts = require('get-keycloak-public-key');
 
 var keycloak_url = 'https://my-keycloak-server.com';
-var keycloak_realm = 'MyRealm;
+var keycloak_realm = 'MyRealm';
 var cache_ttl = 600; // 600sec = 10min
 
 var keyCloakCerts = new KeyCloakCerts(keycloak_url, keycloak_realm);
