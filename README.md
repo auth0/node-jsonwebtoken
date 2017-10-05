@@ -114,12 +114,13 @@ jwt.sign({
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example.
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. If your `token` is unsigned, this option must include `["none"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
@@ -190,6 +191,61 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
 });
 
 ```
+
+Example verify token with fetching public key from Keycloak server
+```js
+var KeyCloakCerts = require('get-keycloak-public-key');
+
+var keycloak_url = 'https://my-keycloak-server.com';
+var keycloak_realm = 'MyRealm;
+var cache_ttl = 600; // 600sec = 10min
+
+var keyCloakCerts = new KeyCloakCerts(keycloak_url, keycloak_realm);
+var key_cache = { };
+
+function keyFunc(header, callback) {
+  // Get kid
+
+  var kid = header.kid;
+  if(!kid) {
+    callback(new Error("header doesn't contain kid"));
+    return;
+  }
+
+  // Get key from cache
+
+  var cached_key = key_cache[kid] || {};
+  var key = cached_key.key;
+  var expires = cached_key.expires;
+  if(key && expires > Date.now()) {
+    callback(undefined, key);
+    return;
+  }
+
+  // Fetch from auth server
+
+  console.log("Fetching cert for kid:", kid);
+  
+  keyCloakCerts.fetch(kid)
+  .then(key => {
+    key_cache[kid] = { expires: Date.now() + cache_ttl * 1000, key };
+    callback(undefined, key);    
+  })
+  .catch(err => {
+    callback(err);
+  });
+}
+
+verify(token, keyFunc, options, function(err, decoded) {
+  if(err) {
+    console.error(err);
+  }
+  else {
+    console.log(decoded);
+  }
+});
+```
+
 
 ### jwt.decode(token [, options])
 
