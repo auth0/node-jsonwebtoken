@@ -120,7 +120,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 `options`
 
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
-* `audience`: if you want to check audience (`aud`), provide a value here
+* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
