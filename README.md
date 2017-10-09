@@ -21,7 +21,7 @@ $ npm install jsonwebtoken
 
 ### jwt.sign(payload, secretOrPrivateKey, [options, callback])
 
-(Asynchronous) If a callback is supplied, callback is called with the `err` or the JWT.
+(Asynchronous) If a callback is supplied, the callback is called with the `err` or the JWT.
 
 (Synchronous) Returns the JsonWebToken as string
 
@@ -106,9 +106,9 @@ jwt.sign({
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
 
-(Asynchronous) If a callback is supplied, function acts asynchronously. Callback is passed the decoded payload if the signature and optional expiration, audience, or issuer are valid. If not, it will be passed the error.
+(Asynchronous) If a callback is supplied, function acts asynchronously. The callback is called with the decoded payload if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will be called with the error.
 
-(Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature (and, optionally, expiration, audience, issuer) are valid. If not, it will throw the error.
+(Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
 `token` is the JsonWebToken string
 
