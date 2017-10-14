@@ -66,7 +66,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
   else {
     getSecret = function(header, callback) {
-      return callback(undefined, secretOrPublicKey);
+      return callback(null, secretOrPublicKey);
     };
   }
 
