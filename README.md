@@ -190,62 +190,17 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
 });
 
-```
-
-Example verify token with fetching public key from Keycloak server
-```js
-var KeyCloakCerts = require('get-keycloak-public-key');
-
-var keycloak_url = 'https://my-keycloak-server.com';
-var keycloak_realm = 'MyRealm';
-var cache_ttl = 600; // 600sec = 10min
-
-var keyCloakCerts = new KeyCloakCerts(keycloak_url, keycloak_realm);
-var key_cache = { };
-
-function keyFunc(header, callback) {
-  // Get kid
-
-  var kid = header.kid;
-  if(!kid) {
-    callback(new Error("header doesn't contain kid"));
-    return;
-  }
-
-  // Get key from cache
-
-  var cached_key = key_cache[kid] || {};
-  var key = cached_key.key;
-  var expires = cached_key.expires;
-  if(key && expires > Date.now()) {
-    callback(undefined, key);
-    return;
-  }
-
-  // Fetch from auth server
-
-  console.log("Fetching cert for kid:", kid);
-  
-  keyCloakCerts.fetch(kid)
-  .then(key => {
-    key_cache[kid] = { expires: Date.now() + cache_ttl * 1000, key };
-    callback(undefined, key);    
-  })
-  .catch(err => {
-    callback(err);
-  });
+// Verify using getKey callback
+function getKey(header, callback) {
+  // fetch secret or public key
+  const key = ...;
+  callback(null, key);
 }
 
-verify(token, keyFunc, options, function(err, decoded) {
-  if(err) {
-    console.error(err);
-  }
-  else {
-    console.log(decoded);
-  }
+verify(token, getKey, options, function(err, decoded) {
+  console.log(decoded.foo) // bar
 });
 ```
-
 
 ### jwt.decode(token [, options])
 
