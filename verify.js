@@ -51,23 +51,28 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   var header = decodedToken.header;
 
-  if(header.alg ==='none' && decodedToken.signature) {
+  if(header.alg === 'none' && decodedToken.signature) {
     return done(new JsonWebTokenError('invalid token: unsigned but signature is present'));
   }
 
   var getSecret;
 
-  if(typeof secretOrPublicKey === 'function') {
+  if(typeof secretOrPublicKey !== 'function') {
+    getSecret = function(header, callback) {
+      return callback(null, secretOrPublicKey);
+    };
+  }
+  else if(header.alg === 'none') {
+    getSecret = function(header, callback) {
+      return callback(null, undefined);
+    };
+  }
+  else {
     if(!callback) {
       return done(new JsonWebTokenError('verify must be called asynchronous if secret or public key is provided as a callback'));
     }
 
     getSecret = secretOrPublicKey;
-  }
-  else {
-    getSecret = function(header, callback) {
-      return callback(null, secretOrPublicKey);
-    };
   }
 
   return getSecret(header, function(err, secretOrPublicKey) {
