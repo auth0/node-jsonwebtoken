@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.1.1 - 2017.12.06
+
+ - Added possibility to use your own algorithm   
+
 ## 8.1.0 - 2017-10-09
 
  - #402: Don't fail if captureStackTrace is not a function (#410) ([77ee965d9081faaf21650f266399f203f69533c5](https://github.com/auth0/node-jsonwebtoken/commit/77ee965d9081faaf21650f266399f203f69533c5))

@@ -1,6 +1,6 @@
 {
   "name": "jsonwebtoken",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "jws": "^3.1.4",
     "lodash.includes": "^4.3.0",
     "lodash.isboolean": "^3.0.3",
+    "lodash.isfunction": "^3.0.8",
     "lodash.isinteger": "^4.0.4",
     "lodash.isnumber": "^3.0.3",
     "lodash.isplainobject": "^4.0.6",

@@ -5,6 +5,7 @@ var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var jws               = require('jws');
 var xtend             = require('xtend');
+var includes          = require('lodash.includes');
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -27,6 +28,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       if (err) throw err;
       return data;
     };
+  }
+  var decodedToken;
+
+  if (options.algorithms && includes(options.algorithms, 'custom')) {
+    try {
+      decodedToken = options.customAlgorithmFunction(jwtString, secretOrPublicKey, options);
+      return done(null, decodedToken);
+    } catch (err) {
+      return done(err);
+    }
   }
 
   if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
@@ -73,7 +84,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   }
 
-  var decodedToken;
   try {
     decodedToken = jws.decode(jwtString);
   } catch(err) {

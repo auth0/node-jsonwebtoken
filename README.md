@@ -35,6 +35,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `algorithm` (default: `HS256`)
 * `expiresIn`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `notBefore`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
+* `customAlgorithmFunction`: function which will be used if custom algorithm is chosen
 * `audience`
 * `issuer`
 * `jwtid`
@@ -71,6 +72,25 @@ var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
 jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
+
+// sign asynchronously and synchronously with custom algorithm
+function customAlgorithmFunctionAsync(payload, secretOrPrivateKey, options, callback) {
+    return callback(null, result);
+}
+var optAsync = {
+    algorithm: 'custom',
+    customAlgorithmFunction: customAlgorithmFunctionAsync
+};
+jwt.sign({ foo: 'bar' }, 'secret', optAsync, callback);
+
+function customAlgorithmFunctionSync(payload, secretOrPrivateKey, options) {
+    return result;
+}
+var optSync = {
+    algorithm: 'custom',
+    customAlgorithmFunction: customAlgorithmFunctionSync
+};
+jwt.sign({ foo: 'bar' }, "secret", optSync);
 ```
 
 #### Token Expiration (exp claim)
@@ -128,6 +148,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
 * `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`.
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
+* `customAlgorithmFunction`: function which will be used to verify signature if algorithm is custom.
 
 
 ```js
@@ -189,6 +210,16 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
 });
 
+//verify with custom alg
+function customAlgorithmFunction (jwtString, secretOrPublicKey, options, callback) {
+ //custom logic here
+ return callback(null, decoded)   
+});
+jwt.verify(jwtString, secretOrPublicKey, {
+    algorithms: ['custom'],
+    customAlgorithmFunction: customAlgorithmFunction
+})
+
 ```
 
 ### jwt.decode(token [, options])
@@ -203,6 +234,8 @@ __Warning:__ This will __not__ verify whether the signature is valid. You should
 
 * `json`: force JSON.parse on the payload even if the header doesn't contain `"typ":"JWT"`.
 * `complete`: return an object with the decoded payload and header.
+* `isCustomAlgorithmUsed`: boolean that declares if you want to use your own algorithm for decoding.
+* `customAlgorithmFunction`: function which will be used for decoding, if isCustomAlgorithmUsed is true.
 
 Example
 

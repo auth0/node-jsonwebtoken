@@ -5,6 +5,7 @@ var includes = require('lodash.includes');
 var isBoolean = require('lodash.isboolean');
 var isInteger = require('lodash.isinteger');
 var isNumber = require('lodash.isnumber');
+var isFunction = require('lodash.isfunction');
 var isPlainObject = require('lodash.isplainobject');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
@@ -13,14 +14,15 @@ var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
   notBefore: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
+  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'custom', 'none']), message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
   issuer: { isValid: isString, message: '"issuer" must be a string' },
   subject: { isValid: isString, message: '"subject" must be a string' },
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
-  keyid: { isValid: isString, message: '"keyid" must be a string' }
+  keyid: { isValid: isString, message: '"keyid" must be a string' },
+  customAlgorithmFunction: {isValid: isFunction, message: 'custom algorithm must provide its own sign function'}
 };
 
 var registered_claims_schema = {
@@ -169,20 +171,30 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   });
 
   var encoding = options.encoding || 'utf8';
+  var isCustomAlgorithmUsed = options.algorithm === 'custom';
 
   if (typeof callback === 'function') {
     callback = callback && once(callback);
 
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: payload,
-      encoding: encoding
-    }).once('error', callback)
-      .once('done', function (signature) {
-        callback(null, signature);
+    if (isCustomAlgorithmUsed) {
+      options.customAlgorithmFunction(payload, secretOrPrivateKey, options, function (err, result) {
+        return callback(err, result);
       });
+    } else {
+        jws.createSign({
+            header: header,
+            privateKey: secretOrPrivateKey,
+            payload: payload,
+            encoding: encoding
+        }).once('error', callback)
+            .once('done', function (signature) {
+                callback(null, signature);
+            });
+    }
   } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
+      if (isCustomAlgorithmUsed) {
+        return options.customAlgorithmFunction(payload, secretOrPrivateKey, options);
+      }
+      return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
   }
 };
