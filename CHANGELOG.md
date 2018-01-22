@@ -4,6 +4,14 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.1.1 - 2018-01-22
+
+ - ci: add newer node versions to build matrix (#428) ([83f3eee44e122da06f812d7da4ace1fa26c24d9d](https://github.com/auth0/node-jsonwebtoken/commit/83f3eee44e122da06f812d7da4ace1fa26c24d9d))
+ - deps: Bump ms version to add support for negative numbers (#438) ([25e0e624545eaef76f3c324a134bf103bc394724](https://github.com/auth0/node-jsonwebtoken/commit/25e0e624545eaef76f3c324a134bf103bc394724))
+ - docs: Minor typo (#424) ([dddcb73ac05de11b81feeb629f6cf78dd03d2047](https://github.com/auth0/node-jsonwebtoken/commit/dddcb73ac05de11b81feeb629f6cf78dd03d2047))
+ - bug fix: Not Before (nbf) calculated based on iat/timestamp (#437) ([2764a64908d97c043d62eba0bf6c600674f9a6d6](https://github.com/auth0/node-jsonwebtoken/commit/2764a64908d97c043d62eba0bf6c600674f9a6d6)), closes [#435](https://github.com/auth0/node-jsonwebtoken/issues/435)
+
+
 ## 8.1.0 - 2017-10-09
 
  - #402: Don't fail if captureStackTrace is not a function (#410) ([77ee965d9081faaf21650f266399f203f69533c5](https://github.com/auth0/node-jsonwebtoken/commit/77ee965d9081faaf21650f266399f203f69533c5))
