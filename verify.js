@@ -111,19 +111,19 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
     if (typeof payload.nbf !== 'number') {
-      return done(new JsonWebTokenError('invalid nbf value'));
+      return done(new JsonWebTokenError('invalid nbf value', payload));
     }
     if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
-      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
+      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000), payload));
     }
   }
 
   if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
     if (typeof payload.exp !== 'number') {
-      return done(new JsonWebTokenError('invalid exp value'));
+      return done(new JsonWebTokenError('invalid exp value', payload));
     }
     if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
-      return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+      return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000), payload));
     }
   }
 
@@ -138,7 +138,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     });
 
     if (!match)
-      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or '), payload));
   }
 
   if (options.issuer) {
@@ -147,33 +147,33 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
         (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
 
     if (invalid_issuer) {
-      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer, payload));
     }
   }
 
   if (options.subject) {
     if (payload.sub !== options.subject) {
-      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
+      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject, payload));
     }
   }
 
   if (options.jwtid) {
     if (payload.jti !== options.jwtid) {
-      return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+      return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid, payload));
     }
   }
 
   if (options.maxAge) {
     if (typeof payload.iat !== 'number') {
-      return done(new JsonWebTokenError('iat required when maxAge is specified'));
+      return done(new JsonWebTokenError('iat required when maxAge is specified', payload));
     }
 
     var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
     if (typeof maxAgeTimestamp === 'undefined') {
-      return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+      return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60', payload));
     }
     if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
-      return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
+      return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000), payload));
     }
   }
 
