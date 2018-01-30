@@ -32,10 +32,9 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 
 `options`:
 
-* `algorithm` (default: `HS256`)
+* `algorithm` (default: `HS256`). It is possible to use a function here that will be used instead of default jws library to sign the payload.
 * `expiresIn`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
 * `notBefore`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
-* `customAlgorithmFunction`: function which will be used if custom algorithm is chosen
 * `audience`
 * `issuer`
 * `jwtid`
@@ -78,8 +77,7 @@ function customAlgorithmFunctionAsync(payload, secretOrPrivateKey, options, call
     return callback(null, result);
 }
 var optAsync = {
-    algorithm: 'custom',
-    customAlgorithmFunction: customAlgorithmFunctionAsync
+    algorithm: customAlgorithmFunctionAsync
 };
 jwt.sign({ foo: 'bar' }, 'secret', optAsync, callback);
 
@@ -87,8 +85,7 @@ function customAlgorithmFunctionSync(payload, secretOrPrivateKey, options) {
     return result;
 }
 var optSync = {
-    algorithm: 'custom',
-    customAlgorithmFunction: customAlgorithmFunctionSync
+    algorithm: customAlgorithmFunctionSync
 };
 jwt.sign({ foo: 'bar' }, "secret", optSync);
 ```
@@ -139,7 +136,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. It is possible to put to this array a function that will be used instead of default jws library to verify the token;
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
@@ -148,8 +145,6 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
 * `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`.
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
-* `customAlgorithmFunction`: function which will be used to verify signature if algorithm is custom.
-
 
 ```js
 // verify a token symmetric - synchronous
@@ -214,10 +209,9 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
 function customAlgorithmFunction (jwtString, secretOrPublicKey, options, callback) {
  //custom logic here
  return callback(null, decoded)   
-});
+})
 jwt.verify(jwtString, secretOrPublicKey, {
-    algorithms: ['custom'],
-    customAlgorithmFunction: customAlgorithmFunction
+    algorithms: [customAlgorithmFunction]
 })
 
 ```
@@ -234,8 +228,6 @@ __Warning:__ This will __not__ verify whether the signature is valid. You should
 
 * `json`: force JSON.parse on the payload even if the header doesn't contain `"typ":"JWT"`.
 * `complete`: return an object with the decoded payload and header.
-* `isCustomAlgorithmUsed`: boolean that declares if you want to use your own algorithm for decoding.
-* `customAlgorithmFunction`: function which will be used for decoding, if isCustomAlgorithmUsed is true.
 
 Example
 
@@ -319,6 +311,8 @@ ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
 ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
 ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
 none | No digital signature or MAC value included
+
+It is also possible to use your own function with custom algorithm to perform sign/verify/decode operations. 
 
 ## Refreshing JWTs
 
