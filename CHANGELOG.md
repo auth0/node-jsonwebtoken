@@ -4,9 +4,16 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 8.1.1 - 2017.12.06
+## 8.1.2 - 2018.01.30
 
- - Added possibility to use your own algorithm   
+ - Added possibility to use your own algorithm (#427) (https://github.com/auth0/node-jsonwebtoken/issues/427)   
+ 
+## 8.1.1 - 2018-01-22
+
+ - ci: add newer node versions to build matrix (#428) ([83f3eee44e122da06f812d7da4ace1fa26c24d9d](https://github.com/auth0/node-jsonwebtoken/commit/83f3eee44e122da06f812d7da4ace1fa26c24d9d))
+ - deps: Bump ms version to add support for negative numbers (#438) ([25e0e624545eaef76f3c324a134bf103bc394724](https://github.com/auth0/node-jsonwebtoken/commit/25e0e624545eaef76f3c324a134bf103bc394724))
+ - docs: Minor typo (#424) ([dddcb73ac05de11b81feeb629f6cf78dd03d2047](https://github.com/auth0/node-jsonwebtoken/commit/dddcb73ac05de11b81feeb629f6cf78dd03d2047))
+ - bug fix: Not Before (nbf) calculated based on iat/timestamp (#437) ([2764a64908d97c043d62eba0bf6c600674f9a6d6](https://github.com/auth0/node-jsonwebtoken/commit/2764a64908d97c043d62eba0bf6c600674f9a6d6)), closes [#435](https://github.com/auth0/node-jsonwebtoken/issues/435)
 
 ## 8.1.0 - 2017-10-09
 
