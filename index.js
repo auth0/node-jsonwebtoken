@@ -4,5 +4,5 @@ module.exports = {
   sign: require('./sign'),
   JsonWebTokenError: require('./lib/JsonWebTokenError'),
   NotBeforeError: require('./lib/NotBeforeError'),
-  TokenExpiredError: require('./lib/TokenExpiredError'),
+  TokenExpiredError: require('./lib/TokenExpiredError')
 };

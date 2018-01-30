@@ -3,8 +3,8 @@ var jws = require('jws');
 module.exports = function (jwt, options) {
   options = options || {};
 
-  if (options.isCustomAlgorithmUsed) {
-    return options.customAlgorithmFunction(jwt);
+  if (typeof options.algorithm === 'function') {
+    return options.algorithm(jwt);
   }
 
   var decoded = jws.decode(jwt, options);

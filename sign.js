@@ -14,15 +14,14 @@ var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
   notBefore: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'custom', 'none']), message: '"algorithm" must be a valid string enum value' },
+  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'custom', 'none']) || isFunction, message: '"algorithm" must be a valid string enum value or a function' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
   issuer: { isValid: isString, message: '"issuer" must be a string' },
   subject: { isValid: isString, message: '"subject" must be a string' },
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
-  keyid: { isValid: isString, message: '"keyid" must be a string' },
-  customAlgorithmFunction: {isValid: isFunction, message: 'custom algorithm must provide its own sign function'}
+  keyid: { isValid: isString, message: '"keyid" must be a string' }
 };
 
 var registered_claims_schema = {
@@ -171,13 +170,13 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   });
 
   var encoding = options.encoding || 'utf8';
-  var isCustomAlgorithmUsed = options.algorithm === 'custom';
+  var isCustomAlgorithmUsed = typeof options.algorithm === 'function';
 
   if (typeof callback === 'function') {
     callback = callback && once(callback);
 
-    if (isCustomAlgorithmUsed) {
-      options.customAlgorithmFunction(payload, secretOrPrivateKey, options, function (err, result) {
+    if (typeof options.algorithm === 'function') {
+      options.algorithm(payload, secretOrPrivateKey, options, function (err, result) {
         return callback(err, result);
       });
     } else {
@@ -193,7 +192,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   } else {
       if (isCustomAlgorithmUsed) {
-        return options.customAlgorithmFunction(payload, secretOrPrivateKey, options);
+        return options.algorithm(payload, secretOrPrivateKey, options);
       }
       return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
   }
