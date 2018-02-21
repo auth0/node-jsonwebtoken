@@ -20,7 +20,8 @@ var sign_options_schema = {
   subject: { isValid: isString, message: '"subject" must be a string' },
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
-  keyid: { isValid: isString, message: '"keyid" must be a string' }
+  keyid: { isValid: isString, message: '"keyid" must be a string' },
+  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
 };
 
 var registered_claims_schema = {
@@ -110,7 +111,9 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     catch (error) {
       return failure(error);
     }
-    payload = xtend(payload);
+    if (!options.mutatePayload) {
+      payload = xtend(payload);
+    }
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
