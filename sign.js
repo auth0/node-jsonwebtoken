@@ -1,5 +1,4 @@
 var timespan = require('./lib/timespan');
-var xtend = require('xtend');
 var jws = require('jws');
 var includes = require('lodash.includes');
 var isBoolean = require('lodash.isboolean');
@@ -8,6 +7,8 @@ var isNumber = require('lodash.isnumber');
 var isPlainObject = require('lodash.isplainobject');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
+var merge = require('lodash.merge');
+var clone = require('lodash.clone');
 
 var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || isString(value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
@@ -84,7 +85,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
-  var header = xtend({
+  var header = merge({
     alg: options.algorithm || 'HS256',
     typ: isObjectPayload ? 'JWT' : undefined,
     kid: options.keyid
@@ -110,7 +111,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     catch (error) {
       return failure(error);
     }
-    payload = xtend(payload);
+    payload = clone(payload);
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
