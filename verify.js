@@ -4,7 +4,7 @@ var TokenExpiredError = require('./lib/TokenExpiredError');
 var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var jws               = require('jws');
-var xtend             = require('xtend');
+var clone             = require('lodash.clone');
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -17,7 +17,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   //clone this object since we are going to mutate it.
-  options = xtend(options);
+  options = clone(options);
   var done;
 
   if (callback) {
