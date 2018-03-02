@@ -42,6 +42,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `noTimestamp`
 * `header`
 * `keyid`
+* `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
 
 If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
