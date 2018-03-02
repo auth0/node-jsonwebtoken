@@ -4,6 +4,11 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.2.0 - 2018-03-02
+
+ - Add a new mutatePayload option (#446) ([d6d7c5e5103f05a92d3633ac190d3025a0455be0](https://github.com/auth0/node-jsonwebtoken/commit/d6d7c5e5103f05a92d3633ac190d3025a0455be0))
+
+
 ## 8.1.1 - 2018-01-22
 
  - ci: add newer node versions to build matrix (#428) ([83f3eee44e122da06f812d7da4ace1fa26c24d9d](https://github.com/auth0/node-jsonwebtoken/commit/83f3eee44e122da06f812d7da4ace1fa26c24d9d))
