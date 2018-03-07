@@ -10,7 +10,7 @@ module.exports = function (jwt, options) {
   if(typeof payload === 'string') {
     try {
       var obj = JSON.parse(payload);
-      if(obj && typeof obj === 'object') {
+      if(obj !== null && typeof obj === 'object') {
         payload = obj;
       }
     } catch (e) { }
