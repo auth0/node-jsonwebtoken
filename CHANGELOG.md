@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.2.1 - 2018-04-05
+
+ - bug fix: Check payload is not null when decoded. (#444) ([1232ae9352ce5fd1ca6c593291ce6ad0834a1ff5](https://github.com/auth0/node-jsonwebtoken/commit/1232ae9352ce5fd1ca6c593291ce6ad0834a1ff5))
+ - docs: Clarify that buffer/string payloads must be JSON (#442) ([e8ac1be7565a3fd986d40cb5e31a9f6c4d9aed1b](https://github.com/auth0/node-jsonwebtoken/commit/e8ac1be7565a3fd986d40cb5e31a9f6c4d9aed1b))
+
+
 ## 8.2.0 - 2018-03-02
 
  - Add a new mutatePayload option (#446) ([d6d7c5e5103f05a92d3633ac190d3025a0455be0](https://github.com/auth0/node-jsonwebtoken/commit/d6d7c5e5103f05a92d3633ac190d3025a0455be0))
