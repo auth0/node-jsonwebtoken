@@ -55,23 +55,30 @@ The header can be customized via the `options.header` object.
 
 Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
-Example
+Sign with default (HMAC SHA256)
 
 ```js
-// sign with default (HMAC SHA256)
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
-//backdate a jwt 30 seconds
-var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
+```
 
+Sign with RSA SHA256
+```js
 // sign with RSA SHA256
-var cert = fs.readFileSync('private.key');  // get private key
+var cert = fs.readFileSync('private.key');
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
+```
 
-// sign asynchronously
+Sign asynchronously
+```js
 jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
+```
+
+Backdate a jwt 30 seconds
+```js
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
 ```
 
 #### Token Expiration (exp claim)
