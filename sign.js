@@ -6,6 +6,7 @@ var isBoolean = require('lodash.isboolean');
 var isInteger = require('lodash.isinteger');
 var isNumber = require('lodash.isnumber');
 var isPlainObject = require('lodash.isplainobject');
+var isObjectLike = require('lodash.isobjectlike');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
@@ -31,8 +32,8 @@ var registered_claims_schema = {
 };
 
 function validate(schema, allowUnknown, object, parameterName) {
-  if (!isPlainObject(object)) {
-    throw new Error('Expected "' + parameterName + '" to be a plain object.');
+  if (!isObjectLike(object)) {
+    throw new Error('Expected "' + parameterName + '" to be object like.');
   }
   Object.keys(object)
     .forEach(function(key) {
