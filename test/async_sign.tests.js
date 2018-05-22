@@ -82,6 +82,30 @@ describe('signing a token asynchronously', function() {
       });
     });
 
+    describe('when mutatePayload is not set', function() {
+      it('should not apply claims to the original payload object (mutatePayload defaults to false)', function(done) {
+        var originalPayload = { foo: 'bar' };
+        jwt.sign(originalPayload, 'secret', { notBefore: 60, expiresIn: 600 }, function (err) {
+          if (err) { return done(err); }
+          expect(originalPayload).to.not.have.property('nbf');
+          expect(originalPayload).to.not.have.property('exp');
+          done();
+        });
+      });
+    });
+
+    describe('when mutatePayload is set to true', function() {
+      it('should apply claims directly to the original payload object', function(done) {
+        var originalPayload = { foo: 'bar' };
+        jwt.sign(originalPayload, 'secret', { notBefore: 60, expiresIn: 600, mutatePayload: true }, function (err) {
+          if (err) { return done(err); }
+          expect(originalPayload).to.have.property('nbf').that.is.a('number');
+          expect(originalPayload).to.have.property('exp').that.is.a('number');
+          done();
+        });
+      });
+    });
+
     describe('secret must have a value', function(){
       [undefined, '', 0].forEach(function(secret){
         it('should return an error if the secret is falsy and algorithm is not set to none: ' + (typeof secret === 'string' ? '(empty string)' : secret), function(done) {

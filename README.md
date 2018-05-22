@@ -21,11 +21,11 @@ $ npm install jsonwebtoken
 
 ### jwt.sign(payload, secretOrPrivateKey, [options, callback])
 
-(Asynchronous) If a callback is supplied, callback is called with the `err` or the JWT.
+(Asynchronous) If a callback is supplied, the callback is called with the `err` or the JWT.
 
 (Synchronous) Returns the JsonWebToken as string
 
-`payload` could be an object literal, buffer or string. *Please note that* `exp` is only set if the payload is an object literal.
+`payload` could be an object literal, buffer or string representing valid JSON. *Please note that* `exp` is only set if the payload is an object literal. Buffer or string payloads are not checked for JSON validity.
 
 `secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
@@ -42,6 +42,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `noTimestamp`
 * `header`
 * `keyid`
+* `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
 
 If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
@@ -54,23 +55,30 @@ The header can be customized via the `options.header` object.
 
 Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
-Example
+Sign with default (HMAC SHA256)
 
 ```js
-// sign with default (HMAC SHA256)
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
-//backdate a jwt 30 seconds
-var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
+```
 
+Sign with RSA SHA256
+```js
 // sign with RSA SHA256
-var cert = fs.readFileSync('private.key');  // get private key
+var cert = fs.readFileSync('private.key');
 var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
+```
 
-// sign asynchronously
+Sign asynchronously
+```js
 jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
+```
+
+Backdate a jwt 30 seconds
+```js
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
 ```
 
 #### Token Expiration (exp claim)
@@ -106,9 +114,9 @@ jwt.sign({
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
 
-(Asynchronous) If a callback is supplied, function acts asynchronously. Callback is passed the decoded payload if the signature and optional expiration, audience, or issuer are valid. If not, it will be passed the error.
+(Asynchronous) If a callback is supplied, function acts asynchronously. The callback is called with the decoded payload if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will be called with the error.
 
-(Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature (and, optionally, expiration, audience, issuer) are valid. If not, it will throw the error.
+(Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
 `token` is the JsonWebToken string
 
@@ -120,7 +128,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 `options`
 
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
-* `audience`: if you want to check audience (`aud`), provide a value here
+* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
@@ -291,7 +299,7 @@ none | No digital signature or MAC value included
 
 First of all, we recommend to think carefully if auto-refreshing a JWT will not introduce any vulnerability in your system.
 
-We are not comfortable including this as part of the library, however, you can take a look to [this example](https://gist.github.com/ziluvatar/a3feb505c4c0ec37059054537b38fc48) to show how this could be accomplish.
+We are not comfortable including this as part of the library, however, you can take a look to [this example](https://gist.github.com/ziluvatar/a3feb505c4c0ec37059054537b38fc48) to show how this could be accomplished.
 Apart from that example there are [an issue](https://github.com/auth0/node-jsonwebtoken/issues/122) and [a pull request](https://github.com/auth0/node-jsonwebtoken/pull/172) to get more knowledge about this topic.
 
 # TODO

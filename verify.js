@@ -131,7 +131,11 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
     var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
 
-    var match = target.some(function(aud) { return audiences.indexOf(aud) != -1; });
+    var match = target.some(function(targetAudience) {
+      return audiences.some(function(audience) {
+        return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+      });
+    });
 
     if (!match)
       return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));

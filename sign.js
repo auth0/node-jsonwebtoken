@@ -21,6 +21,7 @@ var sign_options_schema = {
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
   keyid: { isValid: isString, message: '"keyid" must be a string' },
+  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
 };
 
 var registered_claims_schema = {
@@ -29,16 +30,16 @@ var registered_claims_schema = {
   nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
 };
 
-function validate(schema, unknown, object) {
+function validate(schema, allowUnknown, object, parameterName) {
   if (!isPlainObject(object)) {
-    throw new Error('Expected object');
+    throw new Error('Expected "' + parameterName + '" to be a plain object.');
   }
   Object.keys(object)
     .forEach(function(key) {
       var validator = schema[key];
       if (!validator) {
-        if (!unknown) {
-          throw new Error('"' + key + '" is not allowed');
+        if (!allowUnknown) {
+          throw new Error('"' + key + '" is not allowed in "' + parameterName + '"');
         }
         return;
       }
@@ -46,6 +47,14 @@ function validate(schema, unknown, object) {
         throw new Error(validator.message);
       }
     });
+}
+
+function validateOptions(options) {
+  return validate(sign_options_schema, false, options, 'options');
+}
+
+function validatePayload(payload) {
+  return validate(registered_claims_schema, true, payload, 'payload');
 }
 
 var options_to_payload = {
@@ -97,12 +106,14 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('payload is required'));
   } else if (isObjectPayload) {
     try {
-      validate(registered_claims_schema, true, payload);
+      validatePayload(payload);
     }
     catch (error) {
       return failure(error);
     }
-    payload = xtend(payload);
+    if (!options.mutatePayload) {
+      payload = xtend(payload);
+    }
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
@@ -122,7 +133,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   try {
-    validate(sign_options_schema, false, options);
+    validateOptions(options);
   }
   catch (error) {
     return failure(error);
@@ -137,7 +148,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   if (typeof options.notBefore !== 'undefined') {
-    payload.nbf = timespan(options.notBefore);
+    payload.nbf = timespan(options.notBefore, timestamp);
     if (typeof payload.nbf === 'undefined') {
       return failure(new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
