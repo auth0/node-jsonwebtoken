@@ -25,7 +25,7 @@ $ npm install jsonwebtoken
 
 (Synchronous) Returns the JsonWebToken as string
 
-`payload` could be an object literal, buffer or string representing valid JSON. *Please note that* `exp` is only set if the payload is an object literal. Buffer or string payloads are not checked for JSON validity.
+`payload` could be an object literal, buffer or string representing valid JSON. *Please note that* `exp` or any other claim is only set if the payload is an object literal. Buffer or string payloads are not checked for JSON validity.
 
 `secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
@@ -33,8 +33,8 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 `options`:
 
 * `algorithm` (default: `HS256`)
-* `expiresIn`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
-* `notBefore`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`
+* `expiresIn`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
+* `notBefore`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `audience`
 * `issuer`
 * `jwtid`
@@ -134,7 +134,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
-* `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`.
+* `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 
 
