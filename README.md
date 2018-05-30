@@ -122,12 +122,13 @@ jwt.sign({
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example.
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. If your `token` is unsigned, this option must include `["none"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
@@ -197,6 +198,16 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
 });
 
+// Verify using getKey callback
+function getKey(header, callback) {
+  // fetch secret or public key
+  const key = ...;
+  callback(null, key);
+}
+
+verify(token, getKey, options, function(err, decoded) {
+  console.log(decoded.foo) // bar
+});
 ```
 
 ### jwt.decode(token [, options])
