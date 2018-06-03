@@ -29,6 +29,7 @@ $ npm install jsonwebtoken
 
 `secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 `options`:
 
@@ -195,6 +196,17 @@ jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwt
 var cert = fs.readFileSync('public.pem'); // get public key
 jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
+});
+
+// Verify using getKey callback
+function getKey(header, callback) {
+  // fetch secret or public key
+  const key = ...;
+  callback(null, key);
+}
+
+verify(token, getKey, options, function(err, decoded) {
+  console.log(decoded.foo) // bar
 });
 
 ```
