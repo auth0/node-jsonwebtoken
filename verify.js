@@ -61,13 +61,13 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   var decodedToken;
   try {
-      decodedToken = decode(jwtString, { complete: true });
+    decodedToken = decode(jwtString, { complete: true });
   } catch(err) {
-      return done(err);
+    return done(err);
   }
 
   if (!decodedToken) {
-      return done(new JsonWebTokenError('invalid token'));
+    return done(new JsonWebTokenError('invalid token'));
   }
 
   var header = decodedToken.header;
