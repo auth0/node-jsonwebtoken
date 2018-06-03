@@ -31,12 +31,12 @@
     "xtend": "^4.0.1"
   },
   "devDependencies": {
-    "atob": "^1.1.2",
+    "atob": "^2.1.1",
     "chai": "^1.10.0",
     "conventional-changelog": "~1.1.0",
     "cost-of-modules": "^1.0.1",
-    "mocha": "^2.1.0",
-    "nsp": "^2.6.2",
+    "mocha": "^5.2.0",
+    "nsp": "^3.2.1",
     "sinon": "^1.15.4"
   },
   "engines": {
