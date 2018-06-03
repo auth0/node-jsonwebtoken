@@ -27,8 +27,7 @@
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
-    "ms": "^2.1.1",
-    "xtend": "^4.0.1"
+    "ms": "^2.1.1"
   },
   "devDependencies": {
     "atob": "^1.1.2",
