@@ -42,6 +42,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if (typeof jwtString !== 'string') {
     return done(new JsonWebTokenError('jwt must be a string'));
   }
+  
+  var parts = jwtString.split('.');
+
+  if (parts.length !== 3){
+    return done(new JsonWebTokenError('jwt malformed'));
+  }
 
   var decodedToken;
   try {
@@ -69,15 +75,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       };
   }
 
-  return getSecret(decodedToken, function(err, secretOrPublicKey) {
+  return getSecret(decodedToken.header, function(err, secretOrPublicKey) {
       if(err) {
           return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
-      }
-
-      var parts = jwtString.split('.');
-
-      if (parts.length !== 3){
-        return done(new JsonWebTokenError('jwt malformed'));
       }
 
       var hasSignature = parts[2].trim() !== '';
