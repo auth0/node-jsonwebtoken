@@ -43,22 +43,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt must be a string'));
   }
 
-  var parts = jwtString.split('.');
-
-  if (parts.length !== 3){
-    return done(new JsonWebTokenError('jwt malformed'));
-  }
-
-  var hasSignature = parts[2].trim() !== '';
-
-  if (!hasSignature && secretOrPublicKey){
-    return done(new JsonWebTokenError('jwt signature is required'));
-  }
-
-  if (hasSignature && !secretOrPublicKey) {
-    return done(new JsonWebTokenError('secret or public key must be provided'));
-  }
-
   var decodedToken;
   try {
     decodedToken = decode(jwtString, { complete: true });
@@ -70,8 +54,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('invalid token'));
   }
 
-  var header = decodedToken.header;
-
   var getSecret;
 
   if(typeof secretOrPublicKey === 'function') {
@@ -82,14 +64,30 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       getSecret = secretOrPublicKey;
   }
   else {
-      getSecret = function(header, secretCallback) {
+      getSecret = function(decodedToken, secretCallback) {
           return secretCallback(null, secretOrPublicKey);
       };
   }
 
-  return getSecret(header, function(err, secretOrPublicKey) {
+  return getSecret(decodedToken, function(err, secretOrPublicKey) {
       if(err) {
           return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
+      }
+
+      var parts = jwtString.split('.');
+
+      if (parts.length !== 3){
+        return done(new JsonWebTokenError('jwt malformed'));
+      }
+
+      var hasSignature = parts[2].trim() !== '';
+
+      if (!hasSignature && secretOrPublicKey){
+        return done(new JsonWebTokenError('jwt signature is required'));
+      }
+
+      if (hasSignature && !secretOrPublicKey) {
+        return done(new JsonWebTokenError('secret or public key must be provided'));
       }
 
       if (!hasSignature && !options.algorithms) {
@@ -106,14 +104,14 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
       }
 
-      if (!~options.algorithms.indexOf(header.alg)) {
+      if (!~options.algorithms.indexOf(decodedToken.header.alg)) {
           return done(new JsonWebTokenError('invalid algorithm'));
       }
 
       var valid;
 
       try {
-          valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
+          valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
       } catch (e) {
           return done(e);
       }
@@ -121,13 +119,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       if (!valid)
           return done(new JsonWebTokenError('invalid signature'));
 
-      var payload;
-
-      try {
-          payload = decode(jwtString);
-      } catch (err) {
-          return done(err);
-      }
+      var payload = decodedToken.payload;
 
       if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
           if (typeof payload.nbf !== 'number') {

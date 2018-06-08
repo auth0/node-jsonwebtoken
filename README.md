@@ -29,7 +29,6 @@ $ npm install jsonwebtoken
 
 `secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
-If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 `options`:
 
@@ -123,6 +122,7 @@ jwt.sign({
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
