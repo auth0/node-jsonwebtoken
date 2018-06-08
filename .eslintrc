@@ -1,0 +1,8 @@
+{
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "indent": [2,2]
+  }
+}
