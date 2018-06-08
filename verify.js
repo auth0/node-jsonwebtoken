@@ -72,7 +72,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       getSecret = secretOrPublicKey;
   }
   else {
-      getSecret = function(decodedToken, secretCallback) {
+      getSecret = function(header, secretCallback) {
           return secretCallback(null, secretOrPublicKey);
       };
   }
