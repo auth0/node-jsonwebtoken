@@ -199,13 +199,19 @@ jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
 });
 
 // Verify using getKey callback
-function getKey(header, callback) {
-  // fetch secret or public key
-  const key = ...;
-  callback(null, key);
+// Example uses https://github.com/auth0/node-jwks-rsa as a way to fetch the keys.
+var jwksClient = require('jwks-rsa');
+var client = jwksClient({
+  jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
+});
+function getKey(header, callback){
+  client.getSigningKey(header.kid, function(err, key) {
+    var signingKey = key.publicKey || key.rsaPublicKey;
+    callback(null, signingKey);
+  });
 }
 
-verify(token, getKey, options, function(err, decoded) {
+jwt.verify(token, getKey, options, function(err, decoded) {
   console.log(decoded.foo) // bar
 });
 

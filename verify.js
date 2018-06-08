@@ -118,8 +118,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
           return done(e);
       }
 
-      if (!valid)
+      if (!valid) {
           return done(new JsonWebTokenError('invalid signature'));
+      }
 
       var payload = decodedToken.payload;
 
@@ -151,8 +152,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
               });
           });
 
-          if (!match)
+          if (!match) {
               return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+          }
       }
 
       if (options.issuer) {
