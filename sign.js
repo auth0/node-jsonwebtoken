@@ -1,5 +1,4 @@
 var timespan = require('./lib/timespan');
-var xtend = require('xtend');
 var jws = require('jws');
 var includes = require('lodash.includes');
 var isBoolean = require('lodash.isboolean');
@@ -85,7 +84,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
-  var header = xtend({
+  var header = Object.assign({
     alg: options.algorithm || 'HS256',
     typ: isObjectPayload ? 'JWT' : undefined,
     kid: options.keyid
@@ -112,7 +111,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
       return failure(error);
     }
     if (!options.mutatePayload) {
-      payload = xtend(payload);
+      payload = Object.assign({},payload);
     }
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {

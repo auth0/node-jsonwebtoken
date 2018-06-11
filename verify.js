@@ -4,7 +4,6 @@ var TokenExpiredError = require('./lib/TokenExpiredError');
 var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var jws               = require('jws');
-var xtend             = require('xtend');
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -17,7 +16,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   //clone this object since we are going to mutate it.
-  options = xtend(options);
+  options = Object.assign({}, options);
+
   var done;
 
   if (callback) {
@@ -49,33 +49,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt malformed'));
   }
 
-  var hasSignature = parts[2].trim() !== '';
-
-  if (!hasSignature && secretOrPublicKey){
-    return done(new JsonWebTokenError('jwt signature is required'));
-  }
-
-  if (hasSignature && !secretOrPublicKey) {
-    return done(new JsonWebTokenError('secret or public key must be provided'));
-  }
-
-  if (!hasSignature && !options.algorithms) {
-    options.algorithms = ['none'];
-  }
-
-  if (!options.algorithms) {
-    options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
-                         ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
-                          [ 'RS256','RS384','RS512','ES256','ES384','ES512' ] :
-                         ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ?
-                          [ 'RS256','RS384','RS512' ] :
-                          [ 'HS256','HS384','HS512' ];
-
-  }
-
   var decodedToken;
+
   try {
-    decodedToken = jws.decode(jwtString);
+    decodedToken = decode(jwtString, { complete: true });
   } catch(err) {
     return done(err);
   }
@@ -85,97 +62,137 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   var header = decodedToken.header;
+  var getSecret;
 
-  if (!~options.algorithms.indexOf(header.alg)) {
-    return done(new JsonWebTokenError('invalid algorithm'));
-  }
-
-  var valid;
-
-  try {
-    valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
-  } catch (e) {
-    return done(e);
-  }
-
-  if (!valid)
-    return done(new JsonWebTokenError('invalid signature'));
-
-  var payload;
-
-  try {
-    payload = decode(jwtString);
-  } catch(err) {
-    return done(err);
-  }
-
-  if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
-    if (typeof payload.nbf !== 'number') {
-      return done(new JsonWebTokenError('invalid nbf value'));
+  if(typeof secretOrPublicKey === 'function') {
+    if(!callback) {
+      return done(new JsonWebTokenError('verify must be called asynchronous if secret or public key is provided as a callback'));
     }
-    if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
-      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
-    }
+
+    getSecret = secretOrPublicKey;
+  }
+  else {
+    getSecret = function(header, secretCallback) {
+      return secretCallback(null, secretOrPublicKey);
+    };
   }
 
-  if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
-    if (typeof payload.exp !== 'number') {
-      return done(new JsonWebTokenError('invalid exp value'));
+  return getSecret(header, function(err, secretOrPublicKey) {
+    if(err) {
+      return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
     }
-    if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
-      return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+
+    var hasSignature = parts[2].trim() !== '';
+
+    if (!hasSignature && secretOrPublicKey){
+      return done(new JsonWebTokenError('jwt signature is required'));
     }
-  }
 
-  if (options.audience) {
-    var audiences = Array.isArray(options.audience)? options.audience : [options.audience];
-    var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    if (hasSignature && !secretOrPublicKey) {
+      return done(new JsonWebTokenError('secret or public key must be provided'));
+    }
 
-    var match = target.some(function(targetAudience) {
-      return audiences.some(function(audience) {
-        return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+    if (!hasSignature && !options.algorithms) {
+      options.algorithms = ['none'];
+    }
+
+    if (!options.algorithms) {
+      options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
+          ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
+        ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'] :
+        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ?
+          ['RS256', 'RS384', 'RS512'] :
+          ['HS256', 'HS384', 'HS512'];
+
+    }
+
+    if (!~options.algorithms.indexOf(decodedToken.header.alg)) {
+      return done(new JsonWebTokenError('invalid algorithm'));
+    }
+
+    var valid;
+
+    try {
+      valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
+    } catch (e) {
+      return done(e);
+    }
+
+    if (!valid) {
+      return done(new JsonWebTokenError('invalid signature'));
+    }
+
+    var payload = decodedToken.payload;
+
+    if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
+      if (typeof payload.nbf !== 'number') {
+        return done(new JsonWebTokenError('invalid nbf value'));
+      }
+      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
+        return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
+      }
+    }
+
+    if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
+      if (typeof payload.exp !== 'number') {
+        return done(new JsonWebTokenError('invalid exp value'));
+      }
+      if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
+        return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+      }
+    }
+
+    if (options.audience) {
+      var audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
+      var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+
+      var match = target.some(function (targetAudience) {
+        return audiences.some(function (audience) {
+          return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+        });
       });
-    });
 
-    if (!match)
-      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
-  }
-
-  if (options.issuer) {
-    var invalid_issuer =
-        (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
-        (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
-
-    if (invalid_issuer) {
-      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
-    }
-  }
-
-  if (options.subject) {
-    if (payload.sub !== options.subject) {
-      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
-    }
-  }
-
-  if (options.jwtid) {
-    if (payload.jti !== options.jwtid) {
-      return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
-    }
-  }
-
-  if (options.maxAge) {
-    if (typeof payload.iat !== 'number') {
-      return done(new JsonWebTokenError('iat required when maxAge is specified'));
+      if (!match) {
+        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+      }
     }
 
-    var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
-    if (typeof maxAgeTimestamp === 'undefined') {
-      return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
-    }
-    if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
-      return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
-    }
-  }
+    if (options.issuer) {
+      var invalid_issuer =
+              (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
+              (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
 
-  return done(null, payload);
+      if (invalid_issuer) {
+        return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+      }
+    }
+
+    if (options.subject) {
+      if (payload.sub !== options.subject) {
+        return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
+      }
+    }
+
+    if (options.jwtid) {
+      if (payload.jti !== options.jwtid) {
+        return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+      }
+    }
+
+    if (options.maxAge) {
+      if (typeof payload.iat !== 'number') {
+        return done(new JsonWebTokenError('iat required when maxAge is specified'));
+      }
+
+      var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
+      if (typeof maxAgeTimestamp === 'undefined') {
+        return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+      }
+      if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
+        return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
+      }
+    }
+
+    return done(null, payload);
+  });
 };

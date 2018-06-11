@@ -122,6 +122,7 @@ jwt.sign({
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
@@ -195,6 +196,23 @@ jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwt
 var cert = fs.readFileSync('public.pem'); // get public key
 jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
+});
+
+// Verify using getKey callback
+// Example uses https://github.com/auth0/node-jwks-rsa as a way to fetch the keys.
+var jwksClient = require('jwks-rsa');
+var client = jwksClient({
+  jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
+});
+function getKey(header, callback){
+  client.getSigningKey(header.kid, function(err, key) {
+    var signingKey = key.publicKey || key.rsaPublicKey;
+    callback(null, signingKey);
+  });
+}
+
+jwt.verify(token, getKey, options, function(err, decoded) {
+  console.log(decoded.foo) // bar
 });
 
 ```
