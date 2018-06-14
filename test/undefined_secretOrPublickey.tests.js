@@ -1,4 +1,3 @@
-var fs = require('fs');
 var jwt = require('../index');
 var JsonWebTokenError = require('../lib/JsonWebTokenError');
 var expect = require('chai').expect;
