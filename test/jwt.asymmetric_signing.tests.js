@@ -5,6 +5,7 @@ var path = require('path');
 var expect = require('chai').expect;
 var assert = require('chai').assert;
 var ms = require('ms');
+var sinon = require('sinon');
 
 function loadKey(filename) {
   return fs.readFileSync(path.join(__dirname, filename));
@@ -140,14 +141,14 @@ describe('Asymmetric Algorithms', function(){
 
 
         it('should valid when date are equals', function (done) {
-          Date.fix(1451908031);
+          var fakeClock = sinon.useFakeTimers({now: 1451908031});
 
           token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, notBefore: 0 });
 
           jwt.verify(token, pub, function (err, decoded) {
+            fakeClock.uninstall();
             assert.isNull(err);
             assert.isNotNull(decoded);
-            Date.unfix();
             done();
           });
         });
