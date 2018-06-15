@@ -105,19 +105,5 @@ describe('signing a token asynchronously', function() {
         });
       });
     });
-
-    describe('secret must have a value', function(){
-      [undefined, '', 0].forEach(function(secret){
-        it('should return an error if the secret is falsy and algorithm is not set to none: ' + (typeof secret === 'string' ? '(empty string)' : secret), function(done) {
-        // This is needed since jws will not answer for falsy secrets
-          jwt.sign('string', secret, {}, function(err, token) {
-            expect(err).to.be.exist();
-            expect(err.message).to.equal('secretOrPrivateKey must have a value');
-            expect(token).to.not.exist;
-            done();
-          });
-        });
-      });
-    });
   });
 });

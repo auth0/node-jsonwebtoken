@@ -23,31 +23,4 @@ describe('expires option', function() {
     expect(result.exp).to.be.closeTo(Math.floor(Date.now() / 1000) + day_and_a_half_in_secs, 0.2);
   });
 
-
-  it('should throw if expires has a bad string format', function () {
-    expect(function () {
-      jwt.sign({foo: 123}, '123', { expiresIn: '1 monkey' });
-    }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
-  });
-
-  it('should throw if expires is not an string or number', function () {
-    expect(function () {
-      jwt.sign({foo: 123}, '123', { expiresIn: { crazy : 213 } });
-    }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
-  });
-
-  it('should throw an error if expiresIn and exp are provided', function () {
-    expect(function () {
-      jwt.sign({ foo: 123, exp: 839218392183 }, '123', { expiresIn: '5h' });
-    }).to.throw(/Bad "options.expiresIn" option the payload already has an "exp" property./);
-  });
-
-
-  it('should throw on deprecated expiresInSeconds option', function () {
-    expect(function () {
-      jwt.sign({foo: 123}, '123', { expiresInSeconds: 5 });
-    }).to.throw('"expiresInSeconds" is not allowed');
-  });
-
-
 });
