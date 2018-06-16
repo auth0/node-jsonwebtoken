@@ -4,7 +4,7 @@
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha --require test/util/fakeDate && nsp check && cost-of-modules"
+    "test": "nyc --reporter=html --reporter=text mocha && nsp check && cost-of-modules"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
     "mocha": "^2.1.0",
     "nsp": "^2.6.2",
     "nyc": "^11.8.0",
-    "sinon": "^1.15.4"
+    "sinon": "^6.0.0"
   },
   "engines": {
     "npm": ">=1.4.28",
