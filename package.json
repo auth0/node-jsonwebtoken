@@ -10,7 +10,7 @@
     "functions": 100,
     "branches": 95,
     "exclude": [
-      "./test/**",
+      "./test/**"
     ],
     "reporter": [
       "json",
