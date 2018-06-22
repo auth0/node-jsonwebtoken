@@ -333,33 +333,6 @@ describe('verify', function() {
           done();
         });
       });
-      it('should verify valid token with nbf', function (done) {
-        var token = jwt.sign({
-          foo: 'bar',
-          iat: clockTimestamp,
-          nbf: clockTimestamp + 1,
-          exp: clockTimestamp + 2
-        }, key);
-        jwt.verify(token, key, {clockTimestamp: clockTimestamp + 1}, function (err) {
-          assert.isNull(err);
-          done();
-        });
-      });
-      it('should error on token used before nbf', function (done) {
-        var token = jwt.sign({
-          foo: 'bar',
-          iat: clockTimestamp,
-          nbf: clockTimestamp + 1,
-          exp: clockTimestamp + 2
-        }, key);
-        jwt.verify(token, key, {clockTimestamp: clockTimestamp}, function (err, p) {
-          assert.equal(err.name, 'NotBeforeError');
-          assert.equal(err.date.constructor.name, 'Date');
-          assert.equal(Number(err.date), (clockTimestamp + 1) * 1000);
-          assert.isUndefined(p);
-          done();
-        });
-      });
     });
 
     describe('option: maxAge and clockTimestamp', function () {

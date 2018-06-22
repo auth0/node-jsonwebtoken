@@ -5,7 +5,6 @@ var path = require('path');
 var expect = require('chai').expect;
 var assert = require('chai').assert;
 var ms = require('ms');
-var sinon = require('sinon');
 
 function loadKey(filename) {
   return fs.readFileSync(path.join(__dirname, filename));
@@ -107,57 +106,6 @@ describe('Asymmetric Algorithms', function(){
           token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, expiresIn: -1 * ms('10m') });
 
           jwt.verify(token, pub, { ignoreExpiration: true }, function (err, decoded) {
-            assert.ok(decoded.foo);
-            assert.equal('bar', decoded.foo);
-            done();
-          });
-        });
-      });
-
-      describe('when signing a token with not before', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, notBefore: -10 * 3600 });
-
-        it('should be valid expiration', function (done) {
-          jwt.verify(token, pub, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
-            done();
-          });
-        });
-
-        it('should be invalid', function (done) {
-          // not active token
-          token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, notBefore: '10m' });
-
-          jwt.verify(token, pub, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'NotBeforeError');
-            assert.instanceOf(err.date, Date);
-            assert.instanceOf(err, jwt.NotBeforeError);
-            done();
-          });
-        });
-
-
-        it('should valid when date are equals', function (done) {
-          var fakeClock = sinon.useFakeTimers({now: 1451908031});
-
-          token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, notBefore: 0 });
-
-          jwt.verify(token, pub, function (err, decoded) {
-            fakeClock.uninstall();
-            assert.isNull(err);
-            assert.isNotNull(decoded);
-            done();
-          });
-        });
-
-        it('should NOT be invalid', function (done) {
-          // not active token
-          token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, notBefore: '10m' });
-
-          jwt.verify(token, pub, { ignoreNotBefore: true }, function (err, decoded) {
             assert.ok(decoded.foo);
             assert.equal('bar', decoded.foo);
             done();
