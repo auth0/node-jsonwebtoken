@@ -4,7 +4,8 @@
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha && nsp check && cost-of-modules"
+    "test:unit": "nyc --reporter=html --reporter=text mocha",
+    "test": "npm run test:unit && nsp check && cost-of-modules"
   },
   "repository": {
     "type": "git",

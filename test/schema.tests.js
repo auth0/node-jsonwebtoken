@@ -25,17 +25,6 @@ describe('schema', function() {
       sign({ expiresIn: 10 });
     });
 
-    it('should validate notBefore', function () {
-      expect(function () {
-        sign({ notBefore: '1 monkey' });
-      }).to.throw(/"notBefore" should be a number of seconds or string representing a timespan/);
-      expect(function () {
-        sign({ notBefore: 1.1 });
-      }).to.throw(/"notBefore" should be a number of seconds or string representing a timespan/);
-      sign({ notBefore: '10s' });
-      sign({ notBefore: 10 });
-    });
-
     it('should validate audience', function () {
       expect(function () {
         sign({ audience: 10 });
@@ -122,13 +111,6 @@ describe('schema', function() {
         sign({ exp: '1 monkey' });
       }).to.throw(/"exp" should be a number of seconds/);
       sign({ exp: 10.1 });
-    });
-
-    it('should validate nbf', function () {
-      expect(function () {
-        sign({ nbf: '1 monkey' });
-      }).to.throw(/"nbf" should be a number of seconds/);
-      sign({ nbf: 10.1 });
     });
 
   });
