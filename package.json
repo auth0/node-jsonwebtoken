@@ -3,9 +3,24 @@
   "version": "8.3.0",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
+  "nyc": {
+    "check-coverage": true,
+    "lines": 95,
+    "statements": 95,
+    "functions": 100,
+    "branches": 95,
+    "exclude": [
+      "./test/**"
+    ],
+    "reporter": [
+      "json",
+      "lcov",
+      "text-summary"
+    ]
+  },
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && nyc --reporter=html --reporter=text mocha && nsp check && cost-of-modules"
+    "test": "npm run lint && nyc mocha && nsp check && cost-of-modules"
   },
   "repository": {
     "type": "git",
