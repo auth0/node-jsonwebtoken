@@ -1,6 +1,5 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
-var atob = require('atob');
 
 describe('decoding', function() {
 

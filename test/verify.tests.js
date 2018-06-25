@@ -308,7 +308,7 @@ describe('verify', function() {
       var clockTimestamp = 1000000000;
       it('should verify unexpired token relative to user-provided clockTimestamp', function (done) {
         var token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
-        jwt.verify(token, key, {clockTimestamp: clockTimestamp}, function (err, p) {
+        jwt.verify(token, key, {clockTimestamp: clockTimestamp}, function (err) {
           assert.isNull(err);
           done();
         });
@@ -340,7 +340,7 @@ describe('verify', function() {
           nbf: clockTimestamp + 1,
           exp: clockTimestamp + 2
         }, key);
-        jwt.verify(token, key, {clockTimestamp: clockTimestamp + 1}, function (err, p) {
+        jwt.verify(token, key, {clockTimestamp: clockTimestamp + 1}, function (err) {
           assert.isNull(err);
           done();
         });

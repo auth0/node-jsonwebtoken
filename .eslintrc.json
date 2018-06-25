@@ -1,0 +1,23 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "rules": {
+    "comma-style": "error",
+    "dot-notation": "error",
+    "indent": ["error", 2],
+    "no-control-regex": "error",
+    "no-div-regex": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-invalid-regexp": "error",
+    "no-trailing-spaces": "error",
+    "no-undef": "error",
+    "no-unused-vars": "error"
+  }
+}
