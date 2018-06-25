@@ -19,7 +19,8 @@
     ]
   },
   "scripts": {
-    "test": "nyc mocha && nsp check && cost-of-modules"
+    "lint": "eslint .",
+    "test": "npm run lint && nyc mocha && nsp check && cost-of-modules"
   },
   "repository": {
     "type": "git",
@@ -49,6 +50,7 @@
     "chai": "^1.10.0",
     "conventional-changelog": "~1.1.0",
     "cost-of-modules": "^1.0.1",
+    "eslint": "^4.19.1",
     "mocha": "^2.1.0",
     "nsp": "^2.6.2",
     "nyc": "^11.8.0",

@@ -1,13 +1,12 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
-var assert = require('chai').assert;
 
 describe('invalid expiration', function() {
 
   it('should fail with string', function (done) {
     var broken_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxMjMiLCJmb28iOiJhZGFzIn0.cDa81le-pnwJMcJi3o3PBwB7cTJMiXCkizIhxbXAKRg';
 
-    jwt.verify(broken_token, '123', function (err, decoded) {
+    jwt.verify(broken_token, '123', function (err) {
       expect(err.name).to.equal('JsonWebTokenError');
       done();
     });

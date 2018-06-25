@@ -102,7 +102,7 @@ describe('HS256', function() {
 
     it('should return the "invalid token" error', function(done) {
       var malformedToken = token + ' '; // corrupt the token by adding a space
-      jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err, decoded) {
+      jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err) {
         assert.isNotNull(err);
         assert.equal('JsonWebTokenError', err.name);
         assert.equal('invalid token', err.message);
