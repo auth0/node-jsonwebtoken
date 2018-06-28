@@ -4,14 +4,10 @@ const jwt = require('../');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const util = require('util');
+const testUtils = require('./test-utils');
 
-function base64UrlEncode(str) {
-  return Buffer.from(str).toString('base64')
-    .replace(/\=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-  ;
-}
+const base64UrlEncode = testUtils.base64UrlEncode;
+const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
 
 function signWithNoBefore(payload, notBefore) {
   const options = {algorithm: 'none'};
@@ -20,8 +16,6 @@ function signWithNoBefore(payload, notBefore) {
   }
   return jwt.sign(payload, undefined, options);
 }
-
-const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
 
 describe('not before', function() {
   describe('`jwt.sign` "notBefore" option validation', function () {
