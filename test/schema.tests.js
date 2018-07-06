@@ -14,17 +14,6 @@ describe('schema', function() {
       jwt.sign({foo: 123}, isEcdsa ? cert_ecdsa_priv : cert_rsa_priv, options);
     }
 
-    it('should validate expiresIn', function () {
-      expect(function () {
-        sign({ expiresIn: '1 monkey' });
-      }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
-      expect(function () {
-        sign({ expiresIn: 1.1 });
-      }).to.throw(/"expiresIn" should be a number of seconds or string representing a timespan/);
-      sign({ expiresIn: '10s' });
-      sign({ expiresIn: 10 });
-    });
-
     it('should validate audience', function () {
       expect(function () {
         sign({ audience: 10 });

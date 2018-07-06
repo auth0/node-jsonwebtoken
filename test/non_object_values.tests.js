@@ -10,13 +10,6 @@ describe('non_object_values values', function() {
     expect(result).to.equal('hello');
   });
 
-  //v6 version will throw in this case:
-  it('should throw with expiresIn', function () {
-    expect(function () {
-      jwt.sign('hello', '123', { expiresIn: '12h' });
-    }).to.throw(/invalid expiresIn option for string payload/);
-  });
-
   it('should fail to validate audience when the payload is string', function () {
     var token = jwt.sign('hello', '123');
     expect(function () {
