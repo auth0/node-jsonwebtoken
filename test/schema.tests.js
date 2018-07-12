@@ -14,14 +14,6 @@ describe('schema', function() {
       jwt.sign({foo: 123}, isEcdsa ? cert_ecdsa_priv : cert_rsa_priv, options);
     }
 
-    it('should validate audience', function () {
-      expect(function () {
-        sign({ audience: 10 });
-      }).to.throw(/"audience" must be a string or array/);
-      sign({ audience: 'urn:foo' });
-      sign({ audience: ['urn:foo'] });
-    });
-
     it('should validate algorithm', function () {
       expect(function () {
         sign({ algorithm: 'foo' });
