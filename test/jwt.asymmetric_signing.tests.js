@@ -157,42 +157,6 @@ describe('Asymmetric Algorithms', function(){
         });
       });
 
-      describe('when signing a token with subject', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, subject: 'subject' });
-
-        it('should check subject', function (done) {
-          jwt.verify(token, pub, { subject: 'subject' }, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
-            done();
-          });
-        });
-
-        it('should throw when invalid subject', function (done) {
-          jwt.verify(token, pub, { subject: 'wrongSubject' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
-      describe('when signing a token without subject', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm });
-
-        it('should check subject', function (done) {
-          jwt.verify(token, pub, { subject: 'subject' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
       describe('when signing a token with jwt id', function () {
         var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, jwtid: 'jwtid' });
 
