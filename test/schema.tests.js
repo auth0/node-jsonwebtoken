@@ -51,13 +51,6 @@ describe('schema', function() {
       sign({issuer: 'foo'});
     });
 
-    it('should validate subject', function () {
-      expect(function () {
-        sign({ subject: 10 });
-      }).to.throw(/"subject" must be a string/);
-      sign({subject: 'foo'});
-    });
-
     it('should validate noTimestamp', function () {
       expect(function () {
         sign({ noTimestamp: 10 });
