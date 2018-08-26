@@ -73,13 +73,6 @@ describe('schema', function() {
       jwt.sign(payload, 'foo123');
     }
 
-    it('should validate iat', function () {
-      expect(function () {
-        sign({ iat: '1 monkey' });
-      }).to.throw(/"iat" should be a number of seconds/);
-      sign({ iat: 10.1 });
-    });
-
     it('should validate exp', function () {
       expect(function () {
         sign({ exp: '1 monkey' });
