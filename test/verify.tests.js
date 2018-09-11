@@ -69,6 +69,30 @@ describe('verify', function() {
     });
   });
 
+  describe('option: complete', function() {
+    it('should return header, payload and signature', function (done) {
+      var header = { alg: 'RS256' };
+      var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+      var signed = jws.sign({
+        header: header,
+        payload: payload,
+        secret: priv,
+        encoding: 'utf8'
+      });
+
+      var signature = jws.decode(signed).signature;
+
+      jwt.verify(signed, pub, {typ: 'JWT', complete: true}, function(err, p) {
+        assert.isNull(err);
+        assert.deepEqual(p.header, header);
+        assert.deepEqual(p.payload, payload);
+        assert.deepEqual(p.signature, signature);
+        done();
+      });
+    });
+  });
+
   describe('secret or token as callback', function () {
     var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU5Mn0.3aR3vocmgRpG05rsI9MpR6z2T_BGtMQaPq2YR6QaroU';
     var key = 'key';

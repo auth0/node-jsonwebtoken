@@ -193,6 +193,19 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
+    //return header if `complete` option is enabled.  header includes claims
+    //such as `kid` and `alg` used to select the key within a JWKS needed to
+    //verify the signature
+    if (options.complete === true) {
+      var signature = decodedToken.signature;
+
+      return done(null, {
+        header: header,
+        payload: payload,
+        signature: signature
+      });
+    }
+
     return done(null, payload);
   });
 };
