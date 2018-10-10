@@ -298,6 +298,30 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 });
 ```
 
+### NotBeforeError
+Thrown if current time is before the nbf claim.
+
+Error object:
+
+* name: 'NotBeforeError'
+* message: 'jwt not active'
+* date: 2018-10-04T16:10:44.000Z
+
+```js
+jwt.verify(token, 'shhhhh', function(err, decoded) {
+  if (err) {
+    /*
+      err = {
+        name: 'NotBeforeError',
+        message: 'jwt not active',
+        date: 2018-10-04T16:10:44.000Z
+      }
+    */
+  }
+});
+```
+
+
 ## Algorithms supported
 
 Array of supported algorithms. The following algorithms are currently supported.
