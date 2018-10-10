@@ -46,12 +46,12 @@ describe('expires', function() {
       });
     });
 
-    // TODO this should throw the same error as other invalid inputs
     it(`should error with with value ''`, function (done) {
       signWithExpiresIn('', {}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', 'val is not a non-empty string or a valid number. val=""');
+          expect(err).to.have.property('message')
+            .match(/"expiresIn" should be a number of seconds or string representing a timespan/);
         });
       });
     });

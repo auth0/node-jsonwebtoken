@@ -51,7 +51,8 @@ describe('not before', function() {
       signWithNotBefore('', {}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', 'val is not a non-empty string or a valid number. val=""');
+          expect(err).to.have.property('message')
+            .match(/"notBefore" should be a number of seconds or string representing a timespan/);
         });
       });
     });
