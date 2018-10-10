@@ -113,6 +113,9 @@ describe('expires', function() {
       ['foo'],
       {},
       {foo: 'bar'},
+      -Infinity,
+      Infinity,
+      NaN,
     ].forEach((exp) => {
       it(`should error with with value ${util.inspect(exp)}`, function (done) {
         signWithExpiresIn(undefined, {exp}, (err) => {
@@ -238,39 +241,6 @@ describe('expires', function() {
             expect(decoded).to.have.property('exp', 60);
           });
         })
-      });
-    });
-
-    // TODO an exp of -Infinity should fail validation
-    it('should set null "exp" when given -Infinity', function (done) {
-      signWithExpiresIn(undefined, {exp: -Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
-        });
-      });
-    });
-
-    // TODO an exp of Infinity should fail validation
-    it('should set null "exp" when given value Infinity', function (done) {
-      signWithExpiresIn(undefined, {exp: Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
-        });
-      });
-    });
-
-    // TODO an exp of NaN should fail validation
-    it('should set null "exp" when given value NaN', function (done) {
-      signWithExpiresIn(undefined, {exp: NaN}, (err, token) => {
-        const decoded = jwt.decode(token);
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
-        });
       });
     });
 

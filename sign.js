@@ -23,10 +23,14 @@ var sign_options_schema = {
   mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
 };
 
+var isValidNumber = function(value) {
+  return isNumber(value) && isFinite(value) && !isNaN(value);
+};
+
 var registered_claims_schema = {
-  iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
-  exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
-  nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
+  iat: { isValid: isValidNumber , message: '"iat" should be a number of seconds' },
+  exp: { isValid: isValidNumber, message: '"exp" should be a number of seconds' },
+  nbf: { isValid: isValidNumber, message: '"nbf" should be a number of seconds' }
 };
 
 function validate(schema, allowUnknown, object, parameterName) {
