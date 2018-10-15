@@ -147,7 +147,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   if (typeof options.notBefore !== 'undefined') {
-    payload.nbf = timespan(options.notBefore, timestamp);
+    try {
+      payload.nbf = timespan(options.notBefore, timestamp);
+    }
+    catch (err) {
+      return failure(err);
+    }
     if (typeof payload.nbf === 'undefined') {
       return failure(new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
