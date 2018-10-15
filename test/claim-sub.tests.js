@@ -3,13 +3,14 @@
 const jwt = require('../');
 const expect = require('chai').expect;
 const util = require('util');
+const testUtils = require('./test-utils');
 
-function signWithSubject(payload, subject) {
+function signWithSubject(subject, payload, callback) {
   const options = {algorithm: 'none'};
   if (subject !== undefined) {
     options.subject = subject;
   }
-  return jwt.sign(payload, undefined, options);
+  testUtils.signJWTHelper(payload, 'secret', options, callback);
 }
 
 describe('subject', function() {
@@ -31,77 +32,122 @@ describe('subject', function() {
       {},
       {foo: 'bar'},
     ].forEach((subject) => {
-      it(`should error with with value ${util.inspect(subject)}`, function () {
-        expect(() => signWithSubject({}, subject)).to.throw('"subject" must be a string');
+      it(`should error with with value ${util.inspect(subject)}`, function (done) {
+        signWithSubject(subject, {}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(Error);
+            expect(err).to.have.property('message', '"subject" must be a string');
+          });
+        });
       });
     });
 
     // undefined needs special treatment because {} is not the same as {subject: undefined}
-    it('should error with with value undefined', function () {
-      expect(() => jwt.sign({}, undefined, {subject: undefined, algorithm: 'none'})).to.throw(
-        '"subject" must be a string'
-      );
+    it('should error with with value undefined', function (done) {
+      testUtils.signJWTHelper({}, undefined, {subject: undefined, algorithm: 'none'}, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', '"subject" must be a string');
+        });
+      });
     });
 
-    it('should error when "sub" is in payload', function () {
-      expect(() => signWithSubject({sub: 'bar'}, 'foo')).to.throw(
-        'Bad "options.subject" option. The payload already has an "sub" property.'
-      );
+    it('should error when "sub" is in payload', function (done) {
+      signWithSubject('foo', {sub: 'bar'}, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property(
+            'message',
+            'Bad "options.subject" option. The payload already has an "sub" property.'
+          );
+        });
+      });
     });
 
-
-    it('should error with a string payload', function () {
-      expect(() => signWithSubject('a string payload', 'foo')).to.throw(
-        'invalid subject option for string payload'
-      );
+    it('should error with a string payload', function (done) {
+      signWithSubject('foo', 'a string payload', (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property(
+            'message',
+            'invalid subject option for string payload'
+          );
+        });
+      });
     });
 
-    it('should error with a Buffer payload', function () {
-      expect(() => signWithSubject(new Buffer('a Buffer payload'), 'foo')).to.throw(
-        'invalid subject option for object payload'
-      );
+    it('should error with a Buffer payload', function (done) {
+      signWithSubject('foo', new Buffer('a Buffer payload'), (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property(
+            'message',
+            'invalid subject option for object payload'
+          );
+        });
+      });
     });
   });
 
   describe('when signing and verifying a token with "subject" option', function () {
-    it('should verify with a string "subject"', function () {
-      const token = signWithSubject({}, 'foo');
-      const decoded = jwt.decode(token);
-      const verified = jwt.verify(token, undefined, {subject: 'foo'});
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.sub).to.equal('foo');
+    it('should verify with a string "subject"', function (done) {
+      signWithSubject('foo', {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('sub', 'foo');
+          });
+        })
+      });
     });
 
-    it('should verify with a string "sub"', function () {
-      const token = signWithSubject({sub: 'foo'});
-      const decoded = jwt.decode(token);
-      const verified = jwt.verify(token, undefined, {subject: 'foo'});
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.sub).to.equal('foo');
+    it('should verify with a string "sub"', function (done) {
+      signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('sub', 'foo');
+          });
+        })
+      });
     });
 
-    it('should not verify "sub" if "verify.subject" option not provided', function() {
-      const token = signWithSubject({sub: 'foo'});
-      const decoded = jwt.decode(token);
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.sub).to.equal('foo');
+    it('should not verify "sub" if verify "subject" option not provided', function(done) {
+      signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('sub', 'foo');
+          });
+        })
+      });
     });
 
-    it('should error if "sub" does not match "verify.subject" option', function() {
-      const token = signWithSubject({sub: 'foo'});
-      expect(() => jwt.verify(token, undefined, {subject: 'bar'})).to.throw(
-        jwt.JsonWebTokenError,
-        'jwt subject invalid. expected: bar'
-      );
+    it('should error if "sub" does not match verify "subject" option', function(done) {
+      signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {subject: 'bar'}, (e2) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(e2).to.have.property('message', 'jwt subject invalid. expected: bar');
+          });
+        })
+      });
     });
 
-    it('should error without "sub" and with "verify.subject" option', function() {
-      const token = signWithSubject({});
-      expect(() => jwt.verify(token, undefined, {subject: 'foo'})).to.throw(
-        jwt.JsonWebTokenError,
-        'jwt subject invalid. expected: foo'
-      );
+    it('should error without "sub" and with verify "subject" option', function(done) {
+      signWithSubject(undefined, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(e2).to.have.property('message', 'jwt subject invalid. expected: foo');
+          });
+        })
+      });
     });
   });
 });
