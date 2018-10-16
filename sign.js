@@ -154,7 +154,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
-    payload.exp = timespan(options.expiresIn, timestamp);
+    try {
+      payload.exp = timespan(options.expiresIn, timestamp);
+    }
+    catch (err) {
+      return failure(err);
+    }
     if (typeof payload.exp === 'undefined') {
       return failure(new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
     }
