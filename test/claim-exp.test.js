@@ -29,6 +29,7 @@ describe('expires', function() {
       Infinity,
       NaN,
       ' ',
+      '',
       'invalid',
       [],
       ['foo'],
@@ -42,16 +43,6 @@ describe('expires', function() {
             expect(err).to.have.property('message')
               .match(/"expiresIn" should be a number of seconds or string representing a timespan/);
           });
-        });
-      });
-    });
-
-    it(`should error with with value ''`, function (done) {
-      signWithExpiresIn('', {}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message')
-            .match(/"expiresIn" should be a number of seconds or string representing a timespan/);
         });
       });
     });
