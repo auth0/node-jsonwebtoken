@@ -28,6 +28,7 @@ describe('not before', function() {
       -Infinity,
       Infinity,
       NaN,
+      '',
       ' ',
       'invalid',
       [],
@@ -42,16 +43,6 @@ describe('not before', function() {
             expect(err).to.have.property('message')
               .match(/"notBefore" should be a number of seconds or string representing a timespan/);
           });
-        });
-      });
-    });
-
-    // TODO this should throw the same error as other invalid inputs
-    it(`should error with with value ''`, function (done) {
-      signWithNotBefore('', {}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', 'val is not a non-empty string or a valid number. val=""');
         });
       });
     });
