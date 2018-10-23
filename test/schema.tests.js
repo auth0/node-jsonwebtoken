@@ -57,14 +57,6 @@ describe('schema', function() {
       }).to.throw(/"noTimestamp" must be a boolean/);
       sign({noTimestamp: true});
     });
-
-    it('should validate keyid', function () {
-      expect(function () {
-        sign({ keyid: 10 });
-      }).to.throw(/"keyid" must be a string/);
-      sign({keyid: 'foo'});
-    });
-
   });
 
   describe('sign payload registered claims', function() {
