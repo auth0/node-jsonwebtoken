@@ -113,42 +113,6 @@ describe('Asymmetric Algorithms', function(){
         });
       });
 
-      describe('when signing a token with jwt id', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, jwtid: 'jwtid' });
-
-        it('should check jwt id', function (done) {
-          jwt.verify(token, pub, { jwtid: 'jwtid' }, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
-            done();
-          });
-        });
-
-        it('should throw when invalid jwt id', function (done) {
-          jwt.verify(token, pub, { jwtid: 'wrongJwtid' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
-      describe('when signing a token without jwt id', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm });
-
-        it('should check jwt id', function (done) {
-          jwt.verify(token, pub, { jwtid: 'jwtid' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
       describe('when verifying a malformed token', function () {
         it('should throw', function (done) {
           jwt.verify('fruit.fruit.fruit', pub, function (err, decoded) {
