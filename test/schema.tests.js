@@ -44,13 +44,6 @@ describe('schema', function() {
       sign({encoding: 'utf8'});
     });
 
-    it('should validate issuer', function () {
-      expect(function () {
-        sign({ issuer: 10 });
-      }).to.throw(/"issuer" must be a string/);
-      sign({issuer: 'foo'});
-    });
-
     it('should validate noTimestamp', function () {
       expect(function () {
         sign({ noTimestamp: 10 });

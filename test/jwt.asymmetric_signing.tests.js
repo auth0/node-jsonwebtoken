@@ -113,50 +113,6 @@ describe('Asymmetric Algorithms', function(){
         });
       });
 
-      describe('when signing a token with issuer', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, issuer: 'urn:foo' });
-
-        it('should check issuer', function (done) {
-          jwt.verify(token, pub, { issuer: 'urn:foo' }, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
-            done();
-          });
-        });
-
-        it('should check the issuer when providing a list of valid issuers', function (done) {
-          jwt.verify(token, pub, { issuer: ['urn:foo', 'urn:bar'] }, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
-            done();
-          });
-        });
-
-        it('should throw when invalid issuer', function (done) {
-          jwt.verify(token, pub, { issuer: 'urn:wrong' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
-      describe('when signing a token without issuer', function () {
-        var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm });
-
-        it('should check issuer', function (done) {
-          jwt.verify(token, pub, { issuer: 'urn:foo' }, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
-            assert.instanceOf(err, jwt.JsonWebTokenError);
-            done();
-          });
-        });
-      });
-
       describe('when signing a token with jwt id', function () {
         var token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, jwtid: 'jwtid' });
 
