@@ -125,6 +125,7 @@ jwt.sign({
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
 If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
+An object can be passed to `secretOrPublicKey` in order to map different issuers to specific public keys. See below for a detailed example
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
@@ -168,6 +169,12 @@ jwt.verify(token, 'wrong-secret', function(err, decoded) {
 var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, function(err, decoded) {
   console.log(decoded.foo) // bar
+});
+
+// map issuer to different keys
+jwt.verify(token, {
+  foo: fs.readFileSync('foo.public.key'),
+  bar: fs.readFileSync('bar.public.key')
 });
 
 // verify audience
