@@ -64,6 +64,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   var header = decodedToken.header;
   var getSecret;
 
+  var payload = decodedToken.payload;
+
+  if (secretOrPublicKey && typeof secretOrPublicKey === 'object' && secretOrPublicKey.hasOwnProperty(payload.iss)) {
+    secretOrPublicKey = secretOrPublicKey[payload.iss];
+  }
+
   if(typeof secretOrPublicKey === 'function') {
     if(!callback) {
       return done(new JsonWebTokenError('verify must be called asynchronous if secret or public key is provided as a callback'));
@@ -121,8 +127,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (!valid) {
       return done(new JsonWebTokenError('invalid signature'));
     }
-
-    var payload = decodedToken.payload;
 
     if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
       if (typeof payload.nbf !== 'number') {
