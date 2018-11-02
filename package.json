@@ -47,7 +47,7 @@
     "ms": "^2.1.1"
   },
   "devDependencies": {
-    "atob": "^1.1.2",
+    "atob": "^2.1.2",
     "chai": "^4.1.2",
     "conventional-changelog": "~1.1.0",
     "cost-of-modules": "^1.0.1",
