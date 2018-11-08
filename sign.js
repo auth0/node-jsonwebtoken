@@ -84,11 +84,10 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
-  var header = Object.assign({
-    alg: options.algorithm || 'HS256',
-    typ: isObjectPayload ? 'JWT' : undefined,
-    kid: options.keyid
-  }, options.header);
+  var header = options.header || {};
+  header.alg = header.alg ? header.alg : options.algorithm || 'HS256',
+  header.typ = header.typ ? header.typ : isObjectPayload ? 'JWT' : undefined,
+  header.kid = header.kid ? header.kid : options.keyid;
 
   function failure(err) {
     if (callback) {
