@@ -3,6 +3,7 @@
 const jwt = require('../');
 const expect = require('chai').expect;
 const util = require('util');
+const testUtils = require('./test-utils')
 
 describe('nonce option', function () {
   let token;
@@ -12,39 +13,45 @@ describe('nonce option', function () {
   });
   [
     {
-      description: 'should work with string',
+      description: 'should work with a string',
       nonce: 'abcde',
     },
   ].forEach((testCase) => {
     it(testCase.description, function (done) {
-      expect(jwt.verify(token, undefined, { nonce: testCase.nonce })).to.not.throw;
-      jwt.verify(token, undefined, { nonce: testCase.nonce }, (err) => {
-        expect(err).to.be.null;
-        done();
-      })
+      testUtils.verifyJWTHelper(token, undefined, { nonce: testCase.nonce }, (err, decoded) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          expect(decoded).to.have.property('nonce', 'abcde');
+        });
+      });
     });
   });
   [
     true,
-    'invalid',
+    false,
+    null,
+    -1,
+    0,
+    1,
+    -1.1,
+    1.1,
+    -Infinity,
+    Infinity,
+    NaN,
+    '',
+    ' ',
     [],
     ['foo'],
     {},
     { foo: 'bar' },
   ].forEach((nonce) => {
-    let tokenhoge = jwt.sign({ foo: 'bar' }, undefined, { algorithm: 'none' });
     it(`should error with value ${util.inspect(nonce)}`, function (done) {
-      expect(() => jwt.verify(tokenhoge, undefined, { nonce: nonce })).to.throw(
-        jwt.JsonWebTokenError,
-        'jwt nonce invalid. expected: ' + nonce
-      );
-      jwt.verify(tokenhoge, undefined, { nonce: nonce }, (err) => {
-        expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-        expect(err.message).to.equal(
-          'jwt nonce invalid. expected: ' + nonce
-        );
-        done();
-      })
+      testUtils.verifyJWTHelper(token, undefined, { nonce }, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+          expect(err).to.have.property('message', 'nonce must be a non-empty string')
+        });
+      });
     });
   });
 });
