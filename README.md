@@ -72,13 +72,13 @@ var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 Synchronous Sign with RSA SHA256
 ```js
 // sign with RSA SHA256
-var cert = fs.readFileSync('private.key');
-var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
+var privateKey = fs.readFileSync('private.key');
+var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256'});
 ```
 
 Sign asynchronously
 ```js
-jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
+jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
 ```
