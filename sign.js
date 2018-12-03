@@ -7,6 +7,7 @@ var isNumber = require('lodash.isnumber');
 var isPlainObject = require('lodash.isplainobject');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
+var base64url = require('base64-url');
 
 var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
@@ -75,14 +76,14 @@ var options_for_objects = [
   'jwtid',
 ];
 
-function jwsWithCryptoModule(cryptoManager, keyname, header, payload, callback) {
+function jwsSignWithCryptoModule(cryptoManager, keyname, header, payload, callback) {
   try {
-    var encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64');
-    var encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64');
-    var toSign = encodedHeader + '.' + encodedPayload;
-    var signed = cryptoManager.sign('SHA256', keyname, toSign);
-    var encodeSined = Buffer.from(signed).toString('base64');
-    var jws = toSign+'.'+encodeSined;
+    var encodedHeader = base64url.encode(JSON.stringify(header));
+    var encodedPayload = base64url.encode(JSON.stringify(payload));
+    var toSign = Buffer.from(encodedHeader + '.' + encodedPayload).toString('ascii');
+    var signed = cryptoManager.sign(toSign, keyname, 'SHA256');
+    var encodeSined = base64url.encode(signed);
+    var jws = encodedHeader + '.' + encodedPayload+'.'+encodeSined;
   } catch (err) {
     if (typeof callback === 'function') {
       callback(err);
@@ -219,7 +220,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
 
   //If an external crypto module is defined will not use JWS to sign
   if(cryptoManager) {
-    return jwsWithCryptoModule(cryptoManager, keyName, header, payload, callback);
+    return jwsSignWithCryptoModule(cryptoManager, keyName, header, payload, callback);
   }
 
   var encoding = options.encoding || 'utf8';

@@ -4,14 +4,22 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var cryptoManager = {};
 cryptoManager.keys = {};
-cryptoManager.sign = function (algorithm, keyname, toSign) {
+cryptoManager.sign = function (toSign, keyname, algorithm) {
 
   if(!cryptoManager.keys[keyname]) {
     cryptoManager.keys[keyname] = sjcl.ecc.ecdsa.generateKeys(sjcl.ecc.curves.k256)
   }
   var pair = cryptoManager.keys[keyname];
-  var sig = pair.sec.sign(sjcl.hash.sha256.hash(toSign))
-  return sig
+  var sig = pair.sec.sign(sjcl.hash.sha256.hash(toSign));
+  return sjcl.codec.hex.fromBits(sig);
+}
+cryptoManager.verify = function (content, signature, keyname, algorithm) {
+
+  if(!cryptoManager.keys[keyname]) {
+    throw new Error('Key not found');
+  }
+  var pair = cryptoManager.keys[keyname];
+  return pair.pub.verify(sjcl.hash.sha256.hash(content), sjcl.codec.hex.toBits(signature));
 }
 describe('CryptoManager Test', () => {
 
@@ -88,6 +96,25 @@ describe('CryptoManager Test', () => {
         assert.isUndefined(result);
         done();
       });
+  });
+
+  it('should verify', function () {
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+    var signed = jwt.sign(payload, null, {cryptoManager: cryptoManager, keyName: 'test', algorithm: 'ES256k'});
+    assert.isDefined(signed);
+    var payload =  jwt.verify(signed, null, {cryptoManager: cryptoManager, keyName: 'test'});
+    assert.isDefined(payload);
+  });
+
+  it('should verify with callback', function (done) {
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+    var signed = jwt.sign(payload, null, {cryptoManager: cryptoManager, keyName: 'test', algorithm: 'ES256k'});
+    assert.isDefined(signed);
+    jwt.verify(signed, null, {cryptoManager: cryptoManager, keyName: 'test'}, function (err, payload) {
+      assert.isDefined(payload);
+      done();
+    });
+
   });
 
 });
