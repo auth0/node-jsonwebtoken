@@ -12,7 +12,7 @@ var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
   notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
+  algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES256k', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
   issuer: { isValid: isString, message: '"issuer" must be a string' },
@@ -20,7 +20,9 @@ var sign_options_schema = {
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
   keyid: { isValid: isString, message: '"keyid" must be a string' },
-  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
+  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' },
+  cryptoManager: { isValid: function(value) {return typeof value === 'object' && typeof value.sign === 'function'}, message: '"cryptoManager" must be an object that implements sign' },
+  keyName: { isValid: isString, message: '"keyName" must be a string' },
 };
 
 var registered_claims_schema = {
@@ -73,6 +75,26 @@ var options_for_objects = [
   'jwtid',
 ];
 
+function jwsWithCryptoModule(cryptoManager, keyname, header, payload, callback) {
+  try {
+    var encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64');
+    var encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64');
+    var toSign = encodedHeader + '.' + encodedPayload;
+    var signed = cryptoManager.sign('SHA256', keyname, toSign);
+    var encodeSined = Buffer.from(signed).toString('base64');
+    var jws = toSign+'.'+encodeSined;
+  } catch (err) {
+    if (typeof callback === 'function') {
+      callback(err);
+    }
+    throw err;
+  }
+  if(typeof callback === 'function') {
+    return callback(null, jws);
+  }
+  return jws;
+}
+
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
   if (typeof options === 'function') {
     callback = options;
@@ -97,7 +119,22 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     throw err;
   }
 
-  if (!secretOrPrivateKey && options.algorithm !== 'none') {
+  var cryptoManager = options.cryptoManager;
+  var keyName = options.keyName;
+
+  if(keyName && !cryptoManager) {
+    return failure(new Error('Keyname is only supported with cryptoManager'));
+  }
+
+  if(!keyName && cryptoManager) {
+    return failure(new Error('Keyname is required when using a cryptoManager'));
+  }
+
+  if(!cryptoManager && options.algorithm == 'ES256k') {
+    return failure(new Error('ES256k is only supported with cryptoManager'));
+  }
+
+  if (!secretOrPrivateKey && (options.algorithm !== 'none' && options.algorithm !== 'ES256k')) {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
@@ -180,6 +217,11 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   });
 
+  //If an external crypto module is defined will not use JWS to sign
+  if(cryptoManager) {
+    return jwsWithCryptoModule(cryptoManager, keyName, header, payload, callback);
+  }
+
   var encoding = options.encoding || 'utf8';
 
   if (typeof callback === 'function') {
@@ -197,4 +239,5 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   } else {
     return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
   }
+
 };

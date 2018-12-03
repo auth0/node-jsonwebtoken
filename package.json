@@ -55,7 +55,8 @@
     "mocha": "^5.2.0",
     "nsp": "^3.2.1",
     "nyc": "^11.9.0",
-    "sinon": "^6.0.0"
+    "sinon": "^6.0.0",
+    "sjcl": "civicteam/sjcl.git#v1.0.7-ecc"
   },
   "engines": {
     "npm": ">=1.4.28",
