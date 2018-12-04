@@ -84,8 +84,8 @@ function jwsSignWithCryptoModule(cryptoManager, keyname, header, payload, callba
     var toSign = Buffer.from(encodedHeader + '.' + encodedPayload).toString('ascii');
     var hexHash = crypto.createHash('sha256').update(toSign).digest('hex');
     var signed = cryptoManager.sign(keyname, hexHash);
-    var encodeSined = base64url.encode(signed);
-    var jws = encodedHeader + '.' + encodedPayload+'.'+encodeSined;
+    var encodedSigned = base64url.encode(signed);
+    var jws = encodedHeader + '.' + encodedPayload+'.'+encodedSigned;
   } catch (err) {
     if (typeof callback === 'function') {
       callback(err);

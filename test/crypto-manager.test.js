@@ -32,7 +32,7 @@ describe('CryptoManager Test', () => {
     expect(badFn).to.throw(Error, '"cryptoManager" must be an object that implements sign');
   });
 
-  it('should Sign using the cripto manager', function () {
+  it('should Sign using the crypto manager', function () {
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     var signed = jwt.sign(payload, null, {cryptoManager: cryptoManager, keyName: 'test', algorithm: 'ES256k'});
@@ -40,7 +40,7 @@ describe('CryptoManager Test', () => {
 
   });
 
-  it('should Sign using the cripto manager and return using callback', function (done) {
+  it('should Sign using the crypto manager and return using callback', function (done) {
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     jwt.sign(payload, null, {cryptoManager: cryptoManager, keyName: 'test', algorithm: 'ES256k'}, function (err, signed) {
