@@ -5,6 +5,7 @@ var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var jws               = require('jws');
 var base64url = require('base64-url');
+var crypto = require('crypto');
 
 function jwsVerifyWithCryptoModule(cryptoManager, keyName, jwtString, algorithm) {
   try {
@@ -14,7 +15,8 @@ function jwsVerifyWithCryptoModule(cryptoManager, keyName, jwtString, algorithm)
     var parts = jwtString.split('.');
     var toVerify = Buffer.from(parts[0] + '.' + parts[1]).toString('ascii');
     var signature = base64url.decode(parts[2]);
-    var verified = cryptoManager.verify(toVerify, signature, keyName, 'SHA256');
+    var hexHash = crypto.createHash('sha256').update(toVerify).digest('hex');
+    var verified = cryptoManager.verify(keyName, hexHash, signature,  'SHA256');
     return verified;
   } catch (e) {
     return false;

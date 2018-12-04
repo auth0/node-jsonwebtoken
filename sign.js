@@ -8,6 +8,7 @@ var isPlainObject = require('lodash.isplainobject');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
 var base64url = require('base64-url');
+var crypto = require('crypto');
 
 var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
@@ -81,7 +82,8 @@ function jwsSignWithCryptoModule(cryptoManager, keyname, header, payload, callba
     var encodedHeader = base64url.encode(JSON.stringify(header));
     var encodedPayload = base64url.encode(JSON.stringify(payload));
     var toSign = Buffer.from(encodedHeader + '.' + encodedPayload).toString('ascii');
-    var signed = cryptoManager.sign(toSign, keyname, 'SHA256');
+    var hexHash = crypto.createHash('sha256').update(toSign).digest('hex');
+    var signed = cryptoManager.sign(keyname, hexHash);
     var encodeSined = base64url.encode(signed);
     var jws = encodedHeader + '.' + encodedPayload+'.'+encodeSined;
   } catch (err) {

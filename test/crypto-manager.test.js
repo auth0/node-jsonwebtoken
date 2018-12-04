@@ -4,22 +4,22 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 var cryptoManager = {};
 cryptoManager.keys = {};
-cryptoManager.sign = function (toSign, keyname, algorithm) {
+cryptoManager.sign = function (keyname, hash) {
 
   if(!cryptoManager.keys[keyname]) {
     cryptoManager.keys[keyname] = sjcl.ecc.ecdsa.generateKeys(sjcl.ecc.curves.k256)
   }
   var pair = cryptoManager.keys[keyname];
-  var sig = pair.sec.sign(sjcl.hash.sha256.hash(toSign));
+  var sig = pair.sec.sign(sjcl.codec.hex.toBits(hash));
   return sjcl.codec.hex.fromBits(sig);
 }
-cryptoManager.verify = function (content, signature, keyname, algorithm) {
+cryptoManager.verify = function (keyname, hash, signature) {
 
   if(!cryptoManager.keys[keyname]) {
     throw new Error('Key not found');
   }
   var pair = cryptoManager.keys[keyname];
-  return pair.pub.verify(sjcl.hash.sha256.hash(content), sjcl.codec.hex.toBits(signature));
+  return pair.pub.verify(sjcl.codec.hex.toBits(hash), sjcl.codec.hex.toBits(signature));
 }
 describe('CryptoManager Test', () => {
 
