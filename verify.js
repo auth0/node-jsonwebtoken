@@ -4,6 +4,24 @@ var TokenExpiredError = require('./lib/TokenExpiredError');
 var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var jws               = require('jws');
+var base64url = require('base64-url');
+var crypto = require('crypto');
+
+function jwsVerifyWithCryptoModule(cryptoManager, keyName, jwtString, algorithm) {
+  try {
+
+    if(algorithm !== 'ES256k') return false;
+
+    var parts = jwtString.split('.');
+    var toVerify = Buffer.from(parts[0] + '.' + parts[1]).toString('ascii');
+    var signature = base64url.decode(parts[2]);
+    var hexHash = crypto.createHash('sha256').update(toVerify).digest('hex');
+    var verified = cryptoManager.verify(keyName, hexHash, signature,  'SHA256');
+    return verified;
+  } catch (e) {
+    return false;
+  }
+}
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -82,22 +100,37 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   return getSecret(header, function(err, secretOrPublicKey) {
+    var cryptoManager = options.cryptoManager;
+    var keyName = options.keyName;
+
+    if(keyName && !cryptoManager) {
+      return done(new JsonWebTokenError('Keyname is only supported with cryptoManager'));
+    }
+
+    if(!keyName && cryptoManager) {
+      return done(new JsonWebTokenError('Keyname is required when using a cryptoManager'));
+    }
+
     if(err) {
       return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
     }
 
     var hasSignature = parts[2].trim() !== '';
 
-    if (!hasSignature && secretOrPublicKey){
+    if (!hasSignature && (secretOrPublicKey || cryptoManager)){
       return done(new JsonWebTokenError('jwt signature is required'));
     }
 
-    if (hasSignature && !secretOrPublicKey) {
+    if (hasSignature && !(secretOrPublicKey || cryptoManager)) {
       return done(new JsonWebTokenError('secret or public key must be provided'));
     }
 
     if (!hasSignature && !options.algorithms) {
       options.algorithms = ['none'];
+    }
+
+    if (cryptoManager && !options.algorithms) {
+      options.algorithms = ['ES256k'];
     }
 
     if (!options.algorithms) {
@@ -117,7 +150,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     var valid;
 
     try {
-      valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
+
+      if(cryptoManager) {
+        valid = jwsVerifyWithCryptoModule(cryptoManager, keyName, jwtString, decodedToken.header.alg)
+      } else {
+        valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
+      }
     } catch (e) {
       return done(e);
     }

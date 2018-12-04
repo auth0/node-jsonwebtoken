@@ -36,6 +36,7 @@
     "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
+    "base64-url": "^2.2.0",
     "jws": "^3.1.5",
     "lodash.includes": "^4.3.0",
     "lodash.isboolean": "^3.0.3",
@@ -53,9 +54,10 @@
     "cost-of-modules": "^1.0.1",
     "eslint": "^4.19.1",
     "mocha": "^5.2.0",
-    "nsp": "^2.6.2",
+    "nsp": "^3.2.1",
     "nyc": "^11.9.0",
-    "sinon": "^6.0.0"
+    "sinon": "^6.0.0",
+    "sjcl": "civicteam/sjcl.git#v1.0.7-ecc"
   },
   "engines": {
     "npm": ">=1.4.28",
