@@ -171,6 +171,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
+    if (options.scope) {
+      var invalid_scope =
+              (typeof options.scope === 'string' && payload.scope !== options.scope) ||
+              (Array.isArray(options.scope) && options.scope.indexOf(payload.scope) === -1);
+
+      if (invalid_scope) {
+        return done(new JsonWebTokenError('invalid scope'));
+      }
+    }
+
     if (options.subject) {
       if (payload.sub !== options.subject) {
         return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));

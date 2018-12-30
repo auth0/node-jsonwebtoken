@@ -20,7 +20,8 @@ var sign_options_schema = {
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
   keyid: { isValid: isString, message: '"keyid" must be a string' },
-  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
+  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' },
+  scope: { isValid: isString, message: '"scope" must be a string' }
 };
 
 var registered_claims_schema = {
@@ -60,7 +61,8 @@ var options_to_payload = {
   'audience': 'aud',
   'issuer': 'iss',
   'subject': 'sub',
-  'jwtid': 'jti'
+  'jwtid': 'jti',
+  'scope': 'scope'
 };
 
 var options_for_objects = [
@@ -71,6 +73,7 @@ var options_for_objects = [
   'issuer',
   'subject',
   'jwtid',
+  'scope'
 ];
 
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
