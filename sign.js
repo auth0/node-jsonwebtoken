@@ -1,12 +1,12 @@
 var timespan = require('./lib/timespan');
 var jws = require('jws');
-var includes = require('lodash.includes');
-var isBoolean = require('lodash.isboolean');
-var isInteger = require('lodash.isinteger');
-var isNumber = require('lodash.isnumber');
-var isPlainObject = require('lodash.isplainobject');
-var isString = require('lodash.isstring');
-var once = require('lodash.once');
+var { includes } = require('lodash');
+var { isBoolean } = require('lodash');
+var { isInteger } = require('lodash');
+var { isNumber } = require('lodash');
+var { isPlainObject } = require('lodash');
+var { isString } = require('lodash');
+var { once } = require('lodash');
 
 var sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
