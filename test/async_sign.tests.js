@@ -20,14 +20,14 @@ describe('signing a token asynchronously', function() {
 
     it('should work with empty options', function (done) {
       jwt.sign({abc: 1}, "secret", {}, function (err) {
-        expect(err).to.be.null();
+        expect(err).to.be.null;
         done();
       });
     });
 
     it('should work without options object at all', function (done) {
       jwt.sign({abc: 1}, "secret", function (err) {
-        expect(err).to.be.null();
+        expect(err).to.be.null;
         done();
       });
     });
@@ -53,7 +53,7 @@ describe('signing a token asynchronously', function() {
     it('should return error when secret is not a cert for RS256', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'RS256' }, function (err) {
-        expect(err).to.be.ok();
+        expect(err).to.be.ok;
         done();
       });
     });
@@ -61,14 +61,14 @@ describe('signing a token asynchronously', function() {
     it('should return error on wrong arguments', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { notBefore: {} }, function (err) {
-        expect(err).to.be.ok();
+        expect(err).to.be.ok;
         done();
       });
     });
 
     it('should return error on wrong arguments (2)', function(done) {
       jwt.sign('string', 'secret', {noTimestamp: true}, function (err) {
-        expect(err).to.be.ok();
+        expect(err).to.be.ok;
         expect(err).to.be.instanceof(Error);
         done();
       });
@@ -111,7 +111,7 @@ describe('signing a token asynchronously', function() {
         it('should return an error if the secret is falsy and algorithm is not set to none: ' + (typeof secret === 'string' ? '(empty string)' : secret), function(done) {
         // This is needed since jws will not answer for falsy secrets
           jwt.sign('string', secret, {}, function(err, token) {
-            expect(err).to.be.exist();
+            expect(err).to.exist;
             expect(err.message).to.equal('secretOrPrivateKey must have a value');
             expect(token).to.not.exist;
             done();

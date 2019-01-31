@@ -4,6 +4,49 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.4.0 - 2018-11-14
+
+### New Functionality
+
+ - Add verify option for nonce validation (#540) ([e7938f06fdf2ed3aa88745b72b8ae4ee66c2d0d0](https://github.com/auth0/node-jsonwebtoken/commit/e7938f06fdf2ed3aa88745b72b8ae4ee66c2d0d0)), closes [#540](https://github.com/auth0/node-jsonwebtoken/issues/540)
+
+### Bug Fixes
+
+ - Updating Node version in Engines spec in package.json (#528) ([cfd1079305170a897dee6a5f55039783e6ee2711](https://github.com/auth0/node-jsonwebtoken/commit/cfd1079305170a897dee6a5f55039783e6ee2711)), closes [#528](https://github.com/auth0/node-jsonwebtoken/issues/528) [#509](https://github.com/auth0/node-jsonwebtoken/issues/509)
+ - Fixed error message when empty string passed as expiresIn or notBefore option (#531) ([7f9604ac98d4d0ff8d873c3d2b2ea64bd285cb76](https://github.com/auth0/node-jsonwebtoken/commit/7f9604ac98d4d0ff8d873c3d2b2ea64bd285cb76)), closes [#531](https://github.com/auth0/node-jsonwebtoken/issues/531)
+
+### Docs
+
+ - Update README.md (#527) ([b76f2a80f5229ee5cde321dd2ff14aa5df16d283](https://github.com/auth0/node-jsonwebtoken/commit/b76f2a80f5229ee5cde321dd2ff14aa5df16d283)), closes [#527](https://github.com/auth0/node-jsonwebtoken/issues/527)
+ - Update README.md (#538) ([1956c4006472fd285b8a85074257cbdbe9131cbf](https://github.com/auth0/node-jsonwebtoken/commit/1956c4006472fd285b8a85074257cbdbe9131cbf)), closes [#538](https://github.com/auth0/node-jsonwebtoken/issues/538)
+ - Edited the README.md to make certain parts of the document for the api easier to read, emphasizing the examples. (#548) ([dc89a641293d42f72ecfc623ce2eabc33954cb9d](https://github.com/auth0/node-jsonwebtoken/commit/dc89a641293d42f72ecfc623ce2eabc33954cb9d)), closes [#548](https://github.com/auth0/node-jsonwebtoken/issues/548)
+ - Document NotBeforeError (#529) ([29cd654b956529e939ae8f8c30b9da7063aad501](https://github.com/auth0/node-jsonwebtoken/commit/29cd654b956529e939ae8f8c30b9da7063aad501)), closes [#529](https://github.com/auth0/node-jsonwebtoken/issues/529)
+
+### Test Improvements
+
+ - Use lolex for faking date in tests (#491) ([677ead6d64482f2067b11437dda07309abe73cfa](https://github.com/auth0/node-jsonwebtoken/commit/677ead6d64482f2067b11437dda07309abe73cfa)), closes [#491](https://github.com/auth0/node-jsonwebtoken/issues/491)
+ - Update dependencies used for running tests (#518) ([5498bdc4865ffb2ba2fd44d889fad7e83873bb33](https://github.com/auth0/node-jsonwebtoken/commit/5498bdc4865ffb2ba2fd44d889fad7e83873bb33)), closes [#518](https://github.com/auth0/node-jsonwebtoken/issues/518)
+ - Minor test refactoring for recently added tests (#504) ([e2860a9d2a412627d79741a95bc7159971b923b9](https://github.com/auth0/node-jsonwebtoken/commit/e2860a9d2a412627d79741a95bc7159971b923b9)), closes [#504](https://github.com/auth0/node-jsonwebtoken/issues/504)
+ - Create and implement async/sync test helpers (#523) ([683d8a9b31ad6327948f84268bd2c8e4350779d1](https://github.com/auth0/node-jsonwebtoken/commit/683d8a9b31ad6327948f84268bd2c8e4350779d1)), closes [#523](https://github.com/auth0/node-jsonwebtoken/issues/523)
+ - Refactor tests related to audience and aud (#503) ([53d405e0223cce7c83cb51ecf290ca6bec1e9679](https://github.com/auth0/node-jsonwebtoken/commit/53d405e0223cce7c83cb51ecf290ca6bec1e9679)), closes [#503](https://github.com/auth0/node-jsonwebtoken/issues/503)
+ - Refactor tests related to expiresIn and exp (#501) ([72f0d9e5b11a99082250665d1200c58182903fa6](https://github.com/auth0/node-jsonwebtoken/commit/72f0d9e5b11a99082250665d1200c58182903fa6)), closes [#501](https://github.com/auth0/node-jsonwebtoken/issues/501)
+ - Refactor tests related to iat and maxAge (#507) ([877bd57ab2aca9b7d230805b21f921baed3da169](https://github.com/auth0/node-jsonwebtoken/commit/877bd57ab2aca9b7d230805b21f921baed3da169)), closes [#507](https://github.com/auth0/node-jsonwebtoken/issues/507)
+ - Refactor tests related to iss and issuer (#543) ([0906a3fa80f52f959ac1b6343d3024ce5c7e9dea](https://github.com/auth0/node-jsonwebtoken/commit/0906a3fa80f52f959ac1b6343d3024ce5c7e9dea)), closes [#543](https://github.com/auth0/node-jsonwebtoken/issues/543)
+ - Refactor tests related to kid and keyid (#545) ([88645427a0adb420bd3e149199a2a6bf1e17277e](https://github.com/auth0/node-jsonwebtoken/commit/88645427a0adb420bd3e149199a2a6bf1e17277e)), closes [#545](https://github.com/auth0/node-jsonwebtoken/issues/545)
+ - Refactor tests related to notBefore and nbf (#497) ([39adf87a6faef3df984140f88e6724ddd709fd89](https://github.com/auth0/node-jsonwebtoken/commit/39adf87a6faef3df984140f88e6724ddd709fd89)), closes [#497](https://github.com/auth0/node-jsonwebtoken/issues/497)
+ - Refactor tests related to subject and sub (#505) ([5a7fa23c0b4ac6c25304dab8767ef840b43a0eca](https://github.com/auth0/node-jsonwebtoken/commit/5a7fa23c0b4ac6c25304dab8767ef840b43a0eca)), closes [#505](https://github.com/auth0/node-jsonwebtoken/issues/505)
+ - Implement async/sync tests for exp claim (#536) ([9ae3f207ac64b7450ea0a3434418f5ca58d8125e](https://github.com/auth0/node-jsonwebtoken/commit/9ae3f207ac64b7450ea0a3434418f5ca58d8125e)), closes [#536](https://github.com/auth0/node-jsonwebtoken/issues/536)
+ - Implement async/sync tests for nbf claim (#537) ([88bc965061ed65299a395f42a100fb8f8c3c683e](https://github.com/auth0/node-jsonwebtoken/commit/88bc965061ed65299a395f42a100fb8f8c3c683e)), closes [#537](https://github.com/auth0/node-jsonwebtoken/issues/537)
+ - Implement async/sync tests for sub claim (#534) ([342b07bb105a35739eb91265ba5b9dd33c300fc6](https://github.com/auth0/node-jsonwebtoken/commit/342b07bb105a35739eb91265ba5b9dd33c300fc6)), closes [#534](https://github.com/auth0/node-jsonwebtoken/issues/534)
+ - Implement async/sync tests for the aud claim (#535) ([1c8ff5a68e6da73af2809c9d87faaf78602c99bb](https://github.com/auth0/node-jsonwebtoken/commit/1c8ff5a68e6da73af2809c9d87faaf78602c99bb)), closes [#535](https://github.com/auth0/node-jsonwebtoken/issues/535)
+
+### CI
+
+ - Added Istanbul to check test-coverage (#468) ([9676a8306428a045e34c3987bd0680fb952b44e3](https://github.com/auth0/node-jsonwebtoken/commit/9676a8306428a045e34c3987bd0680fb952b44e3)), closes [#468](https://github.com/auth0/node-jsonwebtoken/issues/468)
+ - Complete ESLint conversion and cleanup (#490) ([cb1d2e1e40547f7ecf29fa6635041df6cbba7f40](https://github.com/auth0/node-jsonwebtoken/commit/cb1d2e1e40547f7ecf29fa6635041df6cbba7f40)), closes [#490](https://github.com/auth0/node-jsonwebtoken/issues/490)
+ - Make code-coverage mandatory when running tests (#495) ([fb0084a78535bfea8d0087c0870e7e3614a2cbe5](https://github.com/auth0/node-jsonwebtoken/commit/fb0084a78535bfea8d0087c0870e7e3614a2cbe5)), closes [#495](https://github.com/auth0/node-jsonwebtoken/issues/495)
+
+
 ## 8.3.0 - 2018-06-11
 
  - docs: add some clarifications (#473) ([cd33cc81f06068b9df6c224d300dc6f70d8904ab](https://github.com/auth0/node-jsonwebtoken/commit/cd33cc81f06068b9df6c224d300dc6f70d8904ab)), closes [#473](https://github.com/auth0/node-jsonwebtoken/issues/473)

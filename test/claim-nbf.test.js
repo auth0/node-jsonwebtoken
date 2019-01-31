@@ -9,12 +9,12 @@ const testUtils = require('./test-utils');
 const base64UrlEncode = testUtils.base64UrlEncode;
 const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
 
-function signWithNotBefore(payload, notBefore) {
+function signWithNotBefore(notBefore, payload, callback) {
   const options = {algorithm: 'none'};
   if (notBefore !== undefined) {
     options.notBefore = notBefore;
   }
-  return jwt.sign(payload, undefined, options);
+  testUtils.signJWTHelper(payload, 'secret', options, callback);
 }
 
 describe('not before', function() {
@@ -28,6 +28,7 @@ describe('not before', function() {
       -Infinity,
       Infinity,
       NaN,
+      '',
       ' ',
       'invalid',
       [],
@@ -35,43 +36,58 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((notBefore) => {
-      it(`should error with with value ${util.inspect(notBefore)}`, function () {
-        expect(() => signWithNotBefore({}, notBefore)).to.throw(
-          '"notBefore" should be a number of seconds or string representing a timespan'
-        );
+      it(`should error with with value ${util.inspect(notBefore)}`, function (done) {
+        signWithNotBefore(notBefore, {}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(Error);
+            expect(err).to.have.property('message')
+              .match(/"notBefore" should be a number of seconds or string representing a timespan/);
+          });
+        });
       });
     });
 
-    // TODO this should throw the same error as other invalid inputs
-    it(`should error with with value ''`, function () {
-      expect(() => signWithNotBefore({}, '')).to.throw(
-        'val is not a non-empty string or a valid number. val=""'
-      );
-    });
-
     // undefined needs special treatment because {} is not the same as {notBefore: undefined}
-    it('should error with with value undefined', function () {
-      expect(() => jwt.sign({}, undefined, {notBefore: undefined, algorithm: 'none'})).to.throw(
-        '"notBefore" should be a number of seconds or string representing a timespan'
-      );
+    it('should error with with value undefined', function (done) {
+      testUtils.signJWTHelper({}, undefined, {notBefore: undefined, algorithm: 'none'}, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property(
+            'message',
+            '"notBefore" should be a number of seconds or string representing a timespan'
+          );
+        });
+      });
     });
 
-    it('should error when "nbf" is in payload', function () {
-      expect(() => signWithNotBefore({nbf: 100}, 100)).to.throw(
-        'Bad "options.notBefore" option the payload already has an "nbf" property.'
-      );
+    it('should error when "nbf" is in payload', function (done) {
+      signWithNotBefore(100, {nbf: 100}, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property(
+            'message',
+            'Bad "options.notBefore" option the payload already has an "nbf" property.'
+          );
+        });
+      });
     });
 
-    it('should error with a string payload', function () {
-      expect(() => signWithNotBefore('a string payload', 100)).to.throw(
-        'invalid notBefore option for string payload'
-      );
+    it('should error with a string payload', function (done) {
+      signWithNotBefore(100, 'a string payload', (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', 'invalid notBefore option for string payload');
+        });
+      });
     });
 
-    it('should error with a Buffer payload', function () {
-      expect(() => signWithNotBefore(new Buffer('a Buffer payload'), 100)).to.throw(
-        'invalid notBefore option for object payload'
-      );
+    it('should error with a Buffer payload', function (done) {
+      signWithNotBefore(100, new Buffer('a Buffer payload'), (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', 'invalid notBefore option for object payload');
+        });
+      });
     });
   });
 
@@ -89,10 +105,13 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((nbf) => {
-      it(`should error with with value ${util.inspect(nbf)}`, function () {
-        expect(() => signWithNotBefore({nbf})).to.throw(
-          '"nbf" should be a number of seconds'
-        );
+      it(`should error with with value ${util.inspect(nbf)}`, function (done) {
+        signWithNotBefore(undefined, {nbf}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(Error);
+            expect(err).to.have.property('message', '"nbf" should be a number of seconds');
+          });
+        });
       });
     });
   });
@@ -113,13 +132,15 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((nbf) => {
-      it(`should error with with value ${util.inspect(nbf)}`, function () {
+      it(`should error with with value ${util.inspect(nbf)}`, function (done) {
         const encodedPayload = base64UrlEncode(JSON.stringify({nbf}));
         const token = `${noneAlgorithmHeader}.${encodedPayload}.`;
-        expect(() => jwt.verify(token, undefined)).to.throw(
-          jwt.JsonWebTokenError,
-          'invalid nbf value'
-        );
+        testUtils.verifyJWTHelper(token, undefined, {nbf}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'invalid nbf value');
+          });
+        });
       });
     })
   });
@@ -134,142 +155,186 @@ describe('not before', function() {
       fakeClock.uninstall();
     });
 
-    it('should set correct "nbf" with negative number of seconds', function () {
-      const token = signWithNotBefore({}, -10);
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(50);
+    it('should set correct "nbf" with negative number of seconds', function (done) {
+      signWithNotBefore(-10, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 50);
+          });
+        })
+      });
     });
 
-    it('should set correct "nbf" with positive number of seconds', function () {
-      const token = signWithNotBefore({}, 10);
-
-      fakeClock.tick(10000);
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(70);
+    it('should set correct "nbf" with positive number of seconds', function (done) {
+      signWithNotBefore(10, {}, (e1, token) => {
+        fakeClock.tick(10000);
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 70);
+          });
+        })
+      });
     });
 
-    it('should set correct "nbf" with zero seconds', function () {
-      const token = signWithNotBefore({}, 0);
-
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(60);
+    it('should set correct "nbf" with zero seconds', function (done) {
+      signWithNotBefore(0, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 60);
+          });
+        })
+      });
     });
 
-    it('should set correct "nbf" with negative string timespan', function () {
-      const token = signWithNotBefore({}, '-10 s');
-
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(50);
+    it('should set correct "nbf" with negative string timespan', function (done) {
+      signWithNotBefore('-10 s', {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 50);
+          });
+        })
+      });
     });
 
-
-    it('should set correct "nbf" with positive string timespan', function () {
-      const token = signWithNotBefore({}, '10 s');
-
-      fakeClock.tick(10000);
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(70);
+    it('should set correct "nbf" with positive string timespan', function (done) {
+      signWithNotBefore('10 s', {}, (e1, token) => {
+        fakeClock.tick(10000);
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 70);
+          });
+        })
+      });
     });
 
-    it('should set correct "nbf" with zero string timespan', function () {
-      const token = signWithNotBefore({}, '0 s');
-
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(60);
+    it('should set correct "nbf" with zero string timespan', function (done) {
+      signWithNotBefore('0 s', {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 60);
+          });
+        })
+      });
     });
 
     // TODO an nbf of -Infinity should fail validation
-    it('should set null "nbf" when given -Infinity', function () {
-      const token = signWithNotBefore({nbf: -Infinity});
-
-      const decoded = jwt.decode(token);
-      expect(decoded.nbf).to.be.null;
+    it('should set null "nbf" when given -Infinity', function (done) {
+      signWithNotBefore(undefined, {nbf: -Infinity}, (err, token) => {
+        const decoded = jwt.decode(token);
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          expect(decoded).to.have.property('nbf', null);
+        });
+      });
     });
 
     // TODO an nbf of Infinity should fail validation
-    it('should set null "nbf" when given value Infinity', function () {
-      const token = signWithNotBefore({nbf: Infinity});
-
-      const decoded = jwt.decode(token);
-      expect(decoded.nbf).to.be.null;
+    it('should set null "nbf" when given value Infinity', function (done) {
+      signWithNotBefore(undefined, {nbf: Infinity}, (err, token) => {
+        const decoded = jwt.decode(token);
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          expect(decoded).to.have.property('nbf', null);
+        });
+      });
     });
 
     // TODO an nbf of NaN should fail validation
-    it('should set null "nbf" when given value NaN', function () {
-      const token = signWithNotBefore({nbf: NaN});
-
-      const decoded = jwt.decode(token);
-      expect(decoded.nbf).to.be.null;
+    it('should set null "nbf" when given value NaN', function (done) {
+      signWithNotBefore(undefined, {nbf: NaN}, (err, token) => {
+        const decoded = jwt.decode(token);
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          expect(decoded).to.have.property('nbf', null);
+        });
+      });
     });
 
-    it('should set correct "nbf" when "iat" is passed', function () {
-      const token = signWithNotBefore({iat: 40}, -10);
-
-      const decoded = jwt.decode(token);
-
-      const verified = jwt.verify(token, undefined);
-      expect(decoded).to.deep.equal(verified);
-      expect(decoded.nbf).to.equal(30);
+    it('should set correct "nbf" when "iat" is passed', function (done) {
+      signWithNotBefore(-10, {iat: 40}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 30);
+          });
+        })
+      });
     });
 
-    it('should verify "nbf" using "clockTimestamp"', function () {
-      const token = signWithNotBefore({}, 10);
-
-      const verified = jwt.verify(token, undefined, {clockTimestamp: 70});
-      expect(verified.iat).to.equal(60);
-      expect(verified.nbf).to.equal(70);
+    it('should verify "nbf" using "clockTimestamp"', function (done) {
+      signWithNotBefore(10, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {clockTimestamp: 70}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('iat', 60);
+            expect(decoded).to.have.property('nbf', 70);
+          });
+        })
+      });
     });
 
-    it('should verify "nbf" using "clockTolerance"', function () {
-      const token = signWithNotBefore({}, 5);
-
-      const verified = jwt.verify(token, undefined, {clockTolerance: 6});
-      expect(verified.iat).to.equal(60);
-      expect(verified.nbf).to.equal(65);
+    it('should verify "nbf" using "clockTolerance"', function (done) {
+      signWithNotBefore(5, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {clockTolerance: 6}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('iat', 60);
+            expect(decoded).to.have.property('nbf', 65);
+          });
+        })
+      });
     });
 
-    it('should ignore a not active token when "ignoreNotBefore" is true', function () {
-      const token = signWithNotBefore({}, '10 s');
-
-      const verified = jwt.verify(token, undefined, {ignoreNotBefore: true});
-      expect(verified.iat).to.equal(60);
-      expect(verified.nbf).to.equal(70);
+    it('should ignore a not active token when "ignoreNotBefore" is true', function (done) {
+      signWithNotBefore('10 s', {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {ignoreNotBefore: true}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('iat', 60);
+            expect(decoded).to.have.property('nbf', 70);
+          });
+        })
+      });
     });
 
-    it('should error on verify if "nbf" is after current time', function () {
-      const token = signWithNotBefore({nbf: 61});
-
-      expect(() => jwt.verify(token, undefined)).to.throw(
-        jwt.NotBeforeError,
-        'jwt not active'
-      );
+    it('should error on verify if "nbf" is after current time', function (done) {
+      signWithNotBefore(undefined, {nbf: 61}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {}, (e2) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.instanceOf(jwt.NotBeforeError);
+            expect(e2).to.have.property('message', 'jwt not active');
+          });
+        })
+      });
     });
 
-    it('should error on verify if "nbf" is after current time using clockTolerance', function () {
-      const token = signWithNotBefore({}, 5);
-
-      expect(() => jwt.verify(token, undefined, {clockTolerance: 4})).to.throw(
-        jwt.NotBeforeError,
-        'jwt not active'
-      );
+    it('should error on verify if "nbf" is after current time using clockTolerance', function (done) {
+      signWithNotBefore(5, {}, (e1, token) => {
+        testUtils.verifyJWTHelper(token, undefined, {clockTolerance: 4}, (e2) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.instanceOf(jwt.NotBeforeError);
+            expect(e2).to.have.property('message', 'jwt not active');
+          });
+        })
+      });
     });
   });
 });

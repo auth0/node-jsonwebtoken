@@ -9,16 +9,7 @@ const testUtils = require('./test-utils');
 const base64UrlEncode = testUtils.base64UrlEncode;
 const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
 
-function signWithIssueAtSync(issueAt, options) {
-  const payload = {};
-  if (issueAt !== undefined) {
-    payload.iat = issueAt;
-  }
-  const opts = Object.assign({algorithm: 'none'}, options);
-  return jwt.sign(payload, undefined, opts);
-}
-
-function signWithIssueAtAsync(issueAt, options, cb) {
+function signWithIssueAt(issueAt, options, callback) {
   const payload = {};
   if (issueAt !== undefined) {
     payload.iat = issueAt;
@@ -26,17 +17,12 @@ function signWithIssueAtAsync(issueAt, options, cb) {
   const opts = Object.assign({algorithm: 'none'}, options);
   // async calls require a truthy secret
   // see: https://github.com/brianloveswords/node-jws/issues/62
-  return jwt.sign(payload, 'secret', opts, cb);
+  testUtils.signJWTHelper(payload, 'secret', opts, callback);
 }
 
-function verifyWithIssueAtSync(token, maxAge, options) {
+function verifyWithIssueAt(token, maxAge, options, callback) {
   const opts = Object.assign({maxAge}, options);
-  return jwt.verify(token, undefined, opts)
-}
-
-function verifyWithIssueAtAsync(token, maxAge, options, cb) {
-  const opts = Object.assign({maxAge}, options);
-  return jwt.verify(token, undefined, opts, cb)
+  testUtils.verifyJWTHelper(token, undefined, opts, callback);
 }
 
 describe('issue at', function() {
@@ -53,22 +39,22 @@ describe('issue at', function() {
       {foo: 'bar'},
     ].forEach((iat) => {
       it(`should error with iat of ${util.inspect(iat)}`, function (done) {
-        expect(() => signWithIssueAtSync(iat, {})).to.throw('"iat" should be a number of seconds');
-        signWithIssueAtAsync(iat, {}, (err) => {
-          expect(err.message).to.equal('"iat" should be a number of seconds');
-          done();
+        signWithIssueAt(iat, {}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(Error);
+            expect(err.message).to.equal('"iat" should be a number of seconds');
+          });
         });
       });
     });
 
     // undefined needs special treatment because {} is not the same as {iat: undefined}
     it('should error with iat of undefined', function (done) {
-      expect(() => jwt.sign({iat: undefined}, undefined, {algorithm: 'none'})).to.throw(
-        '"iat" should be a number of seconds'
-      );
-      jwt.sign({iat: undefined}, undefined, {algorithm: 'none'}, (err) => {
-        expect(err.message).to.equal('"iat" should be a number of seconds');
-        done();
+      testUtils.signJWTHelper({iat: undefined}, 'secret', {algorithm: 'none'}, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err.message).to.equal('"iat" should be a number of seconds');
+        });
       });
     });
   });
@@ -92,14 +78,11 @@ describe('issue at', function() {
       it(`should error with iat of ${util.inspect(iat)}`, function (done) {
         const encodedPayload = base64UrlEncode(JSON.stringify({iat}));
         const token = `${noneAlgorithmHeader}.${encodedPayload}.`;
-        expect(() => verifyWithIssueAtSync(token, '1 min', {})).to.throw(
-          jwt.JsonWebTokenError, 'iat required when maxAge is specified'
-        );
-
-        verifyWithIssueAtAsync(token, '1 min', {}, (err) => {
-          expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-          expect(err.message).to.equal('iat required when maxAge is specified');
-          done();
+        verifyWithIssueAt(token, '1 min', {}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err.message).to.equal('iat required when maxAge is specified');
+          });
         });
       });
     })
@@ -163,25 +146,17 @@ describe('issue at', function() {
       },
     ].forEach((testCase) => {
       it(testCase.description, function (done) {
-        const token = signWithIssueAtSync(testCase.iat, testCase.options);
-        expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
-        signWithIssueAtAsync(testCase.iat, testCase.options, (err, token) => {
-          // node-jsw catches the error from expect, so we have to wrap it in try/catch and use done(error)
-          try {
+        signWithIssueAt(testCase.iat, testCase.options, (err, token) => {
+          testUtils.asyncCheck(done, () => {
             expect(err).to.be.null;
             expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
-            done();
-          }
-          catch (e) {
-            done(e);
-          }
+          });
         });
       });
     });
   });
 
   describe('when verifying a token', function() {
-    let token;
     let fakeClock;
 
     beforeEach(function() {
@@ -213,10 +188,14 @@ describe('issue at', function() {
       },
     ].forEach((testCase) => {
       it(testCase.description, function (done) {
-        const token = signWithIssueAtSync(undefined, {});
+        const token = jwt.sign({}, 'secret', {algorithm: 'none'});
         fakeClock.tick(testCase.clockAdvance);
-        expect(verifyWithIssueAtSync(token, testCase.maxAge, testCase.options)).to.not.throw;
-        verifyWithIssueAtAsync(token, testCase.maxAge, testCase.options, done)
+        verifyWithIssueAt(token, testCase.maxAge, testCase.options, (err, token) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.null;
+            expect(token).to.be.a('object');
+          });
+        });
       });
     });
 
@@ -256,16 +235,15 @@ describe('issue at', function() {
     ].forEach((testCase) => {
       it(testCase.description, function(done) {
         const expectedExpiresAtDate = new Date(testCase.expectedExpiresAt);
-        token = signWithIssueAtSync(undefined, {});
+        const token = jwt.sign({}, 'secret', {algorithm: 'none'});
         fakeClock.tick(testCase.clockAdvance);
-        expect(() => verifyWithIssueAtSync(token, testCase.maxAge, {}))
-          .to.throw(jwt.TokenExpiredError, testCase.expectedError)
-          .to.have.property('expiredAt').that.deep.equals(expectedExpiresAtDate);
-        verifyWithIssueAtAsync(token, testCase.maxAge, {}, (err) => {
-          expect(err).to.be.instanceOf(jwt.TokenExpiredError);
-          expect(err.message).to.equal(testCase.expectedError);
-          expect(err.expiredAt).to.deep.equal(expectedExpiresAtDate);
-          done();
+
+        verifyWithIssueAt(token, testCase.maxAge, testCase.options, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err.message).to.equal(testCase.expectedError);
+            expect(err.expiredAt).to.deep.equal(expectedExpiresAtDate);
+          });
         });
       });
     });
