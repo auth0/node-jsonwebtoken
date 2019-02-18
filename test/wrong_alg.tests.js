@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var jwt = require('../index');
 var JsonWebTokenError = require('../lib/JsonWebTokenError');
+var PS_SUPPORTED = require('../lib/psSupported');
 var expect = require('chai').expect;
 
 
@@ -28,6 +29,16 @@ describe('when setting a wrong `header.alg`', function () {
       }).to.throw(JsonWebTokenError, /invalid algorithm/);
     });
   });
+
+  if (PS_SUPPORTED) {
+    describe('signing with pub key as HS256 and whitelisting only PS256', function () {
+      it('should not verify', function () {
+        expect(function () {
+          jwt.verify(TOKEN, pub, {algorithms: ['PS256']});
+        }).to.throw(JsonWebTokenError, /invalid algorithm/);
+      });
+    });
+  }
 
   describe('signing with HS256 and checking with HS384', function () {
     it('should not verify', function () {
