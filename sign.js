@@ -140,10 +140,10 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
 
   var timestamp = payload.iat || Math.floor(Date.now() / 1000);
 
-  if (!options.noTimestamp) {
-    payload.iat = timestamp;
-  } else {
+  if (options.noTimestamp) {
     delete payload.iat;
+  } else if (isObjectPayload) {
+    payload.iat = timestamp;
   }
 
   if (typeof options.notBefore !== 'undefined') {

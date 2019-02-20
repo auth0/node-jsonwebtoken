@@ -20,7 +20,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "coverage": "nyc mocha",
+    "coverage": "nyc mocha --use_strict",
     "test": "npm run lint && npm run coverage && cost-of-modules"
   },
   "repository": {
