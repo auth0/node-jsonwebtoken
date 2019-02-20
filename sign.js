@@ -4,7 +4,7 @@ var includes = require('lodash.includes');
 var isBoolean = require('lodash.isboolean');
 var isInteger = require('lodash.isinteger');
 var isNumber = require('lodash.isnumber');
-var isPlainObject = require('lodash.isplainobject');
+var isObjectLike = require('lodash.isobjectlike');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
@@ -13,7 +13,7 @@ var sign_options_schema = {
   notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
   algorithm: { isValid: includes.bind(null, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']), message: '"algorithm" must be a valid string enum value' },
-  header: { isValid: isPlainObject, message: '"header" must be an object' },
+  header: { isValid: isObjectLike, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
   issuer: { isValid: isString, message: '"issuer" must be a string' },
   subject: { isValid: isString, message: '"subject" must be a string' },
@@ -30,8 +30,8 @@ var registered_claims_schema = {
 };
 
 function validate(schema, allowUnknown, object, parameterName) {
-  if (!isPlainObject(object)) {
-    throw new Error('Expected "' + parameterName + '" to be a plain object.');
+  if (!isObjectLike(object)) {
+    throw new Error('Expected "' + parameterName + '" to be object like.');
   }
   Object.keys(object)
     .forEach(function(key) {
