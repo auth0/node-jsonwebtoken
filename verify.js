@@ -3,7 +3,17 @@ var NotBeforeError    = require('./lib/NotBeforeError');
 var TokenExpiredError = require('./lib/TokenExpiredError');
 var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
+var PS_SUPPORTED      = require('./lib/psSupported');
 var jws               = require('jws');
+
+var PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
+var RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
+var HS_ALGS = ['HS256', 'HS384', 'HS512'];
+
+if (PS_SUPPORTED) {
+  PUB_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
+  RSA_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
+}
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
@@ -102,11 +112,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     if (!options.algorithms) {
       options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
-          ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ?
-        ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'] :
-        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ?
-          ['RS256', 'RS384', 'RS512'] :
-          ['HS256', 'HS384', 'HS512'];
+        ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
+        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
 
     }
 
