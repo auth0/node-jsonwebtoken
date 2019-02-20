@@ -203,6 +203,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
+    if (options.complete === true) {
+      var signature = decodedToken.signature;
+
+      return done(null, {
+        header: header,
+        payload: payload,
+        signature: signature
+      });
+    }
+
     return done(null, payload);
   });
 };
