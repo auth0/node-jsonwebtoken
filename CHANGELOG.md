@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.5.1 - 2019-03-18
+
+### Bug fix
+
+ - fix: ensure correct PS signing and verification (#585) ([e5874ae428ffc0465e6bd4e660f89f78b56a74a6](https://github.com/auth0/node-jsonwebtoken/commit/e5874ae428ffc0465e6bd4e660f89f78b56a74a6)), closes [#585](https://github.com/auth0/node-jsonwebtoken/issues/585)
+
+### Docs
+
+ - README: fix markdown for algorithms table ([84e03ef70f9c44a3aef95a1dc122c8238854f683](https://github.com/auth0/node-jsonwebtoken/commit/84e03ef70f9c44a3aef95a1dc122c8238854f683))
+
 ## 8.5.0 - 2019-02-20
 
 ### New Functionality
