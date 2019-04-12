@@ -1,0 +1,71 @@
+version: 2.1
+
+# Thanks to https://github.com/teppeis-sandbox/circleci2-multiple-node-versions
+
+commands:
+  test-nodejs:
+    steps:
+      - run:
+          name: Versions
+          command: npm version
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Test
+          command: npm test
+
+jobs:
+  node-v4:
+    docker:
+      - image: node:4
+    steps:
+      - test-nodejs
+  node-v5:
+    docker:
+      - image: node:5
+    steps:
+      - test-nodejs
+  node-v6:
+    docker:
+      - image: node:6
+    steps:
+      - test-nodejs
+  node-v7:
+    docker:
+      - image: node:7
+    steps:
+      - test-nodejs
+  node-v8:
+    docker:
+      - image: node:8
+    steps:
+      - test-nodejs
+  node-v9:
+    docker:
+      - image: node:9
+    steps:
+      - test-nodejs
+  node-v10:
+    docker:
+      - image: node:10
+    steps:
+      - test-nodejs
+  node-v11:
+    docker:
+      - image: node:11
+    steps:
+      - test-nodejs
+
+workflows:
+  node-multi-build:
+    jobs:
+      - node-v4
+      - node-v5
+      - node-v6
+      - node-v7
+      - node-v8
+      - node-v9
+      - node-v10
+      - node-v11
