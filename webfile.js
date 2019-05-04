@@ -1,0 +1,1 @@
+window.jwt = require('./index')
