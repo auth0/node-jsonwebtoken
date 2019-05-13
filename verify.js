@@ -210,6 +210,23 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
+    if (options.maxExpiration) {
+      if (typeof payload.iat !== 'number') {
+        return done(new JsonWebTokenError('iat required when maxExpiration is specified'));
+      }
+      if (typeof payload.exp !== 'number') {
+        return done(new JsonWebTokenError('exp required when maxExpiration is specified'));
+      }
+
+      var maxExpirationTimestamp = timespan(options.maxExpiration, payload.iat);
+      if (typeof maxExpirationTimestamp === 'undefined') {
+        return done(new JsonWebTokenError('"maxExpiration" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+      }
+      if (payload.exp > maxExpirationTimestamp + (options.clockTolerance || 0)) {
+        return done(new TokenExpiredError('jwt expiration is longer then the specified maxExpiration: ' + options.maxExpiration));
+      }
+    }
+
     if (options.complete === true) {
       var signature = decodedToken.signature;
 
