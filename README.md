@@ -146,6 +146,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
 * `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). 
   > Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
+* `maxExpiration`: the maximum time tokens are allowed to expire in. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
 
