@@ -208,15 +208,37 @@ describe('verify', function() {
           done();
         });
       });
-      it('should verify clockTimestamp is a number', function (done) {
-        var token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
-        jwt.verify(token, key, {clockTimestamp: 'notANumber'}, function (err, p) {
-          assert.equal(err.name, 'JsonWebTokenError');
-          assert.equal(err.message,'clockTimestamp must be a number');
-          assert.isUndefined(p);
-          done();
+      ['clockTimestamp', 'clockTolerance'].forEach((option) => {
+        it(`should verify ${option} is a number`, function (done) {
+          var token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+          jwt.verify(token, key, {[option]: 'notANumber'}, function (err, p) {
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.equal(err.message,`${option} must be a valid number`);
+            assert.isUndefined(p);
+            done();
+          });
         });
-      });
+
+        it(`should verify ${option} is a valid number`, function (done) {
+          var token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+          jwt.verify(token, key, {[option]: NaN}, function (err, p) {
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.equal(err.message,`${option} must be a valid number`);
+            assert.isUndefined(p);
+            done();
+          });
+        });
+
+        it(`should verify ${option} is a valid finite number`, function (done) {
+          var token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+          jwt.verify(token, key, {[option]: Infinity}, function (err, p) {
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.equal(err.message,`${option} must be a valid number`);
+            assert.isUndefined(p);
+            done();
+          });
+        });
+      })
     });
 
     describe('option: maxAge and clockTimestamp', function () {

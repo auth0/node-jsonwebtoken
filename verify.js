@@ -39,9 +39,11 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     };
   }
 
-  if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
-    return done(new JsonWebTokenError('clockTimestamp must be a number'));
-  }
+  ['clockTimestamp', 'clockTolerance'].forEach((option) => {
+    if (options[option] !== undefined && (typeof options[option] !== 'number' || !Number.isFinite(options[option]))) {
+      return done(new JsonWebTokenError(`${option} must be a valid number`));
+    }
+  });
 
   if (options.nonce !== undefined && (typeof options.nonce !== 'string' || options.nonce.trim() === '')) {
     return done(new JsonWebTokenError('nonce must be a non-empty string'));
