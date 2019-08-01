@@ -73,7 +73,7 @@ Synchronous Sign with RSA SHA256
 ```js
 // sign with RSA SHA256
 var privateKey = fs.readFileSync('private.key');
-var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256'});
+var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
 ```
 
 Sign asynchronously
