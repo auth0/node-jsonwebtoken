@@ -117,7 +117,7 @@ describe('jwtid', function() {
 
       it('should verify with "jti" in payload', function (done) {
         signWithJWTId(undefined, {jti: 'foo'}, (e1, token) => {
-          testUtils.verifyJWTHelper(token, undefined, {jetid: 'foo'}, (e2, decoded) => {
+          testUtils.verifyJWTHelper(token, undefined, {jwtid: 'foo'}, (e2, decoded) => {
             testUtils.asyncCheck(done, () => {
               expect(e1).to.be.null;
               expect(e2).to.be.null;
