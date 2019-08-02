@@ -291,7 +291,7 @@ Error object:
   * 'invalid signature'
   * 'jwt audience invalid. expected: [OPTIONS AUDIENCE]'
   * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
-  * 'jwt id invalid. expected: [OPTIONS JWT ID]'
+  * 'jwt jwtid invalid. expected: [OPTIONS JWT ID]'
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
 
 ```js
