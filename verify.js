@@ -185,8 +185,26 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (options.jwtid) {
-      if (payload.jti !== options.jwtid) {
-        return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+      if (typeof options.jwtid === 'string') {
+        if (payload.jti !== options.jwtid) {
+          return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+        }
+      }
+
+      if (typeof options.jwtid === 'function') {
+        if (!payload.jti) {
+          return done(new JsonWebTokenError('jwt jwtid invalid. expected a valid string value'));
+        }
+
+        options.jwtid(payload.jti, function (error, isRevoked) {
+          if (error) {
+            return done(new JsonWebTokenError('unable to verify jwtid'))
+          }
+
+          if (isRevoked) {
+            return done(new JsonWebTokenError('jwt jwtid invalid. "' + payload.jti + '" was revoked'))
+          }
+        })
       }
     }
 
