@@ -148,6 +148,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
+* `jwtid`: if you want to check `jti` claim, provide a string value or a function with signature `(jti: string, callback: (err?, isRevoked) => void) => void`. When a string is used, only JWTs that match `jwtid` option will be accepted. When a function is used, only JWTs where `isRevoked` is `false` will be accepted.
 
 
 ```js
@@ -191,10 +192,20 @@ jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(
   // if issuer mismatch, err == invalid issuer
 });
 
-// verify jwt id
+// verify jwt id (string)
 var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwtid' }, function(err, decoded) {
   // if jwt id mismatch, err == invalid jwt id
+});
+
+// verify jwt id (function)
+var cert = fs.readFileSync('public.pem');  // get public key
+var checkJti = function(jti, done) {
+  // verify jti somehow (e.g: against a black-list)
+  done(null, true);
+};
+jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: checkJti }, function(err, decoded) {
+  // if jwt id check fails, err == invalid jwt id
 });
 
 // verify subject
