@@ -1,0 +1,1 @@
+var ms=require("ms");module.exports=function(r,e){var o=e||Math.floor(Date.now()/1e3);if("string"==typeof r){var t=ms(r);if(void 0===t)return;return Math.floor(o+t/1e3)}return"number"==typeof r?o+r:void 0};

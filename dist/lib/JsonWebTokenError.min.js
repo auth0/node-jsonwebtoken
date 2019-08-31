@@ -1,0 +1,1 @@
+var JsonWebTokenError=function(r,o){Error.call(this,r),Error.captureStackTrace&&Error.captureStackTrace(this,this.constructor),this.name="JsonWebTokenError",this.message=r,o&&(this.inner=o)};JsonWebTokenError.prototype=Object.create(Error.prototype),JsonWebTokenError.prototype.constructor=JsonWebTokenError,module.exports=JsonWebTokenError;
