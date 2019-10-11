@@ -1,4 +1,5 @@
 var jws = require('jws');
+var parse = require('secure-json-parse').parse;
 
 module.exports = function (jwt, options) {
   options = options || {};
@@ -9,8 +10,8 @@ module.exports = function (jwt, options) {
   //try parse the payload
   if(typeof payload === 'string') {
     try {
-      var obj = JSON.parse(payload);
-      if(obj !== null && typeof obj === 'object') {
+      var obj = parse(payload);
+      if(obj !== null && isObject(obj) === true) {
         payload = obj;
       }
     } catch (e) { }
@@ -28,3 +29,7 @@ module.exports = function (jwt, options) {
   }
   return payload;
 };
+
+function isObject(entity) {
+  return Object.prototype.toString.apply(entity) === '[object Object]';
+}
