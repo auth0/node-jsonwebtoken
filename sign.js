@@ -9,7 +9,7 @@ var isPlainObject = require('lodash.isplainobject');
 var isString = require('lodash.isstring');
 var once = require('lodash.once');
 
-var SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']
+var SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
 if (PS_SUPPORTED) {
   SUPPORTED_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
 }
