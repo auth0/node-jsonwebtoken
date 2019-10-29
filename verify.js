@@ -15,6 +15,12 @@ if (PS_SUPPORTED) {
   RSA_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
 }
 
+function getDefaultSupportedAlgorithms(secretOrPublicKey) {
+  return ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
+    ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
+    ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
+}
+
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
@@ -24,9 +30,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if (!options) {
     options = {};
   }
-
-  //clone this object since we are going to mutate it.
-  options = Object.assign({}, options);
 
   var done;
 
@@ -97,34 +100,58 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     var hasSignature = parts[2].trim() !== '';
+    var secretOrPublicKeys = Array.isArray(secretOrPublicKey) ? secretOrPublicKey : [secretOrPublicKey];
+    secretOrPublicKeys = secretOrPublicKeys.filter(Boolean);
 
-    if (!hasSignature && secretOrPublicKey){
+    if (!hasSignature && secretOrPublicKeys.length){
       return done(new JsonWebTokenError('jwt signature is required'));
     }
 
-    if (hasSignature && !secretOrPublicKey) {
+    if (hasSignature && !secretOrPublicKeys.length) {
       return done(new JsonWebTokenError('secret or public key must be provided'));
     }
 
-    if (!hasSignature && !options.algorithms) {
-      options.algorithms = ['none'];
+    secretOrPublicKeys.forEach(function(key) {
+      if (typeof key !== 'string' && !Buffer.isBuffer(key)) {
+        return done(new JsonWebTokenError('secret or public keys must resolve to strings or buffers'));
+      }
+    });
+
+    var supportedAlgorithms;
+    var determineAlgsFromKeys = false;
+    if (options.algorithms) {
+      supportedAlgorithms = options.algorithms
     }
 
-    if (!options.algorithms) {
-      options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
-        ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
-        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
-
+    if (!hasSignature && !supportedAlgorithms) {
+      supportedAlgorithms = ['none']
     }
 
-    if (!~options.algorithms.indexOf(decodedToken.header.alg)) {
-      return done(new JsonWebTokenError('invalid algorithm'));
+    if (!supportedAlgorithms) {
+      determineAlgsFromKeys = true;
+      supportedAlgorithms = [];
+      secretOrPublicKeys.forEach(function(key) {
+        supportedAlgorithms = supportedAlgorithms.concat(getDefaultSupportedAlgorithms(key));
+      });
+    }
+
+    if (!~supportedAlgorithms.indexOf(decodedToken.header.alg)) {
+      return done(new JsonWebTokenError('invalid algorithm for every given key or algorithm option'));
     }
 
     var valid;
-
     try {
-      valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
+      // previously filtered out falsey values from keys
+      // if unsigned, re-add an empty string key so that jws.verify runs
+      if (supportedAlgorithms[0] === 'none') {
+        secretOrPublicKeys.push('')
+      }
+      valid = secretOrPublicKeys.some(function(key) {
+        // only attempt to verify if the specific key's default algorithms include token alg
+        var keyAlgorithms = determineAlgsFromKeys ? getDefaultSupportedAlgorithms(key) : supportedAlgorithms;
+        return ~keyAlgorithms.indexOf(decodedToken.header.alg) &&
+          jws.verify(jwtString, decodedToken.header.alg, key);
+      });
     } catch (e) {
       return done(e);
     }
