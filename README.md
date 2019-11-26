@@ -125,6 +125,8 @@ jwt.sign({
 
 (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+
 `token` is the JsonWebToken string
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
@@ -233,6 +235,9 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
 
 > __Warning:__ This will __not__ verify whether the signature is valid. You should __not__ use this for untrusted messages. You most likely want to use `jwt.verify` instead.
+
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external request), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+
 
 `token` is the JsonWebToken string
 
