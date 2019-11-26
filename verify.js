@@ -111,9 +111,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (!options.algorithms) {
-      options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
-        ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
-        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
+      options.algorithms = secretOrPublicKey.toString().includes('BEGIN CERTIFICATE') ||
+        secretOrPublicKey.toString().includes('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
+        secretOrPublicKey.toString().includes('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
 
     }
 
