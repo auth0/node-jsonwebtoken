@@ -142,6 +142,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
+* `jwtid` (optional): if you want to check JWT ID (`jti`), provide a string value here.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
