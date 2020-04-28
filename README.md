@@ -50,7 +50,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `header`
 * `keyid`
 * `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
-
+* `mutateHeader`: if false, the sign function will not modify the `options.header` by assigning with the default headers values.
 
 
 > There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`.  These claims can also be provided in the payload directly with `exp`, `nbf`, `aud`, `sub` and `iss` respectively, but you **_can't_** include in both places.

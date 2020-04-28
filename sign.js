@@ -26,7 +26,8 @@ var sign_options_schema = {
   jwtid: { isValid: isString, message: '"jwtid" must be a string' },
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
   keyid: { isValid: isString, message: '"keyid" must be a string' },
-  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
+  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' },
+  mutateHeader: { isValid: isBoolean, message: '"mutateHeader" must be a boolean' }
 };
 
 var registered_claims_schema = {
@@ -90,17 +91,29 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   var isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
-  var header = Object.assign({
-    alg: options.algorithm || 'HS256',
-    typ: isObjectPayload ? 'JWT' : undefined,
-    kid: options.keyid
-  }, options.header);
-
   function failure(err) {
     if (callback) {
       return callback(err);
     }
     throw err;
+  }
+
+  var mutateHeader = typeof options.mutateHeader === 'undefined' ||
+                      options.mutateHeader;
+
+  var header;
+  if (mutateHeader) {
+    header = Object.assign({
+      alg: options.algorithm || 'HS256',
+      typ: isObjectPayload ? 'JWT' : undefined,
+      kid: options.keyid
+    }, options.header);
+  } else {
+    if (!options.header) {
+      return failure(new Error('with mutateHeader === false, "options.header" is required'));
+    }
+
+    header = options.header;
   }
 
   if (!secretOrPrivateKey && options.algorithm !== 'none') {

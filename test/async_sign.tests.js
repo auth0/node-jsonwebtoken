@@ -130,5 +130,14 @@ describe('signing a token asynchronously', function() {
         });
       });
     });
+
+    describe('when mutateHeader is set to false', function () {
+      it('should return an error if the options.header is not set', function (done) {
+        jwt.sign({ foo: 'bar' }, 'secret', { mutateHeader: false }, function (err) {
+          expect(err).to.be.instanceof(Error);
+          done();
+        });
+      });
+    });
   });
 });
