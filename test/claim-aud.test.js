@@ -120,7 +120,7 @@ describe('audience', function() {
         verifyWithAudience(token, 'urn:no-match', (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match, received: urn:foo`);
           });
         });
       });
