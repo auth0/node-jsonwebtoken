@@ -164,7 +164,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       });
 
       if (!match) {
-        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ') + ', received: ' + target.join('and')));
       }
     }
 
