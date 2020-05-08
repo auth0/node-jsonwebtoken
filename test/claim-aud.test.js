@@ -129,7 +129,7 @@ describe('audience', function() {
         verifyWithAudience(token, ['urn:no-match-1', 'urn:no-match-2'], (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2, received: urn:foo`);
           });
         });
       });
@@ -138,7 +138,7 @@ describe('audience', function() {
         verifyWithAudience(token, /^urn:no-match$/, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: /^urn:no-match$/`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: /^urn:no-match$/, received: urn:foo`);
           });
         });
       });
@@ -148,7 +148,7 @@ describe('audience', function() {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property(
-              'message', `jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/`
+              'message', `jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/, received: urn:foo`
             );
           });
         });
@@ -159,7 +159,7 @@ describe('audience', function() {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property(
-              'message', `jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match`
+              'message', `jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match, received: urn:foo`
             );
           });
         });
@@ -199,7 +199,7 @@ describe('audience', function() {
         verifyWithAudience(token, 'urn:no-match', (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match, received: urn:foo and urn:bar`);
           });
         });
       });
@@ -208,7 +208,7 @@ describe('audience', function() {
         verifyWithAudience(token, ['urn:no-match-1', 'urn:no-match-2'], (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2, received: urn:foo and urn:bar`);
           });
         });
       });
@@ -217,7 +217,7 @@ describe('audience', function() {
         verifyWithAudience(token, /^urn:no-match$/, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', `jwt audience invalid. expected: /^urn:no-match$/`);
+            expect(err).to.have.property('message', `jwt audience invalid. expected: /^urn:no-match$/, received: urn:foo and urn:bar`);
           });
         });
       });
@@ -227,7 +227,7 @@ describe('audience', function() {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property(
-              'message', `jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/`
+              'message', `jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/, received: urn:foo and urn:bar`
             );
           });
         });
@@ -238,7 +238,7 @@ describe('audience', function() {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property(
-              'message', `jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match`
+              'message', `jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match, received: urn:foo and urn:bar`
             );
           });
         });
@@ -391,7 +391,7 @@ describe('audience', function() {
         verifyWithAudience(token, 'urn:no-match', (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', 'jwt audience invalid. expected: urn:no-match');
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: urn:no-match, received: ');
           });
         });
       });
@@ -400,7 +400,7 @@ describe('audience', function() {
         verifyWithAudience(token, ['urn:no-match-1', 'urn:no-match-2'], (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', 'jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2');
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: urn:no-match-1 or urn:no-match-2, received: ');
           });
         });
       });
@@ -409,7 +409,7 @@ describe('audience', function() {
         verifyWithAudience(token, /^urn:no-match$/, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match$/');
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match$/, received: ');
           });
         });
       });
@@ -418,7 +418,7 @@ describe('audience', function() {
         verifyWithAudience(token, [/^urn:no-match-1$/, /^urn:no-match-2$/], (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/');
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match-1$/ or /^urn:no-match-2$/, received: ');
           });
         });
       });
@@ -427,7 +427,7 @@ describe('audience', function() {
         verifyWithAudience(token, [/^urn:no-match$/, 'urn:no-match'], (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match');
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:no-match$/ or urn:no-match, received: ');
           });
         });
       });
