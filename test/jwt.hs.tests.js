@@ -96,16 +96,26 @@ describe('HS256', function() {
     });
   });
 
-  describe('should fail verification gracefully with trailing space in the jwt', function() {
+  describe('should fail verification gracefully on malformed token', function() {
     var secret = 'shhhhhh';
     var token  = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
 
-    it('should return the "invalid token" error', function(done) {
+    it('should return the "jwt malformed" error with a trailing space', function(done) {
       var malformedToken = token + ' '; // corrupt the token by adding a space
       jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err) {
         assert.isNotNull(err);
         assert.equal('JsonWebTokenError', err.name);
-        assert.equal('invalid token', err.message);
+        assert.equal('jwt malformed', err.message);
+        done();
+      });
+    });
+
+    it('should return the "jwt malformed" error with missing pieces', function(done) {
+      var malformedToken = token.split('.').slice(0, 2).join('.'); // corrupt the token by removing a section
+      jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err) {
+        assert.isNotNull(err);
+        assert.equal('JsonWebTokenError', err.name);
+        assert.equal('jwt malformed', err.message);
         done();
       });
     });

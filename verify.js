@@ -72,7 +72,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   if (!decodedToken) {
-    return done(new JsonWebTokenError('invalid token'));
+    return done(new JsonWebTokenError('jwt malformed'));
   }
 
   var header = decodedToken.header;
