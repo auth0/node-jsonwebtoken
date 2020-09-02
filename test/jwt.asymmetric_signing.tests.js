@@ -148,7 +148,7 @@ describe('Asymmetric Algorithms', function(){
 
       describe('when decoding a invalid jwt token', function () {
         it('should return null', function (done) {
-          var payload = jwt.decode('whatever.token');
+          var payload = jwt.unsafeDecode('whatever.token');
           assert.isNull(payload);
           done();
         });
@@ -158,14 +158,14 @@ describe('Asymmetric Algorithms', function(){
         it('should return the payload', function (done) {
           var obj = { foo: 'bar' };
           var token = jwt.sign(obj, priv, { algorithm: algorithm });
-          var payload = jwt.decode(token);
+          var payload = jwt.unsafeDecode(token);
           assert.equal(payload.foo, obj.foo);
           done();
         });
         it('should return the header and payload and signature if complete option is set', function (done) {
           var obj = { foo: 'bar' };
           var token = jwt.sign(obj, priv, { algorithm: algorithm });
-          var decoded = jwt.decode(token, { complete: true });
+          var decoded = jwt.unsafeDecode(token, { complete: true });
           assert.equal(decoded.payload.foo, obj.foo);
           assert.deepEqual(decoded.header, { typ: 'JWT', alg: algorithm });
           assert.ok(typeof decoded.signature == 'string');

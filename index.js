@@ -1,5 +1,5 @@
 module.exports = {
-  decode: require('./decode'),
+  unsafeDecode: require('./decode'),
   verify: require('./verify'),
   sign: require('./sign'),
   JsonWebTokenError: require('./lib/JsonWebTokenError'),
