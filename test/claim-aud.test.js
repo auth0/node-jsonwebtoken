@@ -104,7 +104,10 @@ describe('audience', function() {
         ['urn:no_match', 'urn:foo'],
         ['urn:no_match', /^urn:f[o]{2}$/],
         [/^urn:no_match$/, /^urn:f[o]{2}$/],
-        [/^urn:no_match$/, 'urn:foo']
+        [/^urn:no_match$/, 'urn:foo'],
+        function customAudienceCheck (jwtAud) {
+          return jwtAud === 'urn:foo'
+        }
       ].forEach((audience) =>{
         it(`should verify and decode with verify "audience" option of ${util.inspect(audience)}`, function (done) {
           verifyWithAudience(token, audience, (err, decoded) => {
@@ -164,6 +167,18 @@ describe('audience', function() {
           });
         });
       });
+      it('should error on no match with a function in verify "audience" option', function (done) {
+        verifyWithAudience(token, function customAudienceCheck(jwtAud) {
+          return jwtAud === 'urn:no-match'
+        }, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property(
+              'message', `jwt audience invalid. expected user defined function to return true.`
+            );
+          });
+        });
+      });
     });
 
     describe('with an array of ["urn:foo", "urn:bar"] for "aud" value in payload', function () {
@@ -183,7 +198,15 @@ describe('audience', function() {
         ['urn:no_match', 'urn:foo'],
         ['urn:no_match', /^urn:f[o]{2}$/],
         [/^urn:no_match$/, /^urn:f[o]{2}$/],
-        [/^urn:no_match$/, 'urn:foo']
+        [/^urn:no_match$/, 'urn:foo'],
+        function customAudienceCheck(jwtAud) {
+          if (Array.isArray(jwtAud)) {
+            // verbose Array.includes in early v8 versions
+            return !!~jwtAud.indexOf('urn:foo');
+          }
+
+          return false
+        }
       ].forEach((audience) =>{
         it(`should verify and decode with verify "audience" option of ${util.inspect(audience)}`, function (done) {
           verifyWithAudience(token, audience, (err, decoded) => {
