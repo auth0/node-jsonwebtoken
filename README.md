@@ -231,6 +231,9 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 
 ```
 
+<details>
+<summary><em></em>Need to peak into a JWT without verifying it? (Click to expand)</summary>
+
 ### jwt.decode(token [, options])
 
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
@@ -258,6 +261,8 @@ var decoded = jwt.decode(token, {complete: true});
 console.log(decoded.header);
 console.log(decoded.payload)
 ```
+
+</details>
 
 ## Errors & Codes
 Possible thrown errors during verification.
