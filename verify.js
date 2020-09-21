@@ -66,7 +66,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   var decodedToken;
 
   try {
-    decodedToken = decode(jwtString, { complete: true });
+    decodedToken = decode(jwtString, { encoding: options.encoding, complete: true });
   } catch(err) {
     return done(err);
   }
