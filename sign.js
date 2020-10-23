@@ -125,7 +125,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     });
 
     if (invalid_options.length > 0) {
-      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload'));
+      const suggestions = [];
+      if(invalid_options.includes('expiresIn') && typeof payload==='string'){
+        if(suggestions.length===0) suggestions.length.push('');
+        suggestions.push('expiresIn is only valid if payload is an object).
+      }
+      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload' + (suggestions.join('\n'));
     }
   }
 
