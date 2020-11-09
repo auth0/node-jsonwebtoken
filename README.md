@@ -232,7 +232,7 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 ```
 
 <details>
-<summary><em></em>Need to peak into a JWT without verifying it? (Click to expand)</summary>
+<summary><em></em>Need to peek into a JWT without verifying it? (Click to expand)</summary>
 
 ### jwt.decode(token [, options])
 
