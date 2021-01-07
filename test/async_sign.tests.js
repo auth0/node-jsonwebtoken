@@ -1,6 +1,7 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
 var jws = require('jws');
+var PS_SUPPORTED = require('../lib/psSupported');
 
 describe('signing a token asynchronously', function() {
 
@@ -57,6 +58,16 @@ describe('signing a token asynchronously', function() {
         done();
       });
     });
+
+    if (PS_SUPPORTED) {
+      it('should return error when secret is not a cert for PS256', function(done) {
+        //this throw an error because the secret is not a cert and PS256 requires a cert.
+        jwt.sign({ foo: 'bar' }, secret, { algorithm: 'PS256' }, function (err) {
+          expect(err).to.be.ok;
+          done();
+        });
+      });
+    }
 
     it('should return error on wrong arguments', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.

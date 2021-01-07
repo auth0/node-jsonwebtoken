@@ -248,4 +248,30 @@ describe('issue at', function() {
       });
     });
   });
+
+  describe('with string payload', function () {
+    it('should not add iat to string', function (done) {
+      const payload = 'string payload';
+      const options = {algorithm: 'none'};
+      testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
+        const decoded = jwt.decode(token);
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          expect(decoded).to.equal(payload);
+        });
+      });
+    });
+
+    it('should not add iat to stringified object', function (done) {
+      const payload = '{}';
+      const options = {algorithm: 'none', header: {typ: 'JWT'}};
+      testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
+        const decoded = jwt.decode(token);
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.equal(null);
+          expect(JSON.stringify(decoded)).to.equal(payload);
+        });
+      });
+    });
+  });
 });
