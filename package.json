@@ -1,5 +1,5 @@
 {
-  "name": "jsonwebtoken",
+  "name": "civic-jsonwebtoken",
   "version": "8.4.0",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
