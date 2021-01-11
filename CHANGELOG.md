@@ -4,6 +4,35 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 8.5.1 - 2019-03-18
+
+### Bug fix
+
+ - fix: ensure correct PS signing and verification (#585) ([e5874ae428ffc0465e6bd4e660f89f78b56a74a6](https://github.com/auth0/node-jsonwebtoken/commit/e5874ae428ffc0465e6bd4e660f89f78b56a74a6)), closes [#585](https://github.com/auth0/node-jsonwebtoken/issues/585)
+
+### Docs
+
+ - README: fix markdown for algorithms table ([84e03ef70f9c44a3aef95a1dc122c8238854f683](https://github.com/auth0/node-jsonwebtoken/commit/84e03ef70f9c44a3aef95a1dc122c8238854f683))
+
+## 8.5.0 - 2019-02-20
+
+### New Functionality
+
+ - feat: add PS JWA support for applicable node versions (#573) ([eefb9d9c6eec54718fa6e41306bda84788df7bec](https://github.com/auth0/node-jsonwebtoken/commit/eefb9d9c6eec54718fa6e41306bda84788df7bec)), closes [#573](https://github.com/auth0/node-jsonwebtoken/issues/573)
+ - Add complete option in jwt.verify (#522) ([8737789dd330cf9e7870f4df97fd52479adbac22](https://github.com/auth0/node-jsonwebtoken/commit/8737789dd330cf9e7870f4df97fd52479adbac22)), closes [#522](https://github.com/auth0/node-jsonwebtoken/issues/522)
+
+ ### Test Improvements
+
+ - Add tests for private claims in the payload (#555) ([5147852896755dc1291825e2e40556f964411fb2](https://github.com/auth0/node-jsonwebtoken/commit/5147852896755dc1291825e2e40556f964411fb2)), closes [#555](https://github.com/auth0/node-jsonwebtoken/issues/555)
+ - Force use_strict during testing (#577) ([7b60c127ceade36c33ff33be066e435802001c94](https://github.com/auth0/node-jsonwebtoken/commit/7b60c127ceade36c33ff33be066e435802001c94)), closes [#577](https://github.com/auth0/node-jsonwebtoken/issues/577)
+ - Refactor tests related to jti and jwtid (#544) ([7eebbc75ab89e01af5dacf2aae90fe05a13a1454](https://github.com/auth0/node-jsonwebtoken/commit/7eebbc75ab89e01af5dacf2aae90fe05a13a1454)), closes [#544](https://github.com/auth0/node-jsonwebtoken/issues/544)
+ - ci: remove nsp from tests (#569) ([da8f55c3c7b4dd0bfc07a2df228500fdd050242a](https://github.com/auth0/node-jsonwebtoken/commit/da8f55c3c7b4dd0bfc07a2df228500fdd050242a)), closes [#569](https://github.com/auth0/node-jsonwebtoken/issues/569)
+
+### Docs
+
+- Fix 'cert' token which isn't a cert (#554) ([0c24fe68cd2866cea6322016bf993cd897fefc98](https://github.com/auth0/node-jsonwebtoken/commit/0c24fe68cd2866cea6322016bf993cd897fefc98)), closes [#554](https://github.com/auth0/node-jsonwebtoken/issues/554)
+
+
 ## 8.4.0 - 2018-11-14
 
 ### New Functionality

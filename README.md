@@ -72,13 +72,13 @@ var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 Synchronous Sign with RSA SHA256
 ```js
 // sign with RSA SHA256
-var cert = fs.readFileSync('private.key');
-var token = jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256'});
+var privateKey = fs.readFileSync('private.key');
+var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
 ```
 
 Sign asynchronously
 ```js
-jwt.sign({ foo: 'bar' }, cert, { algorithm: 'RS256' }, function(err, token) {
+jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
 ```
@@ -125,6 +125,8 @@ jwt.sign({
 
 (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+
 `token` is the JsonWebToken string
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
@@ -138,7 +140,9 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
+* `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
+* `jwtid` (optional): if you want to check JWT ID (`jti`), provide a string value here.
 * `ignoreExpiration`: if `true` do not validate the expiration of the token.
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
@@ -227,11 +231,17 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 
 ```
 
+<details>
+<summary><em></em>Need to peek into a JWT without verifying it? (Click to expand)</summary>
+
 ### jwt.decode(token [, options])
 
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
 
 > __Warning:__ This will __not__ verify whether the signature is valid. You should __not__ use this for untrusted messages. You most likely want to use `jwt.verify` instead.
+
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external request), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+
 
 `token` is the JsonWebToken string
 
@@ -251,6 +261,8 @@ var decoded = jwt.decode(token, {complete: true});
 console.log(decoded.header);
 console.log(decoded.payload)
 ```
+
+</details>
 
 ## Errors & Codes
 Possible thrown errors during verification.
@@ -339,9 +351,12 @@ alg Parameter Value | Digital Signature or MAC Algorithm
 HS256 | HMAC using SHA-256 hash algorithm
 HS384 | HMAC using SHA-384 hash algorithm
 HS512 | HMAC using SHA-512 hash algorithm
-RS256 | RSASSA using SHA-256 hash algorithm
-RS384 | RSASSA using SHA-384 hash algorithm
-RS512 | RSASSA using SHA-512 hash algorithm
+RS256 | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
+RS384 | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
+RS512 | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
+PS256 | RSASSA-PSS using SHA-256 hash algorithm (only node ^6.12.0 OR >=8.0.0)
+PS384 | RSASSA-PSS using SHA-384 hash algorithm (only node ^6.12.0 OR >=8.0.0)
+PS512 | RSASSA-PSS using SHA-512 hash algorithm (only node ^6.12.0 OR >=8.0.0)
 ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
 ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
 ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm

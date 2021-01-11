@@ -20,8 +20,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "coverage": "nyc mocha",
-    "test": "npm run lint && npm run coverage && nsp check && cost-of-modules"
+    "coverage": "nyc mocha --use_strict",
+    "test": "npm run lint && npm run coverage && cost-of-modules"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "base64-url": "^2.2.0",
-    "jws": "^3.1.5",
+    "jws": "^3.2.2",
     "lodash.includes": "^4.3.0",
     "lodash.isboolean": "^3.0.3",
     "lodash.isinteger": "^4.0.4",
@@ -45,7 +45,8 @@
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
-    "ms": "^2.1.1"
+    "ms": "^2.1.1",
+    "semver": "^5.6.0"
   },
   "devDependencies": {
     "atob": "^2.1.2",
