@@ -143,7 +143,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('ES256k is only supported with cryptoManager'));
   }
 
-  if (!secretOrPrivateKey && (options.algorithm !== 'none' && options.algorithm !== 'ES256k')) {
+  if (!secretOrPrivateKey && (options.algorithm !== 'none' && !keyName && !cryptoManager)) {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
