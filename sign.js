@@ -1,4 +1,5 @@
 var timespan = require('./lib/timespan');
+var PS_SUPPORTED = require('./lib/psSupported');
 var jws = require('jws');
 var includes = require('lodash.includes');
 var isBoolean = require('lodash.isboolean');
