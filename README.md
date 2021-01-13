@@ -165,7 +165,7 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 
 // invalid token - synchronous
 try {
-  var decoded = jwt.verify(token, 'wrong-secret');
+  var decoded = jwt.verify(token, 'secret');
 } catch(err) {
   // err
 }
