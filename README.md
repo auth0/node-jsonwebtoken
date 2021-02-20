@@ -27,7 +27,7 @@ $ npm install jsonwebtoken
 
 (Synchronous) Returns the JsonWebToken as string
 
-`payload` could be an object literal, buffer or string representing valid JSON. 
+`payload` could be an object literal, buffer or string representing valid JSON.
 > **Please _note_ that** `exp` or any other claim is only set if the payload is an object literal. Buffer or string payloads are not checked for JSON validity.
 
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
@@ -37,10 +37,10 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 
 `options`:
 
-* `algorithm` (default: `HS256`)
-* `expiresIn`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). 
+* `algorithm` (default: `HS256`) See [Algorithms supported](#algorithms-supported) section for more information.
+* `expiresIn`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms).
   > Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
-* `notBefore`: expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). 
+* `notBefore`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms).
   > Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `audience`
 * `issuer`
@@ -49,7 +49,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `noTimestamp`
 * `header`
 * `keyid`
-* `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
+* `mutatePayload`: (default: `false`) if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
 
 
 
@@ -137,8 +137,8 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
-* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
+* `algorithms`: (optional) List of strings with the names of the [allowed algorithms](#algorithms-supported). For instance, `["HS256", "HS384"]`. If not specified, the library will determine the allowed algorithms based on `secretOrPublicKey` value (excluding None algorithm for [security purposes](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/#Meet-the--None--Algorithm)).
+* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions.
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
@@ -147,7 +147,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `ignoreNotBefore`...
 * `subject`: if you want to check subject (`sub`), provide a value here
 * `clockTolerance`: number of seconds to tolerate when checking the `nbf` and `exp` claims, to deal with small clock differences among different servers
-* `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [zeit/ms](https://github.com/zeit/ms). 
+* `maxAge`: the maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms).
   > Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
@@ -347,7 +347,7 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 
 Array of supported algorithms. The following algorithms are currently supported.
 
-alg Parameter Value | Digital Signature or MAC Algorithm
+Parameter Value | Digital Signature or MAC Algorithm
 ----------------|----------------------------
 HS256 | HMAC using SHA-256 hash algorithm
 HS384 | HMAC using SHA-384 hash algorithm
