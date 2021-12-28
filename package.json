@@ -44,8 +44,7 @@
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
-    "ms": "^2.1.1",
-    "semver": "^5.6.0"
+    "ms": "^2.1.1"
   },
   "devDependencies": {
     "atob": "^2.1.2",
@@ -60,7 +59,7 @@
   },
   "engines": {
     "npm": ">=1.4.28",
-    "node": ">=4"
+    "node": ">=8"
   },
   "files": [
     "lib",

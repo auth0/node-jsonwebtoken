@@ -1,5 +1,4 @@
 var jwt = require('../index');
-var PS_SUPPORTED = require('../lib/psSupported');
 var fs = require('fs');
 var path = require('path');
 
@@ -23,17 +22,13 @@ var algorithms = {
     // openssl ec -in ecdsa-private.pem -pubout -out ecdsa-public.pem
     pub_key: loadKey('ecdsa-public.pem'),
     invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
-  }
-};
-
-if (PS_SUPPORTED) {
-  algorithms.PS256 = {
+  },
+  PS256: {
     pub_key: loadKey('pub.pem'),
     priv_key: loadKey('priv.pem'),
     invalid_pub_key: loadKey('invalid_pub.pem')
-  };
-}
-
+  }
+};
 
 describe('Asymmetric Algorithms', function(){
 
