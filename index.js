@@ -1,5 +1,7 @@
+const { verify, isExpired } = require('./verify');
 module.exports = {
-  verify: require('./verify'),
+  verify: verify,
+  isExpired: isExpired,
   sign: require('./sign'),
   JsonWebTokenError: require('./lib/JsonWebTokenError'),
   NotBeforeError: require('./lib/NotBeforeError'),
