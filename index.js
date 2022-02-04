@@ -1,6 +1,8 @@
+const signObj = require('./sign');
 module.exports = {
   verify: require('./verify'),
-  sign: require('./sign'),
+  sign: signObj.sign,
+  supported_algorithms: signObj.SUPPORTED_ALGS,
   JsonWebTokenError: require('./lib/JsonWebTokenError'),
   NotBeforeError: require('./lib/NotBeforeError'),
   TokenExpiredError: require('./lib/TokenExpiredError'),

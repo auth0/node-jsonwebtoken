@@ -79,7 +79,7 @@ var options_for_objects = [
   'jwtid',
 ];
 
-module.exports = function (payload, secretOrPrivateKey, options, callback) {
+function sign(payload, secretOrPrivateKey, options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -205,3 +205,10 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return jws.sign({ header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding });
   }
 };
+
+
+
+module.exports = {
+  sign,
+  SUPPORTED_ALGS,
+}
