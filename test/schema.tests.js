@@ -1,17 +1,17 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
-var fs = require('fs');
-var PS_SUPPORTED = require('../lib/psSupported');
+const jwt = require('../index');
+const expect = require('chai').expect;
+const fs = require('fs');
+const PS_SUPPORTED = require('../lib/psSupported');
 
 describe('schema', function() {
 
   describe('sign options', function() {
 
-    var cert_rsa_priv = fs.readFileSync(__dirname + '/rsa-private.pem');
-    var cert_ecdsa_priv = fs.readFileSync(__dirname + '/ecdsa-private.pem');
+    const cert_rsa_priv = fs.readFileSync(__dirname + '/rsa-private.pem');
+    const cert_ecdsa_priv = fs.readFileSync(__dirname + '/ecdsa-private.pem');
 
     function sign(options) {
-      var isEcdsa = options.algorithm && options.algorithm.indexOf('ES') === 0;
+      const isEcdsa = options.algorithm && options.algorithm.indexOf('ES') === 0;
       jwt.sign({foo: 123}, isEcdsa ? cert_ecdsa_priv : cert_rsa_priv, options);
     }
 

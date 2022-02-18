@@ -1,15 +1,15 @@
-var jws = require('jws');
+const jws = require('jws');
 
 module.exports = function (jwt, options) {
   options = options || {};
-  var decoded = jws.decode(jwt, options);
+  const decoded = jws.decode(jwt, options);
   if (!decoded) { return null; }
-  var payload = decoded.payload;
+  let payload = decoded.payload;
 
   //try parse the payload
   if(typeof payload === 'string') {
     try {
-      var obj = JSON.parse(payload);
+      const obj = JSON.parse(payload);
       if(obj !== null && typeof obj === 'object') {
         payload = obj;
       }

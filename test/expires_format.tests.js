@@ -1,5 +1,5 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
+const jwt = require('../index');
+const expect = require('chai').expect;
 
 describe('expires option', function() {
 
