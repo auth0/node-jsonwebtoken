@@ -3,6 +3,7 @@
   "version": "8.5.1",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
+  "exports": "./index.js",
   "nyc": {
     "check-coverage": true,
     "lines": 95,
