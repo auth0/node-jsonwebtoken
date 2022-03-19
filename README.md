@@ -220,8 +220,7 @@ var client = jwksClient({
 });
 function getKey(header, callback){
   client.getSigningKey(header.kid, function(err, key) {
-    var signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey);
+    callback(err, key?.getPublicKey());
   });
 }
 
