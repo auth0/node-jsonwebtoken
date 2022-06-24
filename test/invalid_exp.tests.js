@@ -7,7 +7,7 @@ describe('invalid expiration', function() {
     var broken_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxMjMiLCJmb28iOiJhZGFzIn0.cDa81le-pnwJMcJi3o3PBwB7cTJMiXCkizIhxbXAKRg';
 
     jwt.verify(broken_token, '123', function (err) {
-      expect(err.name).to.equal('JsonWebTokenError');
+      expect(err.name).to.equal('TokenExpiredError');
       done();
     });
 
