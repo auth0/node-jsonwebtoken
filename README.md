@@ -1,9 +1,8 @@
 # jsonwebtoken
 
-| **Build** | **Dependency** |
-|-----------|---------------|
-| [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken) |
-
+| **Build** | **Dependency** | **Downloads** |
+|-----------|---------------|---------------|
+| [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://img.shields.io/npm/v/jsonwebtoken.svg?style=flat)](https://www.npmjs.com/package/jsonwebtoken) | [![Downloads](https://img.shields.io/npm/dm/jsonwebtoken.svg?style=flat)](https://www.npmjs.com/package/jsonwebtoken) |
 
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
 
