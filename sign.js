@@ -1,20 +1,21 @@
-var timespan = require('./lib/timespan');
-var PS_SUPPORTED = require('./lib/psSupported');
-var jws = require('jws');
-var includes = require('lodash.includes');
-var isBoolean = require('lodash.isboolean');
-var isInteger = require('lodash.isinteger');
-var isNumber = require('lodash.isnumber');
-var isPlainObject = require('lodash.isplainobject');
-var isString = require('lodash.isstring');
-var once = require('lodash.once');
+const timespan = require('./lib/timespan');
+const PS_SUPPORTED = require('./lib/psSupported');
+const jws = require('jws');
+const includes = require('lodash.includes');
+const isBoolean = require('lodash.isboolean');
+const isInteger = require('lodash.isinteger');
+const isNumber = require('lodash.isnumber');
+const isPlainObject = require('lodash.isplainobject');
+const isString = require('lodash.isstring');
+const once = require('lodash.once');
+const { KeyObject } = require('crypto')
 
-var SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
+const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
 if (PS_SUPPORTED) {
   SUPPORTED_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
 }
 
-var sign_options_schema = {
+const sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
   notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
@@ -29,7 +30,7 @@ var sign_options_schema = {
   mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
 };
 
-var registered_claims_schema = {
+const registered_claims_schema = {
   iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
   exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
   nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
@@ -41,7 +42,7 @@ function validate(schema, allowUnknown, object, parameterName) {
   }
   Object.keys(object)
     .forEach(function(key) {
-      var validator = schema[key];
+      const validator = schema[key];
       if (!validator) {
         if (!allowUnknown) {
           throw new Error('"' + key + '" is not allowed in "' + parameterName + '"');
@@ -62,14 +63,14 @@ function validatePayload(payload) {
   return validate(registered_claims_schema, true, payload, 'payload');
 }
 
-var options_to_payload = {
+const options_to_payload = {
   'audience': 'aud',
   'issuer': 'iss',
   'subject': 'sub',
   'jwtid': 'jti'
 };
 
-var options_for_objects = [
+const options_for_objects = [
   'expiresIn',
   'notBefore',
   'noTimestamp',
@@ -87,10 +88,10 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     options = options || {};
   }
 
-  var isObjectPayload = typeof payload === 'object' &&
+  const isObjectPayload = typeof payload === 'object' &&
                         !Buffer.isBuffer(payload);
 
-  var header = Object.assign({
+  const header = Object.assign({
     alg: options.algorithm || 'HS256',
     typ: isObjectPayload ? 'JWT' : undefined,
     kid: options.keyid
@@ -107,6 +108,18 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
+  // Public keys used with HS algorithms is a misconfiguration
+  if (header.alg.startsWith('HS')) {
+    if (secretOrPrivateKey instanceof KeyObject) {
+      if (secretOrPrivateKey.type !== 'secret') {
+        return failure(new Error((`secretOrPrivateKey KeyObject must be of type secret when using ${header.alg}. Got ${secretOrPrivateKey.type}`)))
+      }
+    } else if (typeof secretOrPrivateKey !== 'string'
+      && ![ArrayBuffer, Buffer, Object.getPrototypeOf(Int8Array), DataView].some((x) => secretOrPrivateKey instanceof x)){
+      return failure(new Error((`secretOrPrivateKey must be a KeyObject or valid input for secret for crypto.createSecretKey when using ${header.alg}`)))
+    }
+  }
+
   if (typeof payload === 'undefined') {
     return failure(new Error('payload is required'));
   } else if (isObjectPayload) {
@@ -120,7 +133,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
       payload = Object.assign({},payload);
     }
   } else {
-    var invalid_options = options_for_objects.filter(function (opt) {
+    const invalid_options = options_for_objects.filter(function (opt) {
       return typeof options[opt] !== 'undefined';
     });
 
@@ -144,7 +157,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(error);
   }
 
-  var timestamp = payload.iat || Math.floor(Date.now() / 1000);
+  const timestamp = payload.iat || Math.floor(Date.now() / 1000);
 
   if (options.noTimestamp) {
     delete payload.iat;
@@ -177,7 +190,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   Object.keys(options_to_payload).forEach(function (key) {
-    var claim = options_to_payload[key];
+    const claim = options_to_payload[key];
     if (typeof options[key] !== 'undefined') {
       if (typeof payload[claim] !== 'undefined') {
         return failure(new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.'));
@@ -186,7 +199,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   });
 
-  var encoding = options.encoding || 'utf8';
+  const encoding = options.encoding || 'utf8';
 
   if (typeof callback === 'function') {
     callback = callback && once(callback);
