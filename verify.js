@@ -1,14 +1,15 @@
-var JsonWebTokenError = require('./lib/JsonWebTokenError');
-var NotBeforeError    = require('./lib/NotBeforeError');
-var TokenExpiredError = require('./lib/TokenExpiredError');
-var decode            = require('./decode');
-var timespan          = require('./lib/timespan');
-var PS_SUPPORTED      = require('./lib/psSupported');
-var jws               = require('jws');
+const JsonWebTokenError = require('./lib/JsonWebTokenError');
+const NotBeforeError = require('./lib/NotBeforeError');
+const TokenExpiredError = require('./lib/TokenExpiredError');
+const decode = require('./decode');
+const timespan = require('./lib/timespan');
+const PS_SUPPORTED = require('./lib/psSupported');
+const jws = require('jws');
+const {KeyObject} = require("crypto");
 
-var PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
-var RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
-var HS_ALGS = ['HS256', 'HS384', 'HS512'];
+const PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
+const RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
+const HS_ALGS = ['HS256', 'HS384', 'HS512'];
 
 if (PS_SUPPORTED) {
   PUB_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
@@ -28,7 +29,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   //clone this object since we are going to mutate it.
   options = Object.assign({}, options);
 
-  var done;
+  let done;
 
   if (callback) {
     done = callback;
@@ -47,7 +48,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('nonce must be a non-empty string'));
   }
 
-  var clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
 
   if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
@@ -57,13 +58,13 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt must be a string'));
   }
 
-  var parts = jwtString.split('.');
+  const parts = jwtString.split('.');
 
   if (parts.length !== 3){
     return done(new JsonWebTokenError('jwt malformed'));
   }
 
-  var decodedToken;
+  let decodedToken;
 
   try {
     decodedToken = decode(jwtString, { complete: true });
@@ -75,8 +76,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('invalid token'));
   }
 
-  var header = decodedToken.header;
-  var getSecret;
+  const header = decodedToken.header;
+  let getSecret;
 
   if(typeof secretOrPublicKey === 'function') {
     if(!callback) {
@@ -96,7 +97,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
     }
 
-    var hasSignature = parts[2].trim() !== '';
+    const hasSignature = parts[2].trim() !== '';
 
     if (!hasSignature && secretOrPublicKey){
       return done(new JsonWebTokenError('jwt signature is required'));
@@ -117,11 +118,26 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     }
 
-    if (!~options.algorithms.indexOf(decodedToken.header.alg)) {
+    if (options.algorithms.indexOf(decodedToken.header.alg) === -1) {
       return done(new JsonWebTokenError('invalid algorithm'));
     }
 
-    var valid;
+    if (decodedToken.header.alg.startsWith('HS')) {
+      if (secretOrPublicKey instanceof KeyObject) {
+        if (secretOrPublicKey.type !== 'secret') {
+          return done(new JsonWebTokenError((`secretOrPrivateKey KeyObject must be of type secret when using ${header.alg}. Got ${secretOrPublicKey.type}`)))
+        }
+      } else if (typeof secretOrPublicKey !== 'string'
+        && ![ArrayBuffer, Buffer, Object.getPrototypeOf(Int8Array), DataView].some((x) => secretOrPublicKey instanceof x)){
+        return done(new JsonWebTokenError((`secretOrPrivateKey must be a KeyObject or valid input for secret for crypto.createSecretKey when using ${header.alg}`)))
+      }
+
+      if (/BEGIN (CERTIFICATE|PUBLIC|RSA)/.test(secretOrPublicKey.toString())) {
+        return done(new JsonWebTokenError('secretOrPublicKey must be a symmetric key. Got an asymmetric key'))
+      }
+    }
+
+    let valid;
 
     try {
       valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
@@ -133,7 +149,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       return done(new JsonWebTokenError('invalid signature'));
     }
 
-    var payload = decodedToken.payload;
+    const payload = decodedToken.payload;
 
     if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
       if (typeof payload.nbf !== 'number') {
@@ -154,10 +170,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (options.audience) {
-      var audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
-      var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+      const audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
+      const target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
 
-      var match = target.some(function (targetAudience) {
+      const match = target.some(function (targetAudience) {
         return audiences.some(function (audience) {
           return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
         });
@@ -169,9 +185,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (options.issuer) {
-      var invalid_issuer =
-              (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
-              (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
+      const invalid_issuer =
+        (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
+        (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
 
       if (invalid_issuer) {
         return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
@@ -201,7 +217,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
         return done(new JsonWebTokenError('iat required when maxAge is specified'));
       }
 
-      var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
+      const maxAgeTimestamp = timespan(options.maxAge, payload.iat);
       if (typeof maxAgeTimestamp === 'undefined') {
         return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
       }
@@ -211,7 +227,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (options.complete === true) {
-      var signature = decodedToken.signature;
+      const signature = decodedToken.signature;
 
       return done(null, {
         header: header,
