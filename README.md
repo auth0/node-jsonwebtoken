@@ -33,7 +33,9 @@ $ npm install jsonwebtoken
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
 `secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
-encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+encoded private key for RSA and ECDSA. 
+`secretOrPublicKey` can either be hardcoded or stored in the .env file. For best practice, it should be stored in the .env file 
+In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
 
 `options`:
 
@@ -66,7 +68,7 @@ Synchronous Sign with default (HMAC SHA256)
 
 ```js
 var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+var token = jwt.sign({ foo: 'bar' }, 'secretOrPrivateKey');
 ```
 
 Synchronous Sign with RSA SHA256
@@ -85,7 +87,7 @@ jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token
 
 Backdate a jwt 30 seconds
 ```js
-var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'secretOrPrivateKey');
 ```
 
 #### Token Expiration (exp claim)
@@ -102,7 +104,7 @@ Signing a token with 1 hour of expiration:
 jwt.sign({
   exp: Math.floor(Date.now() / 1000) + (60 * 60),
   data: 'foobar'
-}, 'secret');
+}, 'secretOrPrivateKey');
 ```
 
 Another way to generate a token like this with this library is:
@@ -110,13 +112,13 @@ Another way to generate a token like this with this library is:
 ```javascript
 jwt.sign({
   data: 'foobar'
-}, 'secret', { expiresIn: 60 * 60 });
+}, 'secretOrPrivateKey', { expiresIn: 60 * 60 });
 
 //or even better:
 
 jwt.sign({
   data: 'foobar'
-}, 'secret', { expiresIn: '1h' });
+}, 'secretOrPrivateKey', { expiresIn: '1h' });
 ```
 
 ### jwt.verify(token, secretOrPublicKey, [options, callback])
@@ -131,6 +133,7 @@ jwt.sign({
 
 `secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
+`secretOrPublicKey` can either be hardcoded or stored in the .env file. For best practice, it should be stored in the .env file 
 If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
@@ -155,23 +158,23 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 ```js
 // verify a token symmetric - synchronous
-var decoded = jwt.verify(token, 'shhhhh');
+var decoded = jwt.verify(token, 'secretOrPrivateKey');
 console.log(decoded.foo) // bar
 
 // verify a token symmetric
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'secretOrPrivateKey', function(err, decoded) {
   console.log(decoded.foo) // bar
 });
 
 // invalid token - synchronous
 try {
-  var decoded = jwt.verify(token, 'wrong-secret');
+  var decoded = jwt.verify(token, 'wrong-secretOrPrivateKey');
 } catch(err) {
   // err
 }
 
 // invalid token
-jwt.verify(token, 'wrong-secret', function(err, decoded) {
+jwt.verify(token, 'wrong-secretOrPrivateKey', function(err, decoded) {
   // err
   // decoded undefined
 });
@@ -279,7 +282,7 @@ Error object:
 * expiredAt: [ExpDate]
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'secretOrPrivateKey', function(err, decoded) {
   if (err) {
     /*
       err = {
@@ -307,7 +310,7 @@ Error object:
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'secretOrPrivateKey', function(err, decoded) {
   if (err) {
     /*
       err = {
@@ -329,7 +332,7 @@ Error object:
 * date: 2018-10-04T16:10:44.000Z
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'secretOrPrivateKey', function(err, decoded) {
   if (err) {
     /*
       err = {
