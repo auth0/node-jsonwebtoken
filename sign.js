@@ -15,9 +15,9 @@ if (PS_SUPPORTED) {
 }
 
 var sign_options_schema = {
-  expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
-  notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
-  audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
+  expiresIn: { isValid: function (value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
+  notBefore: { isValid: function (value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
+  audience: { isValid: function (value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
   algorithm: { isValid: includes.bind(null, SUPPORTED_ALGS), message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
@@ -40,7 +40,7 @@ function validate(schema, allowUnknown, object, parameterName) {
     throw new Error('Expected "' + parameterName + '" to be a plain object.');
   }
   Object.keys(object)
-    .forEach(function(key) {
+    .forEach(function (key) {
       var validator = schema[key];
       if (!validator) {
         if (!allowUnknown) {
@@ -88,7 +88,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 
   var isObjectPayload = typeof payload === 'object' &&
-                        !Buffer.isBuffer(payload);
+    !Buffer.isBuffer(payload);
+
 
   var header = Object.assign({
     alg: options.algorithm || 'HS256',
@@ -107,7 +108,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
-  if (typeof payload === 'undefined') {
+  if (typeof payload === 'undefined' || !payload) {
     return failure(new Error('payload is required'));
   } else if (isObjectPayload) {
     try {
@@ -117,7 +118,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
       return failure(error);
     }
     if (!options.mutatePayload) {
-      payload = Object.assign({},payload);
+      payload = Object.assign({}, payload);
     }
   } else {
     var invalid_options = options_for_objects.filter(function (opt) {
@@ -125,7 +126,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     });
 
     if (invalid_options.length > 0) {
-      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload'));
+      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload) + ' payload'));
     }
   }
 
@@ -201,6 +202,6 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
         callback(null, signature);
       });
   } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
+    return jws.sign({ header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding });
   }
 };
