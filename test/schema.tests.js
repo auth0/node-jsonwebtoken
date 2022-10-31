@@ -1,7 +1,6 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
 var fs = require('fs');
-var PS_SUPPORTED = require('../lib/psSupported');
 
 describe('schema', function() {
 
@@ -22,11 +21,9 @@ describe('schema', function() {
       sign({algorithm: 'RS256'});
       sign({algorithm: 'RS384'});
       sign({algorithm: 'RS512'});
-      if (PS_SUPPORTED) {
-        sign({algorithm: 'PS256'});
-        sign({algorithm: 'PS384'});
-        sign({algorithm: 'PS512'});
-      }
+      sign({algorithm: 'PS256'});
+      sign({algorithm: 'PS384'});
+      sign({algorithm: 'PS512'});
       sign({algorithm: 'ES256'});
       sign({algorithm: 'ES384'});
       sign({algorithm: 'ES512'});
