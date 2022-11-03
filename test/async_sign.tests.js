@@ -1,17 +1,17 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
-var jws = require('jws');
-var PS_SUPPORTED = require('../lib/psSupported');
+const jwt = require('../index');
+const expect = require('chai').expect;
+const jws = require('jws');
+const PS_SUPPORTED = require('../lib/psSupported');
 
 describe('signing a token asynchronously', function() {
 
   describe('when signing a token', function() {
-    var secret = 'shhhhhh';
+    const secret = 'shhhhhh';
 
     it('should return the same result as singing synchronously', function(done) {
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' }, function (err, asyncToken) {
         if (err) return done(err);
-        var syncToken = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
+        const syncToken = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });
         expect(asyncToken).to.be.a('string');
         expect(asyncToken.split('.')).to.have.length(3);
         expect(asyncToken).to.equal(syncToken);
@@ -95,7 +95,7 @@ describe('signing a token asynchronously', function() {
 
     describe('when mutatePayload is not set', function() {
       it('should not apply claims to the original payload object (mutatePayload defaults to false)', function(done) {
-        var originalPayload = { foo: 'bar' };
+        const originalPayload = { foo: 'bar' };
         jwt.sign(originalPayload, 'secret', { notBefore: 60, expiresIn: 600 }, function (err) {
           if (err) { return done(err); }
           expect(originalPayload).to.not.have.property('nbf');
@@ -107,7 +107,7 @@ describe('signing a token asynchronously', function() {
 
     describe('when mutatePayload is set to true', function() {
       it('should apply claims directly to the original payload object', function(done) {
-        var originalPayload = { foo: 'bar' };
+        const originalPayload = { foo: 'bar' };
         jwt.sign(originalPayload, 'secret', { notBefore: 60, expiresIn: 600, mutatePayload: true }, function (err) {
           if (err) { return done(err); }
           expect(originalPayload).to.have.property('nbf').that.is.a('number');

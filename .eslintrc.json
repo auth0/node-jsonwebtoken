@@ -8,6 +8,8 @@
     "node": true
   },
   "rules": {
+    "prefer-const": "error",
+    "no-var": "error",
     "comma-style": "error",
     "dot-notation": "error",
     "indent": ["error", 2],
