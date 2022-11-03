@@ -153,7 +153,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
-    if (options.audience) {
+    if (typeof options.audience === 'function') {
+      var match = options.audience(payload.aud)
+      if (match !== true) {
+        return done(new JsonWebTokenError('jwt audience invalid. expected user defined function to return true.'));
+      }
+    } else if (options.audience) {
       var audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
       var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
 
