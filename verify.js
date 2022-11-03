@@ -57,7 +57,13 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('jwt must be a string'));
   }
 
-  var parts = jwtString.split('.');
+  var parts;
+
+  if (jwtString.includes('Bearer ')) {
+    parts = jwtString.replace('Bearer ', '').split('.');
+  } else {
+    parts = jwtString.split('.');
+  }
 
   if (parts.length !== 3){
     return done(new JsonWebTokenError('jwt malformed'));
