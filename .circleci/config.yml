@@ -17,16 +17,6 @@ commands:
           command: npm test
 
 jobs:
-  node-v4:
-    docker:
-      - image: node:4
-    steps:
-      - test-nodejs
-  node-v5:
-    docker:
-      - image: node:5
-    steps:
-      - test-nodejs
   node-v6:
     docker:
       - image: node:6
@@ -61,8 +51,6 @@ jobs:
 workflows:
   node-multi-build:
     jobs:
-      - node-v4
-      - node-v5
       - node-v6
       - node-v7
       - node-v8
