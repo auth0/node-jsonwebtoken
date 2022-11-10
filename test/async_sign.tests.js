@@ -41,16 +41,6 @@ describe('signing a token asynchronously', function() {
       });
     });
 
-    //Known bug: https://github.com/brianloveswords/node-jws/issues/62
-    //If you need this use case, you need to go for the non-callback-ish code style.
-    it.skip('should work with none algorithm where secret is falsy', function(done) {
-      jwt.sign({ foo: 'bar' }, undefined, { algorithm: 'none' }, function(err, token) {
-        expect(token).to.be.a('string');
-        expect(token.split('.')).to.have.length(3);
-        done();
-      });
-    });
-
     it('should return error when secret is not a cert for RS256', function(done) {
       //this throw an error because the secret is not a cert and RS256 requires a cert.
       jwt.sign({ foo: 'bar' }, secret, { algorithm: 'RS256' }, function (err) {

@@ -1,7 +1,8 @@
-var jwt = require('../index');
+const jwt = require('../index');
 
-var expect = require('chai').expect;
-var assert = require('chai').assert;
+const jws = require('jws');
+const expect = require('chai').expect;
+const assert = require('chai').assert;
 
 describe('HS256', function() {
 
@@ -42,19 +43,21 @@ describe('HS256', function() {
     });
 
     it('should throw with secret and token not signed', function(done) {
-      var signed = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'none' });
-      var unsigned = signed.split('.')[0] + '.' + signed.split('.')[1] + '.';
-      jwt.verify(unsigned, 'secret', function(err, decoded) {
+      const header = { alg: 'none' };
+      const payload = { foo: 'bar' };
+      const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
+      jwt.verify(token, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
       });
     });
 
-    it('should work with falsy secret and token not signed', function(done) {
-      var signed = jwt.sign({ foo: 'bar' }, null, { algorithm: 'none' });
-      var unsigned = signed.split('.')[0] + '.' + signed.split('.')[1] + '.';
-      jwt.verify(unsigned, 'secret', function(err, decoded) {
+    it('should throw with falsy secret and token not signed', function(done) {
+      const header = { alg: 'none' };
+      const payload = { foo: 'bar' };
+      const token = jws.sign({ header, payload, secret: null, encoding: 'utf8' });
+      jwt.verify(token, 'secret', function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();

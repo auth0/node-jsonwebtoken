@@ -58,6 +58,7 @@ function base64UrlEncode(str) {
  */
 function verifyJWTHelper(jwtString, secretOrPrivateKey, options, callback) {
   // freeze the time to ensure the clock remains stable across the async and sync calls
+
   const fakeClock = sinon.useFakeTimers({now: Date.now()});
   let error;
   let syncVerified;

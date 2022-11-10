@@ -5,24 +5,22 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const util = require('util');
 const testUtils = require('./test-utils');
-
-const base64UrlEncode = testUtils.base64UrlEncode;
-const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
+const jws = require('jws');
 
 function signWithIssueAt(issueAt, options, callback) {
   const payload = {};
   if (issueAt !== undefined) {
     payload.iat = issueAt;
   }
-  const opts = Object.assign({algorithm: 'none'}, options);
+  const opts = Object.assign({algorithm: 'HS256'}, options);
   // async calls require a truthy secret
   // see: https://github.com/brianloveswords/node-jws/issues/62
   testUtils.signJWTHelper(payload, 'secret', opts, callback);
 }
 
-function verifyWithIssueAt(token, maxAge, options, callback) {
+function verifyWithIssueAt(token, maxAge, options, secret, callback) {
   const opts = Object.assign({maxAge}, options);
-  testUtils.verifyJWTHelper(token, undefined, opts, callback);
+  testUtils.verifyJWTHelper(token, secret, opts, callback);
 }
 
 describe('issue at', function() {
@@ -50,7 +48,7 @@ describe('issue at', function() {
 
     // undefined needs special treatment because {} is not the same as {iat: undefined}
     it('should error with iat of undefined', function (done) {
-      testUtils.signJWTHelper({iat: undefined}, 'secret', {algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({iat: undefined}, 'secret', {algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err.message).to.equal('"iat" should be a number of seconds');
@@ -76,9 +74,10 @@ describe('issue at', function() {
       {foo: 'bar'},
     ].forEach((iat) => {
       it(`should error with iat of ${util.inspect(iat)}`, function (done) {
-        const encodedPayload = base64UrlEncode(JSON.stringify({iat}));
-        const token = `${noneAlgorithmHeader}.${encodedPayload}.`;
-        verifyWithIssueAt(token, '1 min', {}, (err) => {
+        const header = { alg: 'HS256' };
+        const payload = { iat };
+        const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
+        verifyWithIssueAt(token, '1 min', {}, 'secret', (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err.message).to.equal('iat required when maxAge is specified');
@@ -188,9 +187,9 @@ describe('issue at', function() {
       },
     ].forEach((testCase) => {
       it(testCase.description, function (done) {
-        const token = jwt.sign({}, 'secret', {algorithm: 'none'});
+        const token = jwt.sign({}, 'secret', {algorithm: 'HS256'});
         fakeClock.tick(testCase.clockAdvance);
-        verifyWithIssueAt(token, testCase.maxAge, testCase.options, (err, token) => {
+        verifyWithIssueAt(token, testCase.maxAge, testCase.options, 'secret', (err, token) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.null;
             expect(token).to.be.a('object');
@@ -235,10 +234,10 @@ describe('issue at', function() {
     ].forEach((testCase) => {
       it(testCase.description, function(done) {
         const expectedExpiresAtDate = new Date(testCase.expectedExpiresAt);
-        const token = jwt.sign({}, 'secret', {algorithm: 'none'});
+        const token = jwt.sign({}, 'secret', {algorithm: 'HS256'});
         fakeClock.tick(testCase.clockAdvance);
 
-        verifyWithIssueAt(token, testCase.maxAge, testCase.options, (err) => {
+        verifyWithIssueAt(token, testCase.maxAge, testCase.options, 'secret', (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err.message).to.equal(testCase.expectedError);
@@ -252,7 +251,7 @@ describe('issue at', function() {
   describe('with string payload', function () {
     it('should not add iat to string', function (done) {
       const payload = 'string payload';
-      const options = {algorithm: 'none'};
+      const options = {algorithm: 'HS256'};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
         const decoded = jwt.decode(token);
         testUtils.asyncCheck(done, () => {
@@ -264,7 +263,7 @@ describe('issue at', function() {
 
     it('should not add iat to stringified object', function (done) {
       const payload = '{}';
-      const options = {algorithm: 'none', header: {typ: 'JWT'}};
+      const options = {algorithm: 'HS256', header: {typ: 'JWT'}};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
         const decoded = jwt.decode(token);
         testUtils.asyncCheck(done, () => {

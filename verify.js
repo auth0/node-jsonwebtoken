@@ -5,6 +5,7 @@ var decode            = require('./decode');
 var timespan          = require('./lib/timespan');
 var PS_SUPPORTED      = require('./lib/psSupported');
 var jws               = require('jws');
+var includes          = require('lodash.includes');
 
 var PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
 var RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
@@ -76,7 +77,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   var header = decodedToken.header;
+  var alg = header.alg;
   var getSecret;
+
+  if (!includes(options.algorithms, 'none') && alg === 'none') {
+    return done(new JsonWebTokenError('please specify "none" in "algorithms" to verify unsigned tokens'));
+  }
 
   if(typeof secretOrPublicKey === 'function') {
     if(!callback) {
@@ -104,10 +110,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     if (hasSignature && !secretOrPublicKey) {
       return done(new JsonWebTokenError('secret or public key must be provided'));
-    }
-
-    if (!hasSignature && !options.algorithms) {
-      options.algorithms = ['none'];
     }
 
     if (!options.algorithms) {

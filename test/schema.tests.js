@@ -19,6 +19,7 @@ describe('schema', function() {
       expect(function () {
         sign({ algorithm: 'foo' });
       }).to.throw(/"algorithm" must be a valid string enum value/);
+      sign({ algorithm: 'none' });
       sign({algorithm: 'RS256'});
       sign({algorithm: 'RS384'});
       sign({algorithm: 'RS512'});
@@ -33,7 +34,6 @@ describe('schema', function() {
       sign({algorithm: 'HS256'});
       sign({algorithm: 'HS384'});
       sign({algorithm: 'HS512'});
-      sign({algorithm: 'none'});
     });
 
     it('should validate header', function () {

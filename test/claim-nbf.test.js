@@ -5,12 +5,10 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const util = require('util');
 const testUtils = require('./test-utils');
-
-const base64UrlEncode = testUtils.base64UrlEncode;
-const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
+const jws = require('jws');
 
 function signWithNotBefore(notBefore, payload, callback) {
-  const options = {algorithm: 'none'};
+  const options = {algorithm: 'HS256'};
   if (notBefore !== undefined) {
     options.notBefore = notBefore;
   }
@@ -49,7 +47,7 @@ describe('not before', function() {
 
     // undefined needs special treatment because {} is not the same as {notBefore: undefined}
     it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, undefined, {notBefore: undefined, algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({}, 'secret', {notBefore: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property(
@@ -133,9 +131,10 @@ describe('not before', function() {
       {foo: 'bar'},
     ].forEach((nbf) => {
       it(`should error with with value ${util.inspect(nbf)}`, function (done) {
-        const encodedPayload = base64UrlEncode(JSON.stringify({nbf}));
-        const token = `${noneAlgorithmHeader}.${encodedPayload}.`;
-        testUtils.verifyJWTHelper(token, undefined, {nbf}, (err) => {
+        const header = { alg: 'HS256' };
+        const payload = { nbf };
+        const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
+        testUtils.verifyJWTHelper(token, 'secret', {nbf}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property('message', 'invalid nbf value');
@@ -157,7 +156,7 @@ describe('not before', function() {
 
     it('should set correct "nbf" with negative number of seconds', function (done) {
       signWithNotBefore(-10, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -170,7 +169,7 @@ describe('not before', function() {
     it('should set correct "nbf" with positive number of seconds', function (done) {
       signWithNotBefore(10, {}, (e1, token) => {
         fakeClock.tick(10000);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -182,7 +181,7 @@ describe('not before', function() {
 
     it('should set correct "nbf" with zero seconds', function (done) {
       signWithNotBefore(0, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -194,7 +193,7 @@ describe('not before', function() {
 
     it('should set correct "nbf" with negative string timespan', function (done) {
       signWithNotBefore('-10 s', {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -207,7 +206,7 @@ describe('not before', function() {
     it('should set correct "nbf" with positive string timespan', function (done) {
       signWithNotBefore('10 s', {}, (e1, token) => {
         fakeClock.tick(10000);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -219,7 +218,7 @@ describe('not before', function() {
 
     it('should set correct "nbf" with zero string timespan', function (done) {
       signWithNotBefore('0 s', {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -264,7 +263,7 @@ describe('not before', function() {
 
     it('should set correct "nbf" when "iat" is passed', function (done) {
       signWithNotBefore(-10, {iat: 40}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -276,7 +275,7 @@ describe('not before', function() {
 
     it('should verify "nbf" using "clockTimestamp"', function (done) {
       signWithNotBefore(10, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {clockTimestamp: 70}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTimestamp: 70}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -289,7 +288,7 @@ describe('not before', function() {
 
     it('should verify "nbf" using "clockTolerance"', function (done) {
       signWithNotBefore(5, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {clockTolerance: 6}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTolerance: 6}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -302,7 +301,7 @@ describe('not before', function() {
 
     it('should ignore a not active token when "ignoreNotBefore" is true', function (done) {
       signWithNotBefore('10 s', {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {ignoreNotBefore: true}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {ignoreNotBefore: true}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -315,7 +314,7 @@ describe('not before', function() {
 
     it('should error on verify if "nbf" is after current time', function (done) {
       signWithNotBefore(undefined, {nbf: 61}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.NotBeforeError);
@@ -327,7 +326,7 @@ describe('not before', function() {
 
     it('should error on verify if "nbf" is after current time using clockTolerance', function (done) {
       signWithNotBefore(5, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {clockTolerance: 4}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTolerance: 4}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.NotBeforeError);

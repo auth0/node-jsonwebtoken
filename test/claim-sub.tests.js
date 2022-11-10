@@ -6,7 +6,7 @@ const util = require('util');
 const testUtils = require('./test-utils');
 
 function signWithSubject(subject, payload, callback) {
-  const options = {algorithm: 'none'};
+  const options = {algorithm: 'HS256'};
   if (subject !== undefined) {
     options.subject = subject;
   }
@@ -44,7 +44,7 @@ describe('subject', function() {
 
     // undefined needs special treatment because {} is not the same as {subject: undefined}
     it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, undefined, {subject: undefined, algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({}, 'secret', {subject: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property('message', '"subject" must be a string');
@@ -92,7 +92,7 @@ describe('subject', function() {
   describe('when signing and verifying a token with "subject" option', function () {
     it('should verify with a string "subject"', function (done) {
       signWithSubject('foo', {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {subject: 'foo'}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -104,7 +104,7 @@ describe('subject', function() {
 
     it('should verify with a string "sub"', function (done) {
       signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {subject: 'foo'}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -116,7 +116,7 @@ describe('subject', function() {
 
     it('should not verify "sub" if verify "subject" option not provided', function(done) {
       signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -128,7 +128,7 @@ describe('subject', function() {
 
     it('should error if "sub" does not match verify "subject" option', function(done) {
       signWithSubject(undefined, {sub: 'foo'}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {subject: 'bar'}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {subject: 'bar'}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.JsonWebTokenError);
@@ -140,7 +140,7 @@ describe('subject', function() {
 
     it('should error without "sub" and with verify "subject" option', function(done) {
       signWithSubject(undefined, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {subject: 'foo'}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {subject: 'foo'}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.JsonWebTokenError);
