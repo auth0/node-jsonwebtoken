@@ -37,15 +37,9 @@
   },
   "dependencies": {
     "jws": "^3.2.2",
-    "lodash.includes": "^4.3.0",
-    "lodash.isboolean": "^3.0.3",
-    "lodash.isinteger": "^4.0.4",
-    "lodash.isnumber": "^3.0.3",
-    "lodash.isplainobject": "^4.0.6",
-    "lodash.isstring": "^4.0.1",
-    "lodash.once": "^4.0.0",
+    "lodash": "^4.17.21",
     "ms": "^2.1.1",
-    "semver": "^5.6.0"
+    "semver": "^7.3.8"
   },
   "devDependencies": {
     "atob": "^2.1.2",
@@ -59,8 +53,8 @@
     "sinon": "^6.0.0"
   },
   "engines": {
-    "npm": ">=1.4.28",
-    "node": ">=4"
+    "npm": ">=6",
+    "node": ">=12"
   },
   "files": [
     "lib",

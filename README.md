@@ -32,8 +32,9 @@ $ npm install jsonwebtoken
 
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-`secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
+`secretOrPrivateKey` is a string, buffer, object, or KeyObject containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+When signing with RSA algorithms the minimum modulus length is 2048 except when the allowInsecureKeySizes option is set to true. Private keys below this size will be rejected with an error.
 
 `options`:
 
@@ -50,6 +51,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `header`
 * `keyid`
 * `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
+* `allowInsecureKeySizes`: if true allows private keys with a modulus below 2048 to be used for RSA
 
 
 
@@ -129,7 +131,7 @@ jwt.sign({
 
 `token` is the JsonWebToken string
 
-`secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
+`secretOrPublicKey` is a string, buffer, or KeyObject containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
 If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 

@@ -2,6 +2,7 @@ var jwt = require('../index');
 var expect = require('chai').expect;
 var jws = require('jws');
 var PS_SUPPORTED = require('../lib/psSupported');
+const {generateKeyPairSync} = require("crypto");
 
 describe('signing a token asynchronously', function() {
 
@@ -57,6 +58,21 @@ describe('signing a token asynchronously', function() {
         expect(err).to.be.ok;
         done();
       });
+    });
+
+    it('should not work for RS algorithms when modulus length is less than 2048 when allowInsecureKeySizes is false or not set', function(done) {
+      const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 1024 });
+
+      jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function (err) {
+        expect(err).to.be.ok;
+        done();
+      });
+    });
+
+    it('should work for RS algorithms when modulus length is less than 2048 when allowInsecureKeySizes is true', function(done) {
+      const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 1024 });
+
+      jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256', allowInsecureKeySizes: true }, done);
     });
 
     if (PS_SUPPORTED) {
