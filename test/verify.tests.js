@@ -43,6 +43,22 @@ describe('verify', function() {
 
     expect(function () {
       jwt.verify(signed, 'secret', {typ: 'JWT'});
+    }).to.throw(JsonWebTokenError, /jwt signature is required/);
+  });
+
+  it('should not be able to verify unsigned token', function () {
+    var header = { alg: 'none' };
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+    var signed = jws.sign({
+      header: header,
+      payload: payload,
+      secret: 'secret',
+      encoding: 'utf8'
+    });
+
+    expect(function () {
+      jwt.verify(signed, undefined, {typ: 'JWT'});
     }).to.throw(JsonWebTokenError, /please specify "none" in "algorithms" to verify unsigned tokens/);
   });
 
