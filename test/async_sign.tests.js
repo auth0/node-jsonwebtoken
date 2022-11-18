@@ -41,6 +41,7 @@ describe('signing a token asynchronously', function() {
       });
     });
 
+    //Known bug: https://github.com/brianloveswords/node-jws/issues/62
     //If you need this use case, you need to go for the non-callback-ish code style.
     it.skip('should work with none algorithm where secret is falsy', function(done) {
       jwt.sign({ foo: 'bar' }, undefined, { algorithm: 'none' }, function(err, token) {
