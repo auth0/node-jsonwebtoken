@@ -37,6 +37,9 @@ describe('issue at', function() {
       ['foo'],
       {},
       {foo: 'bar'},
+      -Infinity,
+      Infinity,
+      NaN,
     ].forEach((iat) => {
       it(`should error with iat of ${util.inspect(iat)}`, function (done) {
         signWithIssueAt(iat, {}, (err) => {
@@ -109,27 +112,6 @@ describe('issue at', function() {
         description: 'should sign with provided time for "iat"',
         iat: 100,
         expectedIssueAt: 100,
-        options: {}
-      },
-      // TODO an iat of -Infinity should fail validation
-      {
-        description: 'should set null "iat" when given -Infinity',
-        iat: -Infinity,
-        expectedIssueAt: null,
-        options: {}
-      },
-      // TODO an iat of Infinity should fail validation
-      {
-        description: 'should set null "iat" when given Infinity',
-        iat: Infinity,
-        expectedIssueAt: null,
-        options: {}
-      },
-      // TODO an iat of NaN should fail validation
-      {
-        description: 'should set to current time for "iat" when given value NaN',
-        iat: NaN,
-        expectedIssueAt: 60,
         options: {}
       },
       {
