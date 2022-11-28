@@ -38,7 +38,6 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 `options`:
 
 * `algorithm` (default: `HS256`)
-  * * `none` MUST be configured in order to create unsigned tokens.
 * `expiresIn`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms). 
   > Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `notBefore`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms). 
@@ -139,7 +138,6 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 `options`
 
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
-  * `none` MUST be configured in order to verify unsigned tokens.
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
