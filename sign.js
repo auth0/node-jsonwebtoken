@@ -3,7 +3,6 @@ const PS_SUPPORTED = require('./lib/psSupported');
 const jws = require('jws');
 const {includes, isBoolean, isInteger, isNumber, isPlainObject, isString, once} = require('lodash')
 const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
-const semver = require('semver');
 
 const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
 if (PS_SUPPORTED) {
@@ -124,7 +123,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
     if (!options.allowInsecureKeySizes &&
       !header.alg.startsWith('ES') &&
-      semver.gte(process.versions.node, '15.0.0') && //KeyObject.asymmetricKeyDetails is supported in Node 15+
+      secretOrPrivateKey.asymmetricKeyDetails !== undefined && //KeyObject.asymmetricKeyDetails is supported in Node 15+
       secretOrPrivateKey.asymmetricKeyDetails.modulusLength < 2048) {
       return failure(new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`));
     }

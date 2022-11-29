@@ -29,4 +29,11 @@ describe('when verifying a malicious token', function () {
 
     expect(() => jwt.verify(maliciousToken, pubRsaKey.export({type: 'spki', format: 'pem'}), options)).to.throw(JsonWebTokenError, 'must be a symmetric key');
   })
+
+  it('should not allow arbitrary execution from malicious Buffers containing objects with overridden toString functions', function () {
+    const token = jwt.sign({"foo": "bar"}, 'secret')
+    const maliciousBuffer = {toString: () => {throw new Error("Arbitrary Code Execution")}}
+
+    expect(() => jwt.verify(token, maliciousBuffer)).to.throw(Error, 'not valid key material');
+  })
 })

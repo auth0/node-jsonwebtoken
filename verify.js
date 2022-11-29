@@ -7,13 +7,14 @@ const PS_SUPPORTED = require('./lib/psSupported');
 const jws = require('jws');
 const {KeyObject, createSecretKey, createPublicKey} = require("crypto");
 
-const PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
+const PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
+const EC_KEY_ALGS = ['ES256', 'ES384', 'ES512'];
 const RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
 const HS_ALGS = ['HS256', 'HS384', 'HS512'];
 
 if (PS_SUPPORTED) {
-  PUB_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
-  RSA_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
+  PUB_KEY_ALGS.splice(PUB_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
+  RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
 }
 
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
@@ -126,8 +127,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (!options.algorithms) {
       if (secretOrPublicKey.type === 'secret') {
         options.algorithms = HS_ALGS;
-      } else if (secretOrPublicKey.asymmetricKeyType === 'rsa') {
+      } else if (['rsa', 'rsa-pss'].includes(secretOrPublicKey.asymmetricKeyType)) {
         options.algorithms = RSA_KEY_ALGS
+      } else if (secretOrPublicKey.asymmetricKeyType === 'ec') {
+        options.algorithms = EC_KEY_ALGS
       } else {
         options.algorithms = PUB_KEY_ALGS
       }

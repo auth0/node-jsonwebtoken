@@ -21,6 +21,12 @@ describe('HS256', function() {
         jwt.sign(undefined, "secret", { algorithm: 'HS256' })
       }).to.throw(Error, 'payload is required')
     })
+
+    it('should throw if options is not a plain object', function () {
+      expect(function () {
+        jwt.sign({ foo: 'bar' }, "secret", ['HS256'])
+      }).to.throw(Error, 'Expected "options" to be a plain object')
+    })
   })
 
   describe('with a token signed using HS256', function() {
