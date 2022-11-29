@@ -5,12 +5,10 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const util = require('util');
 const testUtils = require('./test-utils');
-
-const base64UrlEncode = testUtils.base64UrlEncode;
-const noneAlgorithmHeader = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0';
+const jws = require('jws');
 
 function signWithExpiresIn(expiresIn, payload, callback) {
-  const options = {algorithm: 'none'};
+  const options = {algorithm: 'HS256'};
   if (expiresIn !== undefined) {
     options.expiresIn = expiresIn;
   }
@@ -49,7 +47,7 @@ describe('expires', function() {
 
     // undefined needs special treatment because {} is not the same as {expiresIn: undefined}
     it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, undefined, {expiresIn: undefined, algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({}, 'secret', {expiresIn: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property(
@@ -133,9 +131,10 @@ describe('expires', function() {
       {foo: 'bar'},
     ].forEach((exp) => {
       it(`should error with with value ${util.inspect(exp)}`, function (done) {
-        const encodedPayload = base64UrlEncode(JSON.stringify({exp}));
-        const token = `${noneAlgorithmHeader}.${encodedPayload}.`;
-        testUtils.verifyJWTHelper(token, undefined, {exp}, (err) => {
+        const header = { alg: 'HS256' };
+        const payload = { exp };
+        const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
+        testUtils.verifyJWTHelper(token, 'secret', { exp }, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property('message', 'invalid exp value');
@@ -158,7 +157,7 @@ describe('expires', function() {
     it('should set correct "exp" with negative number of seconds', function(done) {
       signWithExpiresIn(-10, {}, (e1, token) => {
         fakeClock.tick(-10001);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -170,7 +169,7 @@ describe('expires', function() {
 
     it('should set correct "exp" with positive number of seconds', function(done) {
       signWithExpiresIn(10, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -183,7 +182,7 @@ describe('expires', function() {
     it('should set correct "exp" with zero seconds', function(done) {
       signWithExpiresIn(0, {}, (e1, token) => {
         fakeClock.tick(-1);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -196,7 +195,7 @@ describe('expires', function() {
     it('should set correct "exp" with negative string timespan', function(done) {
       signWithExpiresIn('-10 s', {}, (e1, token) => {
         fakeClock.tick(-10001);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -209,7 +208,7 @@ describe('expires', function() {
     it('should set correct "exp" with positive string timespan', function(done) {
       signWithExpiresIn('10 s', {}, (e1, token) => {
         fakeClock.tick(-10001);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -222,7 +221,7 @@ describe('expires', function() {
     it('should set correct "exp" with zero string timespan', function(done) {
       signWithExpiresIn('0 s', {}, (e1, token) => {
         fakeClock.tick(-1);
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -267,7 +266,7 @@ describe('expires', function() {
 
     it('should set correct "exp" when "iat" is passed', function (done) {
       signWithExpiresIn(-10, {iat: 80}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -279,7 +278,7 @@ describe('expires', function() {
 
     it('should verify "exp" using "clockTimestamp"', function (done) {
       signWithExpiresIn(10, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {clockTimestamp: 69}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTimestamp: 69}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -293,7 +292,7 @@ describe('expires', function() {
     it('should verify "exp" using "clockTolerance"', function (done) {
       signWithExpiresIn(5, {}, (e1, token) => {
         fakeClock.tick(10000);
-        testUtils.verifyJWTHelper(token, undefined, {clockTimestamp: 6}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTimestamp: 6}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -306,7 +305,7 @@ describe('expires', function() {
 
     it('should ignore a expired token when "ignoreExpiration" is true', function (done) {
       signWithExpiresIn('-10 s', {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {ignoreExpiration: true}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {ignoreExpiration: true}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -319,7 +318,7 @@ describe('expires', function() {
 
     it('should error on verify if "exp" is at current time', function(done) {
       signWithExpiresIn(undefined, {exp: 60}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.TokenExpiredError);
@@ -331,7 +330,7 @@ describe('expires', function() {
 
     it('should error on verify if "exp" is before current time using clockTolerance', function (done) {
       signWithExpiresIn(-5, {}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {clockTolerance: 5}, (e2) => {
+        testUtils.verifyJWTHelper(token, 'secret', {clockTolerance: 5}, (e2) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.instanceOf(jwt.TokenExpiredError);

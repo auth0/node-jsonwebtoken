@@ -30,18 +30,50 @@ describe('verify', function() {
     });
   });
 
-  it('should be able to validate unsigned token', function (done) {
+  it('should not be able to verify unsigned token', function () {
     var header = { alg: 'none' };
     var payload = { iat: Math.floor(Date.now() / 1000 ) };
 
     var signed = jws.sign({
       header: header,
       payload: payload,
-      secret: priv,
+      secret: 'secret',
       encoding: 'utf8'
     });
 
-    jwt.verify(signed, null, {typ: 'JWT'}, function(err, p) {
+    expect(function () {
+      jwt.verify(signed, 'secret', {typ: 'JWT'});
+    }).to.throw(JsonWebTokenError, /jwt signature is required/);
+  });
+
+  it('should not be able to verify unsigned token', function () {
+    var header = { alg: 'none' };
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+    var signed = jws.sign({
+      header: header,
+      payload: payload,
+      secret: 'secret',
+      encoding: 'utf8'
+    });
+
+    expect(function () {
+      jwt.verify(signed, undefined, {typ: 'JWT'});
+    }).to.throw(JsonWebTokenError, /please specify "none" in "algorithms" to verify unsigned tokens/);
+  });
+
+  it('should be able to verify unsigned token when none is specified', function (done) {
+    var header = { alg: 'none' };
+    var payload = { iat: Math.floor(Date.now() / 1000 ) };
+
+    var signed = jws.sign({
+      header: header,
+      payload: payload,
+      secret: 'secret',
+      encoding: 'utf8'
+    });
+
+    jwt.verify(signed, null, {typ: 'JWT', algorithms: ['none']}, function(err, p) {
       assert.isNull(err);
       assert.deepEqual(p, payload);
       done();
@@ -49,20 +81,17 @@ describe('verify', function() {
   });
 
   it('should not mutate options', function (done) {
-    var header = { alg: 'none' };
-
-    var payload = { iat: Math.floor(Date.now() / 1000 ) };
-
-    var options = {typ: 'JWT'};
-
-    var signed = jws.sign({
+    const header = { alg: 'HS256' };
+    const payload = { iat: Math.floor(Date.now() / 1000 ) };
+    const  options = { typ: 'JWT' };
+    const signed = jws.sign({
       header: header,
       payload: payload,
-      secret: priv,
+      secret: 'secret',
       encoding: 'utf8'
     });
 
-    jwt.verify(signed, null, options, function(err) {
+    jwt.verify(signed, 'secret', options, function(err) {
       assert.isNull(err);
       assert.deepEqual(Object.keys(options).length, 1);
       done();

@@ -107,7 +107,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (!hasSignature && !options.algorithms) {
-      options.algorithms = ['none'];
+      return done(new JsonWebTokenError('please specify "none" in "algorithms" to verify unsigned tokens'));
     }
 
     if (!options.algorithms) {
