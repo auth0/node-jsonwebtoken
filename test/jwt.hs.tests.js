@@ -3,10 +3,33 @@ const jwt = require('../index');
 const jws = require('jws');
 const expect = require('chai').expect;
 const assert = require('chai').assert;
+const { generateKeyPairSync } = require('crypto')
 
 describe('HS256', function() {
 
-  describe('when signing a token', function() {
+  describe("when signing using HS256", function () {
+    it('should throw if the secret is an asymmetric key', function () {
+      const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+
+      expect(function () {
+        jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'HS256' })
+      }).to.throw(Error, 'must be a symmetric key')
+    })
+
+    it('should throw if the payload is undefined', function () {
+      expect(function () {
+        jwt.sign(undefined, "secret", { algorithm: 'HS256' })
+      }).to.throw(Error, 'payload is required')
+    })
+
+    it('should throw if options is not a plain object', function () {
+      expect(function () {
+        jwt.sign({ foo: 'bar' }, "secret", ['HS256'])
+      }).to.throw(Error, 'Expected "options" to be a plain object')
+    })
+  })
+
+  describe('with a token signed using HS256', function() {
     var secret = 'shhhhhh';
 
     var token = jwt.sign({ foo: 'bar' }, secret, { algorithm: 'HS256' });

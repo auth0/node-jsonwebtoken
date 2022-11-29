@@ -1,7 +1,7 @@
 # jsonwebtoken
 
-| **Build** | **Dependency** |
-|-----------|---------------|
+| **Build**                                                                                                                               | **Dependency**                                                                                                         |
+|-----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken) |
 
 
@@ -32,8 +32,9 @@ $ npm install jsonwebtoken
 
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-`secretOrPrivateKey` is a string, buffer, or object containing either the secret for HMAC algorithms or the PEM
+`secretOrPrivateKey` is a string (utf-8 encoded), buffer, object, or KeyObject containing either the secret for HMAC algorithms or the PEM
 encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+When signing with RSA algorithms the minimum modulus length is 2048 except when the allowInsecureKeySizes option is set to true. Private keys below this size will be rejected with an error.
 
 `options`:
 
@@ -50,6 +51,7 @@ encoded private key for RSA and ECDSA. In case of a private key with passphrase 
 * `header`
 * `keyid`
 * `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
+* `allowInsecureKeySizes`: if true allows private keys with a modulus below 2048 to be used for RSA
 
 
 
@@ -129,7 +131,7 @@ jwt.sign({
 
 `token` is the JsonWebToken string
 
-`secretOrPublicKey` is a string or buffer containing either the secret for HMAC algorithms, or the PEM
+`secretOrPublicKey` is a string (utf-8 encoded), buffer, or KeyObject containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
 If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
@@ -137,7 +139,12 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. 
+  > If not specified a defaults will be used based on the type of key provided
+  > * secret - ['HS256', 'HS384', 'HS512']
+  > * rsa - ['RS256', 'RS384', 'RS512']
+  > * ec - ['ES256', 'ES384', 'ES512']
+  > * default - ['RS256', 'RS384', 'RS512']
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
@@ -347,21 +354,21 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 
 Array of supported algorithms. The following algorithms are currently supported.
 
-alg Parameter Value | Digital Signature or MAC Algorithm
-----------------|----------------------------
-HS256 | HMAC using SHA-256 hash algorithm
-HS384 | HMAC using SHA-384 hash algorithm
-HS512 | HMAC using SHA-512 hash algorithm
-RS256 | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
-RS384 | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
-RS512 | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
-PS256 | RSASSA-PSS using SHA-256 hash algorithm (only node ^6.12.0 OR >=8.0.0)
-PS384 | RSASSA-PSS using SHA-384 hash algorithm (only node ^6.12.0 OR >=8.0.0)
-PS512 | RSASSA-PSS using SHA-512 hash algorithm (only node ^6.12.0 OR >=8.0.0)
-ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
-ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
-ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
-none | No digital signature or MAC value included
+| alg Parameter Value | Digital Signature or MAC Algorithm                                     |
+|---------------------|------------------------------------------------------------------------|
+| HS256               | HMAC using SHA-256 hash algorithm                                      |
+| HS384               | HMAC using SHA-384 hash algorithm                                      |
+| HS512               | HMAC using SHA-512 hash algorithm                                      |
+| RS256               | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm                         |
+| RS384               | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm                         |
+| RS512               | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm                         |
+| PS256               | RSASSA-PSS using SHA-256 hash algorithm (only node ^6.12.0 OR >=8.0.0) |
+| PS384               | RSASSA-PSS using SHA-384 hash algorithm (only node ^6.12.0 OR >=8.0.0) |
+| PS512               | RSASSA-PSS using SHA-512 hash algorithm (only node ^6.12.0 OR >=8.0.0) |
+| ES256               | ECDSA using P-256 curve and SHA-256 hash algorithm                     |
+| ES384               | ECDSA using P-384 curve and SHA-384 hash algorithm                     |
+| ES512               | ECDSA using P-521 curve and SHA-512 hash algorithm                     |
+| none                | No digital signature or MAC value included                             |
 
 ## Refreshing JWTs
 
