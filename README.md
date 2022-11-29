@@ -139,7 +139,12 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 `options`
 
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`.
+* `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. 
+  > If not specified a defaults will be used based on the type of key provided
+  > * secret - ['HS256', 'HS384', 'HS512']
+  > * rsa - ['RS256', 'RS384', 'RS512']
+  > * ec - ['ES256', 'ES384', 'ES512']
+  > * default - ['RS256', 'RS384', 'RS512']
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
