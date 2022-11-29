@@ -18,6 +18,7 @@ $ npm install jsonwebtoken
 # Migration notes
 
 * [From v7 to v8](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)
+* [From v8 to v9](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)
 
 # Usage
 
