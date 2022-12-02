@@ -3,7 +3,7 @@ name: Semgrep
 on:
   pull_request_target: {}
   push:
-    branches: ["master", "main"]
+    branches: ["master"]
 jobs:
   semgrep:
     name: Scan
