@@ -9,7 +9,7 @@ describe('nonce option', function () {
   let token;
 
   beforeEach(function () {
-    token = jwt.sign({ nonce: 'abcde' }, undefined, { algorithm: 'none' });
+    token = jwt.sign({ nonce: 'abcde' }, 'secret', { algorithm: 'HS256' });
   });
   [
     {
@@ -18,7 +18,7 @@ describe('nonce option', function () {
     },
   ].forEach((testCase) => {
     it(testCase.description, function (done) {
-      testUtils.verifyJWTHelper(token, undefined, { nonce: testCase.nonce }, (err, decoded) => {
+      testUtils.verifyJWTHelper(token, 'secret', { nonce: testCase.nonce }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded).to.have.property('nonce', 'abcde');
@@ -46,7 +46,7 @@ describe('nonce option', function () {
     { foo: 'bar' },
   ].forEach((nonce) => {
     it(`should error with value ${util.inspect(nonce)}`, function (done) {
-      testUtils.verifyJWTHelper(token, undefined, { nonce }, (err) => {
+      testUtils.verifyJWTHelper(token, 'secret', { nonce }, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
           expect(err).to.have.property('message', 'nonce must be a non-empty string')

@@ -5,7 +5,7 @@ const util = require('util');
 const testUtils = require('./test-utils');
 
 function signWithPayload(payload, callback) {
-  testUtils.signJWTHelper(payload, 'secret', {algorithm: 'none'}, callback);
+  testUtils.signJWTHelper(payload, 'secret', {algorithm: 'HS256'}, callback);
 }
 
 describe('with a private claim', function() {
@@ -28,7 +28,7 @@ describe('with a private claim', function() {
   ].forEach((privateClaim) => {
     it(`should sign and verify with claim of ${util.inspect(privateClaim)}`, function (done) {
       signWithPayload({privateClaim}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -47,7 +47,7 @@ describe('with a private claim', function() {
   ].forEach((privateClaim) => {
     it(`should sign and verify with claim of ${util.inspect(privateClaim)}`, function (done) {
       signWithPayload({privateClaim}, (e1, token) => {
-        testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
           testUtils.asyncCheck(done, () => {
             expect(e1).to.be.null;
             expect(e2).to.be.null;
@@ -61,7 +61,7 @@ describe('with a private claim', function() {
   // private claims with value undefined are not added to the payload
   it(`should sign and verify with claim of undefined`, function (done) {
     signWithPayload({privateClaim: undefined}, (e1, token) => {
-      testUtils.verifyJWTHelper(token, undefined, {}, (e2, decoded) => {
+      testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
         testUtils.asyncCheck(done, () => {
           expect(e1).to.be.null;
           expect(e2).to.be.null;

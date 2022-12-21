@@ -6,7 +6,7 @@ const util = require('util');
 const testUtils = require('./test-utils');
 
 function signWithKeyId(keyid, payload, callback) {
-  const options = {algorithm: 'none'};
+  const options = {algorithm: 'HS256'};
   if (keyid !== undefined) {
     options.keyid = keyid;
   }
@@ -44,7 +44,7 @@ describe('keyid', function() {
 
     // undefined needs special treatment because {} is not the same as {keyid: undefined}
     it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, undefined, {keyid: undefined, algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({}, 'secret', {keyid: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property('message', '"keyid" must be a string');

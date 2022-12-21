@@ -6,7 +6,7 @@ const util = require('util');
 const testUtils = require('./test-utils');
 
 function signWithAudience(audience, payload, callback) {
-  const options = {algorithm: 'none'};
+  const options = {algorithm: 'HS256'};
   if (audience !== undefined) {
     options.audience = audience;
   }
@@ -15,7 +15,7 @@ function signWithAudience(audience, payload, callback) {
 }
 
 function verifyWithAudience(token, audience,  callback) {
-  testUtils.verifyJWTHelper(token, undefined, {audience}, callback);
+  testUtils.verifyJWTHelper(token, 'secret', {audience}, callback);
 }
 
 describe('audience', function() {
@@ -47,7 +47,7 @@ describe('audience', function() {
 
     // undefined needs special treatment because {} is not the same as {aud: undefined}
     it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {audience: undefined, algorithm: 'none'}, (err) => {
+      testUtils.signJWTHelper({}, 'secret', {audience: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property('message', '"audience" must be a string or array');

@@ -4,6 +4,24 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.0 - 2022-12-21
+
+  **Breaking changes: See [Migration from v8 to v9](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)**
+
+### Breaking changes
+
+- Removed support for Node versions 11 and below.
+- The verify() function no longer accepts unsigned tokens by default. ([834503079514b72264fd13023a3b8d648afd6a16]https://github.com/auth0/node-jsonwebtoken/commit/834503079514b72264fd13023a3b8d648afd6a16)
+- RSA key size must be 2048 bits or greater. ([ecdf6cc6073ea13a7e71df5fad043550f08d0fa6]https://github.com/auth0/node-jsonwebtoken/commit/ecdf6cc6073ea13a7e71df5fad043550f08d0fa6)
+- Key types must be valid for the signing / verification algorithm
+
+### Security fixes
+
+- security: fixes `Arbitrary File Write via verify function` - CVE-2022-23529
+- security: fixes `Insecure default algorithm in jwt.verify() could lead to signature validation bypass` - CVE-2022-23540
+- security: fixes `Insecure implementation of key retrieval function could lead to Forgeable Public/Private Tokens from RSA to HMAC` - CVE-2022-23541
+- security: fixes `Unrestricted key type could lead to legacy keys usage` - CVE-2022-23539
+
 ## 8.5.1 - 2019-03-18
 
 ### Bug fix
