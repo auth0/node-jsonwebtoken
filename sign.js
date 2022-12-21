@@ -1,5 +1,6 @@
 const timespan = require('./lib/timespan');
 const PS_SUPPORTED = require('./lib/psSupported');
+const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const jws = require('jws');
 const {includes, isBoolean, isInteger, isNumber, isPlainObject, isString, once} = require('lodash')
 const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
@@ -22,7 +23,8 @@ const sign_options_schema = {
   noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
   keyid: { isValid: isString, message: '"keyid" must be a string' },
   mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' },
-  allowInsecureKeySizes: { isValid: isBoolean, message: '"allowInsecureKeySizes" must be a boolean'}
+  allowInsecureKeySizes: { isValid: isBoolean, message: '"allowInsecureKeySizes" must be a boolean'},
+  allowInvalidAsymmetricKeyTypes: { isValid: isBoolean, message: '"allowInvalidAsymmetricKeyTypes" must be a boolean'}
 };
 
 const registered_claims_schema = {
@@ -164,6 +166,14 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
   catch (error) {
     return failure(error);
+  }
+
+  if (!options.allowInvalidAsymmetricKeyTypes) {
+    try {
+      validateAsymmetricKey(header.alg, secretOrPrivateKey);
+    } catch (error) {
+      return failure(error);
+    }
   }
 
   const timestamp = payload.iat || Math.floor(Date.now() / 1000);
