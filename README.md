@@ -69,15 +69,15 @@ Generated jwts will include an `iat` (issued at) claim by default unless `noTime
 Synchronous Sign with default (HMAC SHA256)
 
 ```js
-var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+let jwt = require('jsonwebtoken');
+let token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 ```
 
 Synchronous Sign with RSA SHA256
 ```js
 // sign with RSA SHA256
-var privateKey = fs.readFileSync('private.key');
-var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
+let privateKey = fs.readFileSync('private.key');
+let token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
 ```
 
 Sign asynchronously
@@ -89,7 +89,7 @@ jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token
 
 Backdate a jwt 30 seconds
 ```js
-var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
+let older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
 ```
 
 #### Token Expiration (exp claim)
@@ -164,7 +164,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 ```js
 // verify a token symmetric - synchronous
-var decoded = jwt.verify(token, 'shhhhh');
+let decoded = jwt.verify(token, 'shhhhh');
 console.log(decoded.foo) // bar
 
 // verify a token symmetric
@@ -174,7 +174,7 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 
 // invalid token - synchronous
 try {
-  var decoded = jwt.verify(token, 'wrong-secret');
+  let decoded = jwt.verify(token, 'wrong-secret');
 } catch(err) {
   // err
 }
@@ -186,50 +186,50 @@ jwt.verify(token, 'wrong-secret', function(err, decoded) {
 });
 
 // verify a token asymmetric
-var cert = fs.readFileSync('public.pem');  // get public key
+let cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, function(err, decoded) {
   console.log(decoded.foo) // bar
 });
 
 // verify audience
-var cert = fs.readFileSync('public.pem');  // get public key
+let cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo' }, function(err, decoded) {
   // if audience mismatch, err == invalid audience
 });
 
 // verify issuer
-var cert = fs.readFileSync('public.pem');  // get public key
+let cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer' }, function(err, decoded) {
   // if issuer mismatch, err == invalid issuer
 });
 
 // verify jwt id
-var cert = fs.readFileSync('public.pem');  // get public key
+let cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwtid' }, function(err, decoded) {
   // if jwt id mismatch, err == invalid jwt id
 });
 
 // verify subject
-var cert = fs.readFileSync('public.pem');  // get public key
+let cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwtid', subject: 'subject' }, function(err, decoded) {
   // if subject mismatch, err == invalid subject
 });
 
 // alg mismatch
-var cert = fs.readFileSync('public.pem'); // get public key
+let cert = fs.readFileSync('public.pem'); // get public key
 jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
 });
 
 // Verify using getKey callback
 // Example uses https://github.com/auth0/node-jwks-rsa as a way to fetch the keys.
-var jwksClient = require('jwks-rsa');
-var client = jwksClient({
+let jwksClient = require('jwks-rsa');
+let client = jwksClient({
   jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
 });
 function getKey(header, callback){
   client.getSigningKey(header.kid, function(err, key) {
-    var signingKey = key.publicKey || key.rsaPublicKey;
+    let signingKey = key.publicKey || key.rsaPublicKey;
     callback(null, signingKey);
   });
 }
@@ -263,10 +263,10 @@ Example
 
 ```js
 // get the decoded payload ignoring signature, no secretOrPrivateKey needed
-var decoded = jwt.decode(token);
+let decoded = jwt.decode(token);
 
 // get the decoded payload and header
-var decoded = jwt.decode(token, {complete: true});
+let decoded = jwt.decode(token, {complete: true});
 console.log(decoded.header);
 console.log(decoded.payload)
 ```
