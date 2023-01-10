@@ -8,5 +8,6 @@ module.exports = {
 
 Object.defineProperty(module.exports, 'decode', {
   enumerable: false,
+  configurable: true,
   value: require('./decode'),
 });
