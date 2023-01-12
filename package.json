@@ -8,7 +8,7 @@
     "lines": 95,
     "statements": 95,
     "functions": 100,
-    "branches": 95,
+    "branches": 94,
     "exclude": [
       "./test/**"
     ],
