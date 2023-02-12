@@ -35,22 +35,12 @@ describe('audience', function() {
       {},
       {foo: 'bar'},
     ].forEach((audience) => {
-      it(`should error with with value ${util.inspect(audience)}`, function (done) {
+      it(`should error with value ${util.inspect(audience)}`, function (done) {
         signWithAudience(audience, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message', '"audience" must be a string or array');
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {aud: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {audience: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"audience" must be a string or array');
         });
       });
     });

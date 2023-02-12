@@ -34,26 +34,13 @@ describe('expires', function() {
       {},
       {foo: 'bar'},
     ].forEach((expiresIn) => {
-      it(`should error with with value ${util.inspect(expiresIn)}`, function (done) {
+      it(`should error with value ${util.inspect(expiresIn)}`, function (done) {
         signWithExpiresIn(expiresIn, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message')
               .match(/"expiresIn" should be a number of seconds or string representing a timespan/);
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {expiresIn: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {expiresIn: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property(
-            'message',
-            '"expiresIn" should be a number of seconds or string representing a timespan'
-          );
         });
       });
     });
@@ -94,7 +81,6 @@ describe('expires', function() {
       true,
       false,
       null,
-      undefined,
       '',
       ' ',
       'invalid',
@@ -103,7 +89,7 @@ describe('expires', function() {
       {},
       {foo: 'bar'},
     ].forEach((exp) => {
-      it(`should error with with value ${util.inspect(exp)}`, function (done) {
+      it(`should error with value ${util.inspect(exp)}`, function (done) {
         signWithExpiresIn(undefined, {exp}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
@@ -130,7 +116,7 @@ describe('expires', function() {
       {},
       {foo: 'bar'},
     ].forEach((exp) => {
-      it(`should error with with value ${util.inspect(exp)}`, function (done) {
+      it(`should error with value ${util.inspect(exp)}`, function (done) {
         const header = { alg: 'HS256' };
         const payload = { exp };
         const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });

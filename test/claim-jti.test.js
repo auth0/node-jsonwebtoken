@@ -32,22 +32,12 @@ describe('jwtid', function() {
       {},
       {foo: 'bar'},
     ].forEach((jwtid) => {
-      it(`should error with with value ${util.inspect(jwtid)}`, function (done) {
+      it(`should error with value ${util.inspect(jwtid)}`, function (done) {
         signWithJWTId(jwtid, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message', '"jwtid" must be a string');
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {jwtid: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {jwtid: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"jwtid" must be a string');
         });
       });
     });

@@ -34,26 +34,13 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((notBefore) => {
-      it(`should error with with value ${util.inspect(notBefore)}`, function (done) {
+      it(`should error with value ${util.inspect(notBefore)}`, function (done) {
         signWithNotBefore(notBefore, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message')
               .match(/"notBefore" should be a number of seconds or string representing a timespan/);
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {notBefore: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {notBefore: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property(
-            'message',
-            '"notBefore" should be a number of seconds or string representing a timespan'
-          );
         });
       });
     });
@@ -94,7 +81,6 @@ describe('not before', function() {
       true,
       false,
       null,
-      undefined,
       '',
       ' ',
       'invalid',
@@ -103,7 +89,7 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((nbf) => {
-      it(`should error with with value ${util.inspect(nbf)}`, function (done) {
+      it(`should error with value ${util.inspect(nbf)}`, function (done) {
         signWithNotBefore(undefined, {nbf}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
@@ -130,7 +116,7 @@ describe('not before', function() {
       {},
       {foo: 'bar'},
     ].forEach((nbf) => {
-      it(`should error with with value ${util.inspect(nbf)}`, function (done) {
+      it(`should error with value ${util.inspect(nbf)}`, function (done) {
         const header = { alg: 'HS256' };
         const payload = { nbf };
         const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });

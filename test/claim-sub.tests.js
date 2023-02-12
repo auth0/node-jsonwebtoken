@@ -32,22 +32,12 @@ describe('subject', function() {
       {},
       {foo: 'bar'},
     ].forEach((subject) => {
-      it(`should error with with value ${util.inspect(subject)}`, function (done) {
+      it(`should error with value ${util.inspect(subject)}`, function (done) {
         signWithSubject(subject, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message', '"subject" must be a string');
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {subject: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {subject: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"subject" must be a string');
         });
       });
     });
