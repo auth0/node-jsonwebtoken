@@ -39,6 +39,11 @@ function validate(schema, allowUnknown, object, parameterName) {
   }
   Object.keys(object)
     .forEach(function(key) {
+      // Don't validate undefined attribute
+      if (object[key] === undefined) {
+        return;
+      }
+
       const validator = schema[key];
       if (!validator) {
         if (!allowUnknown) {
