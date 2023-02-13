@@ -17,6 +17,7 @@ $ npm install jsonwebtoken
 
 # Migration notes
 
+* [From v8 to v9](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)
 * [From v7 to v8](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)
 
 # Usage
@@ -52,6 +53,7 @@ When signing with RSA algorithms the minimum modulus length is 2048 except when 
 * `keyid`
 * `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
 * `allowInsecureKeySizes`: if true allows private keys with a modulus below 2048 to be used for RSA
+* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
 
 
 
@@ -158,7 +160,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
-
+* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
 
 ```js
 // verify a token symmetric - synchronous
