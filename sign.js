@@ -2,7 +2,9 @@ const timespan = require('./lib/timespan');
 const PS_SUPPORTED = require('./lib/psSupported');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const jws = require('jws');
-const {includes, isBoolean, isInteger, isNumber, isPlainObject, isString, once} = require('lodash')
+const once = require('./lib/once');
+const isPlainObject = require('./lib/isPlainObject');
+const isNumber = require('./lib/isNumber')
 const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
 
 const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
@@ -11,20 +13,20 @@ if (PS_SUPPORTED) {
 }
 
 const sign_options_schema = {
-  expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
-  notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
-  audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, SUPPORTED_ALGS), message: '"algorithm" must be a valid string enum value' },
+  expiresIn: { isValid: function(value) { return Number.isInteger(value) || (function (value) {  return typeof value === 'string' }(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
+  notBefore: { isValid: function(value) { return  Number.isInteger(value) || (function (value) {  return typeof value === 'string' }(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
+  audience: { isValid: function(value) { return function (value) {  return typeof value === 'string' }(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
+  algorithm: { isValid: function (value) { return SUPPORTED_ALGS.indexOf(value) !== -1 }, message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
-  encoding: { isValid: isString, message: '"encoding" must be a string' },
-  issuer: { isValid: isString, message: '"issuer" must be a string' },
-  subject: { isValid: isString, message: '"subject" must be a string' },
-  jwtid: { isValid: isString, message: '"jwtid" must be a string' },
-  noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
-  keyid: { isValid: isString, message: '"keyid" must be a string' },
-  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' },
-  allowInsecureKeySizes: { isValid: isBoolean, message: '"allowInsecureKeySizes" must be a boolean'},
-  allowInvalidAsymmetricKeyTypes: { isValid: isBoolean, message: '"allowInvalidAsymmetricKeyTypes" must be a boolean'}
+  encoding: { isValid: function (value) {  return typeof value === 'string' }, message: '"encoding" must be a string' },
+  issuer: { isValid: function (value) {  return typeof value === 'string' }, message: '"issuer" must be a string' },
+  subject: { isValid: function (value) {  return typeof value === 'string' }, message: '"subject" must be a string' },
+  jwtid: { isValid: function (value) {  return typeof value === 'string' }, message: '"jwtid" must be a string' },
+  noTimestamp: { isValid: function (value) { return typeof value === 'boolean' }, message: '"noTimestamp" must be a boolean' },
+  keyid: { isValid: function (value) {  return typeof value === 'string' }, message: '"keyid" must be a string' },
+  mutatePayload: { isValid: function (value) { return typeof value === 'boolean' }, message: '"mutatePayload" must be a boolean' },
+  allowInsecureKeySizes: { isValid: function (value) { return typeof value === 'boolean' }, message: '"allowInsecureKeySizes" must be a boolean'},
+  allowInvalidAsymmetricKeyTypes: { isValid: function (value) { return typeof value === 'boolean' }, message: '"allowInvalidAsymmetricKeyTypes" must be a boolean'}
 };
 
 const registered_claims_schema = {
