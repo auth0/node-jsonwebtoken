@@ -2,8 +2,14 @@ const timespan = require('./lib/timespan');
 const PS_SUPPORTED = require('./lib/psSupported');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const jws = require('jws');
-const {includes, isBoolean, isInteger, isNumber, isPlainObject, isString, once} = require('lodash')
 const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
+const includes = require('lodash/includes')
+const isBoolean = require('lodash/isBoolean')
+const isInteger = require('lodash/isInteger')
+const isNumber = require('lodash/isNumber')
+const isPlainObject = require('lodash/isPlainObject')
+const isString = require('lodash/isString')
+const once = require('lodash/once')
 
 const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
 if (PS_SUPPORTED) {
