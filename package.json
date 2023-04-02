@@ -20,7 +20,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "coverage": "nyc mocha --use_strict",
+    "coverage": "nyc mocha",
     "test": "npm run lint && npm run coverage && cost-of-modules"
   },
   "repository": {
@@ -38,7 +38,7 @@
   "dependencies": {
     "jws": "^3.2.2",
     "lodash": "^4.17.21",
-    "ms": "^2.1.1",
+    "ms": "^2.1.3",
     "semver": "^7.3.8"
   },
   "devDependencies": {
@@ -47,9 +47,9 @@
     "conventional-changelog": "~1.1.0",
     "cost-of-modules": "^1.0.1",
     "eslint": "^4.19.1",
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.3",
     "nsp": "^2.6.2",
-    "nyc": "^11.9.0",
+    "nyc": "^15.1.0",
     "sinon": "^6.0.0"
   },
   "engines": {
