@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.1 - 2023-07-05
+
+- fix(stubs): allow decode method to be stubbed
+
 ## 9.0.0 - 2022-12-21
 
   **Breaking changes: See [Migration from v8 to v9](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)**
