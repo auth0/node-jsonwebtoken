@@ -54,7 +54,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
   }
 
-  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+  const time = new Date();
+  const clockTimestamp = options.clockTimestamp || Math.floor((time.getTime() - time.getTimezoneOffset() * 6000) / 1000);
 
   if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
