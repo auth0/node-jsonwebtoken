@@ -3,6 +3,7 @@
   "version": "9.0.2",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
+  "module": "index.mjs",
   "nyc": {
     "check-coverage": true,
     "lines": 95,
