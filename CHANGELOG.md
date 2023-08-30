@@ -4,6 +4,11 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.2 - 2023-08-30
+
+- security: updating semver to 7.5.4 to resolve CVE-2022-25883, closes [#921](https://github.com/auth0/node-jsonwebtoken/issues/921).
+- refactor: reduce library size by using lodash specific dependencies, closes [#878](https://github.com/auth0/node-jsonwebtoken/issues/878).
+
 ## 9.0.1 - 2023-07-05
 
 - fix(stubs): allow decode method to be stubbed
