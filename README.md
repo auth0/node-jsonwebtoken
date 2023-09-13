@@ -70,7 +70,7 @@ Synchronous Sign with default (HMAC SHA256)
 
 ```js
 var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+var token = jwt.sign({ foo: 'bar' }, 'yourSecretKey');
 ```
 
 Synchronous Sign with RSA SHA256
@@ -89,7 +89,7 @@ jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token
 
 Backdate a jwt 30 seconds
 ```js
-var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
+var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'yourSecretKey');
 ```
 
 #### Token Expiration (exp claim)
@@ -164,11 +164,11 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 
 ```js
 // verify a token symmetric - synchronous
-var decoded = jwt.verify(token, 'shhhhh');
+var decoded = jwt.verify(token, 'yourSecretKey');
 console.log(decoded.foo) // bar
 
 // verify a token symmetric
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'yourSecretKey', function(err, decoded) {
   console.log(decoded.foo) // bar
 });
 
@@ -288,7 +288,7 @@ Error object:
 * expiredAt: [ExpDate]
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'yourSecretKey', function(err, decoded) {
   if (err) {
     /*
       err = {
@@ -316,7 +316,7 @@ Error object:
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'yourSecretKey', function(err, decoded) {
   if (err) {
     /*
       err = {
@@ -338,7 +338,7 @@ Error object:
 * date: 2018-10-04T16:10:44.000Z
 
 ```js
-jwt.verify(token, 'shhhhh', function(err, decoded) {
+jwt.verify(token, 'yourSecretKey', function(err, decoded) {
   if (err) {
     /*
       err = {
