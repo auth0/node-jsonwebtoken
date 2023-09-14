@@ -1,6 +1,6 @@
 {
   "name": "jsonwebtoken",
-  "version": "9.0.0",
+  "version": "9.0.2",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
   "exports": "./index.js",
@@ -38,9 +38,15 @@
   },
   "dependencies": {
     "jws": "^3.2.2",
-    "lodash": "^4.17.21",
+    "lodash.includes": "^4.3.0",
+    "lodash.isboolean": "^3.0.3",
+    "lodash.isinteger": "^4.0.4",
+    "lodash.isnumber": "^3.0.3",
+    "lodash.isplainobject": "^4.0.6",
+    "lodash.isstring": "^4.0.1",
+    "lodash.once": "^4.0.0",
     "ms": "^2.1.1",
-    "semver": "^7.3.8"
+    "semver": "^7.5.4"
   },
   "devDependencies": {
     "atob": "^2.1.2",
