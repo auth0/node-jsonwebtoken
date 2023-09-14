@@ -1,7 +1,7 @@
 {
   "root": true,
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": "latest"
   },
   "env": {
     "es6": true,

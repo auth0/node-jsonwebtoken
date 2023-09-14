@@ -3,6 +3,7 @@
   "version": "9.0.2",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "main": "index.js",
+  "exports": "./index.js",
   "nyc": {
     "check-coverage": true,
     "lines": 95,
@@ -52,7 +53,7 @@
     "chai": "^4.1.2",
     "conventional-changelog": "~1.1.0",
     "cost-of-modules": "^1.0.1",
-    "eslint": "^4.19.1",
+    "eslint": "^8.30.0",
     "mocha": "^5.2.0",
     "nsp": "^2.6.2",
     "nyc": "^11.9.0",
