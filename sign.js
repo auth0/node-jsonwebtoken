@@ -45,13 +45,13 @@ function validate(schema, allowUnknown, object, parameterName) {
   }
   Object.keys(object)
     .forEach(function(key) {
-      const validator = schema[key];
-      if (!validator) {
+      if (!Object.prototype.hasOwnProperty.call(schema, key)) {
         if (!allowUnknown) {
           throw new Error('"' + key + '" is not allowed in "' + parameterName + '"');
         }
         return;
       }
+      const validator = schema[key];
       if (!validator.isValid(object[key])) {
         throw new Error(validator.message);
       }
