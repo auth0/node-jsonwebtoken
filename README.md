@@ -314,6 +314,8 @@ Error object:
   * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
   * 'jwt id invalid. expected: [OPTIONS JWT ID]'
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
+  * 'secretOrPrivateKey must have a value'
+  * 'secretOrPrivateKey is not valid key material'
 
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {
