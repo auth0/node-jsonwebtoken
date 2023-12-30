@@ -231,7 +231,7 @@ describe('not before', function() {
     // TODO an nbf of -Infinity should fail validation
     it('should set null "nbf" when given -Infinity', function (done) {
       signWithNotBefore(undefined, {nbf: -Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.unsafe_decode(token);
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded).to.have.property('nbf', null);
@@ -242,7 +242,7 @@ describe('not before', function() {
     // TODO an nbf of Infinity should fail validation
     it('should set null "nbf" when given value Infinity', function (done) {
       signWithNotBefore(undefined, {nbf: Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.unsafe_decode(token);
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded).to.have.property('nbf', null);
@@ -253,7 +253,7 @@ describe('not before', function() {
     // TODO an nbf of NaN should fail validation
     it('should set null "nbf" when given value NaN', function (done) {
       signWithNotBefore(undefined, {nbf: NaN}, (err, token) => {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.unsafe_decode(token);
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded).to.have.property('nbf', null);

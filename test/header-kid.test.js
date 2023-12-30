@@ -57,7 +57,7 @@ describe('keyid', function() {
     it('should not add "kid" header when "keyid" option not provided', function(done) {
       signWithKeyId(undefined, {}, (err, token) => {
         testUtils.asyncCheck(done, () => {
-          const decoded = jwt.decode(token, {complete: true});
+          const decoded = jwt.unsafe_decode(token, {complete: true});
           expect(err).to.be.null;
           expect(decoded.header).to.not.have.property('kid');
         });
@@ -67,7 +67,7 @@ describe('keyid', function() {
     it('should add "kid" header when "keyid" option is provided and an object payload', function(done) {
       signWithKeyId('foo', {}, (err, token) => {
         testUtils.asyncCheck(done, () => {
-          const decoded = jwt.decode(token, {complete: true});
+          const decoded = jwt.unsafe_decode(token, {complete: true});
           expect(err).to.be.null;
           expect(decoded.header).to.have.property('kid', 'foo');
         });
@@ -77,7 +77,7 @@ describe('keyid', function() {
     it('should add "kid" header when "keyid" option is provided and a Buffer payload', function(done) {
       signWithKeyId('foo', new Buffer('a Buffer payload'), (err, token) => {
         testUtils.asyncCheck(done, () => {
-          const decoded = jwt.decode(token, {complete: true});
+          const decoded = jwt.unsafe_decode(token, {complete: true});
           expect(err).to.be.null;
           expect(decoded.header).to.have.property('kid', 'foo');
         });
@@ -87,7 +87,7 @@ describe('keyid', function() {
     it('should add "kid" header when "keyid" option is provided and a string payload', function(done) {
       signWithKeyId('foo', 'a string payload', (err, token) => {
         testUtils.asyncCheck(done, () => {
-          const decoded = jwt.decode(token, {complete: true});
+          const decoded = jwt.unsafe_decode(token, {complete: true});
           expect(err).to.be.null;
           expect(decoded.header).to.have.property('kid', 'foo');
         });
