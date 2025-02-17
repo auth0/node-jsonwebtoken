@@ -4,21 +4,106 @@ const TokenExpiredError = require('./lib/TokenExpiredError');
 const decode = require('./decode');
 const timespan = require('./lib/timespan');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
-const PS_SUPPORTED = require('./lib/psSupported');
-const jws = require('jws');
-const {KeyObject, createSecretKey, createPublicKey} = require("crypto");
+const crypto = require("crypto");
+const oneShotAlgs = require('./lib/oneShotAlgs');
 
-const PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
-const EC_KEY_ALGS = ['ES256', 'ES384', 'ES512'];
+const EC_KEY_ALGS = ['ES256', 'ES256K', 'ES384', 'ES512'];
 const RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
+const RSA_PSS_KEY_ALGS = ['PS256', 'PS384', 'PS512'];
+const PUB_KEY_ALGS = [].concat(RSA_KEY_ALGS, EC_KEY_ALGS);
 const HS_ALGS = ['HS256', 'HS384', 'HS512'];
+const EdDSA_ALGS = ['EdDSA'];
 
-if (PS_SUPPORTED) {
-  PUB_KEY_ALGS.splice(PUB_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
-  RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
+function processPayload(header, payload, signature, options, done) {
+  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+
+  if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
+    if (typeof payload.nbf !== 'number') {
+      return done(new JsonWebTokenError('invalid nbf value'));
+    }
+    if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
+      return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
+    }
+  }
+
+  if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
+    if (typeof payload.exp !== 'number') {
+      return done(new JsonWebTokenError('invalid exp value'));
+    }
+    if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
+      return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+    }
+  }
+
+  if (options.audience) {
+    const audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
+    const target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+
+    const match = target.some(function(targetAudience) {
+      return audiences.some(function(audience) {
+        return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+      });
+    });
+
+    if (!match) {
+      return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+    }
+  }
+
+  if (options.issuer) {
+    const invalid_issuer =
+            (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
+            (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
+
+    if (invalid_issuer) {
+      return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+    }
+  }
+
+  if (options.subject) {
+    if (payload.sub !== options.subject) {
+      return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
+    }
+  }
+
+  if (options.jwtid) {
+    if (payload.jti !== options.jwtid) {
+      return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
+    }
+  }
+
+  if (options.nonce) {
+    if (payload.nonce !== options.nonce) {
+      return done(new JsonWebTokenError('jwt nonce invalid. expected: ' + options.nonce));
+    }
+  }
+
+  if (options.maxAge) {
+    if (typeof payload.iat !== 'number') {
+      return done(new JsonWebTokenError('iat required when maxAge is specified'));
+    }
+
+    const maxAgeTimestamp = timespan(options.maxAge, payload.iat);
+    if (typeof maxAgeTimestamp === 'undefined') {
+      return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
+    }
+    if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
+      return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
+    }
+  }
+
+  if (options.complete === true) {
+    return done(null, {
+      header,
+      payload: payload,
+      signature,
+    });
+  }
+
+  return done(null, payload);
 }
 
-module.exports = function (jwtString, secretOrPublicKey, options, callback) {
+module.exports = function(jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
     options = {};
@@ -53,8 +138,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if (options.allowInvalidAsymmetricKeyTypes !== undefined && typeof options.allowInvalidAsymmetricKeyTypes !== 'boolean') {
     return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
   }
-
-  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
 
   if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
@@ -117,12 +200,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       return done(new JsonWebTokenError('please specify "none" in "algorithms" to verify unsigned tokens'));
     }
 
-    if (secretOrPublicKey != null && !(secretOrPublicKey instanceof KeyObject)) {
+    if (secretOrPublicKey != null && !(secretOrPublicKey instanceof crypto.KeyObject)) {
       try {
-        secretOrPublicKey = createPublicKey(secretOrPublicKey);
+        secretOrPublicKey = crypto.createPublicKey(secretOrPublicKey);
       } catch (_) {
         try {
-          secretOrPublicKey = createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey);
+          secretOrPublicKey = crypto.createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey);
         } catch (_) {
           return done(new JsonWebTokenError('secretOrPublicKey is not valid key material'))
         }
@@ -132,12 +215,26 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (!options.algorithms) {
       if (secretOrPublicKey.type === 'secret') {
         options.algorithms = HS_ALGS;
-      } else if (['rsa', 'rsa-pss'].includes(secretOrPublicKey.asymmetricKeyType)) {
-        options.algorithms = RSA_KEY_ALGS
-      } else if (secretOrPublicKey.asymmetricKeyType === 'ec') {
-        options.algorithms = EC_KEY_ALGS
       } else {
-        options.algorithms = PUB_KEY_ALGS
+        switch (secretOrPublicKey.asymmetricKeyType) {
+        case 'rsa':
+          options.algorithms = [].concat(RSA_KEY_ALGS, RSA_PSS_KEY_ALGS);
+          break;
+        case 'rsa-pss':
+          options.algorithms = RSA_PSS_KEY_ALGS;
+          break;
+        case 'ec':
+          options.algorithms = EC_KEY_ALGS;
+          break;
+        case 'ed25519':
+          options.algorithms = [].concat(EdDSA_ALGS, 'Ed25519');
+          break;
+        case 'ed448':
+          options.algorithms = [].concat(EdDSA_ALGS, 'Ed448');
+          break;
+        default:
+          options.algorithms = PUB_KEY_ALGS;
+        }
       }
     }
 
@@ -161,103 +258,54 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     let valid;
 
-    try {
-      valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
-    } catch (e) {
-      return done(e);
+    const data = Buffer.from(`${parts[0]}.${parts[1]}`);
+    const signature = Buffer.from(parts[2], 'base64');
+
+    const sync = decodedToken.header.alg === 'none' || decodedToken.header.alg.startsWith('HS') || done !== callback || parseInt(process.versions.node, 10) < 16 || options.allowInvalidAsymmetricKeyTypes;
+
+    if (decodedToken.header.alg === 'none') {
+      valid = parts[2] === '';
+      if (!valid) {
+        return done(new JsonWebTokenError('invalid signature'));
+      }
+      return processPayload(header, decodedToken.payload, parts[2], options, done);
     }
 
-    if (!valid) {
-      return done(new JsonWebTokenError('invalid signature'));
-    }
-
-    const payload = decodedToken.payload;
-
-    if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
-      if (typeof payload.nbf !== 'number') {
-        return done(new JsonWebTokenError('invalid nbf value'));
-      }
-      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
-        return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
-      }
-    }
-
-    if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
-      if (typeof payload.exp !== 'number') {
-        return done(new JsonWebTokenError('invalid exp value'));
-      }
-      if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
-        return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
+    if (decodedToken.header.alg.startsWith('HS')) {
+      try {
+        const expected = signature;
+        const actual = crypto.createHmac(`sha${decodedToken.header.alg.substring(2, 5)}`, secretOrPublicKey).update(data).digest();
+        valid = crypto.timingSafeEqual(expected, actual);
+        if (!valid) {
+          return done(new JsonWebTokenError('invalid signature'));
+        }
+        return processPayload(header, decodedToken.payload, signature, options, done);
+      } catch (e) {
+        return done(e);
       }
     }
 
-    if (options.audience) {
-      const audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
-      const target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-
-      const match = target.some(function (targetAudience) {
-        return audiences.some(function (audience) {
-          return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
-        });
-      });
-
-      if (!match) {
-        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+    if (sync) {
+      try {
+        const { digest, key } = oneShotAlgs(decodedToken.header.alg, secretOrPublicKey);
+        const valid = crypto.verify(digest, data, key, signature);
+        if (!valid) {
+          return done(new JsonWebTokenError('invalid signature'));
+        }
+        return processPayload(header, decodedToken.payload, parts[2], options, done);
+      } catch (e) {
+        return done(e);
       }
     }
 
-    if (options.issuer) {
-      const invalid_issuer =
-              (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
-              (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
-
-      if (invalid_issuer) {
-        return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
+    const { digest, key } = oneShotAlgs(decodedToken.header.alg, secretOrPublicKey);
+    crypto.verify(digest, data, key, signature, (err, valid) => {
+      if (err) {
+        return done(err);
+      } else if (!valid) {
+        return done(new JsonWebTokenError('invalid signature'));
       }
-    }
-
-    if (options.subject) {
-      if (payload.sub !== options.subject) {
-        return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
-      }
-    }
-
-    if (options.jwtid) {
-      if (payload.jti !== options.jwtid) {
-        return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
-      }
-    }
-
-    if (options.nonce) {
-      if (payload.nonce !== options.nonce) {
-        return done(new JsonWebTokenError('jwt nonce invalid. expected: ' + options.nonce));
-      }
-    }
-
-    if (options.maxAge) {
-      if (typeof payload.iat !== 'number') {
-        return done(new JsonWebTokenError('iat required when maxAge is specified'));
-      }
-
-      const maxAgeTimestamp = timespan(options.maxAge, payload.iat);
-      if (typeof maxAgeTimestamp === 'undefined') {
-        return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
-      }
-      if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
-        return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
-      }
-    }
-
-    if (options.complete === true) {
-      const signature = decodedToken.signature;
-
-      return done(null, {
-        header: header,
-        payload: payload,
-        signature: signature
-      });
-    }
-
-    return done(null, payload);
+      return processPayload(header, decodedToken.payload, parts[2], options, done);
+    });
   });
 };

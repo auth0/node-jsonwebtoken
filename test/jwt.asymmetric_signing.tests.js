@@ -1,5 +1,4 @@
 const jwt = require('../index');
-const PS_SUPPORTED = require('../lib/psSupported');
 const fs = require('fs');
 const path = require('path');
 
@@ -18,21 +17,31 @@ const algorithms = {
     invalid_pub_key: loadKey('invalid_pub.pem')
   },
   ES256: {
-    // openssl ecparam -name secp256r1 -genkey -param_enc explicit -out ecdsa-private.pem
     priv_key: loadKey('ecdsa-private.pem'),
-    // openssl ec -in ecdsa-private.pem -pubout -out ecdsa-public.pem
     pub_key: loadKey('ecdsa-public.pem'),
     invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
-  }
-};
-
-if (PS_SUPPORTED) {
-  algorithms.PS256 = {
+  },
+  ES256K: {
+    priv_key: loadKey('secp256k1-private.pem'),
+    pub_key: loadKey('secp256k1-public.pem'),
+    invalid_pub_key: loadKey('secp256k1-public-invalid.pem')
+  },
+  EdDSA: {
+    priv_key: loadKey('ed25519-private.pem'),
+    pub_key: loadKey('ed25519-public.pem'),
+    invalid_pub_key: loadKey('ed25519-public-invalid.pem')
+  },
+  Ed25519: {
+    priv_key: loadKey('ed25519-private.pem'),
+    pub_key: loadKey('ed25519-public.pem'),
+    invalid_pub_key: loadKey('ed25519-public-invalid.pem')
+  },
+  PS256: {
     pub_key: loadKey('pub.pem'),
     priv_key: loadKey('priv.pem'),
     invalid_pub_key: loadKey('invalid_pub.pem')
-  };
-}
+  },
+};
 
 
 describe('Asymmetric Algorithms', function() {

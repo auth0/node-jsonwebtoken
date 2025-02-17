@@ -1,15 +1,16 @@
 var jwt = require('../index');
 var expect = require('chai').expect;
 var fs = require('fs');
-var PS_SUPPORTED = require('../lib/psSupported');
 
 describe('schema', function() {
 
   describe('sign options', function() {
     var cert_rsa_priv = fs.readFileSync(__dirname + '/rsa-private.pem');
     var cert_ecdsa_priv = fs.readFileSync(__dirname + '/ecdsa-private.pem');
+    var cert_secp256k1_priv = fs.readFileSync(__dirname + '/secp256k1-private.pem');
     var cert_secp384r1_priv = fs.readFileSync(__dirname + '/secp384r1-private.pem');
     var cert_secp521r1_priv = fs.readFileSync(__dirname + '/secp521r1-private.pem');
+    var cert_ed25519_priv = fs.readFileSync(__dirname + '/ed25519-private.pem');
 
     function sign(options, secretOrPrivateKey) {
       jwt.sign({foo: 123}, secretOrPrivateKey, options);
@@ -23,14 +24,14 @@ describe('schema', function() {
       sign({algorithm: 'RS256'}, cert_rsa_priv);
       sign({algorithm: 'RS384'}, cert_rsa_priv);
       sign({algorithm: 'RS512'}, cert_rsa_priv);
-      if (PS_SUPPORTED) {
-        sign({algorithm: 'PS256'}, cert_rsa_priv);
-        sign({algorithm: 'PS384'}, cert_rsa_priv);
-        sign({algorithm: 'PS512'}, cert_rsa_priv);
-      }
+      sign({algorithm: 'PS256'}, cert_rsa_priv);
+      sign({algorithm: 'PS384'}, cert_rsa_priv);
+      sign({algorithm: 'PS512'}, cert_rsa_priv);
       sign({algorithm: 'ES256'}, cert_ecdsa_priv);
+      sign({algorithm: 'ES256K'}, cert_secp256k1_priv);
       sign({algorithm: 'ES384'}, cert_secp384r1_priv);
       sign({algorithm: 'ES512'}, cert_secp521r1_priv);
+      sign({algorithm: 'EdDSA'}, cert_ed25519_priv);
       sign({algorithm: 'HS256'}, 'superSecret');
       sign({algorithm: 'HS384'}, 'superSecret');
       sign({algorithm: 'HS512'}, 'superSecret');

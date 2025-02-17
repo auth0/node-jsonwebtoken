@@ -1,7 +1,5 @@
 const validateAsymmetricKey = require('../lib/validateAsymmetricKey');
-const PS_SUPPORTED = require('../lib/psSupported');
-const ASYMMETRIC_KEY_DETAILS_SUPPORTED = require('../lib/asymmetricKeyDetailsSupported');
-const RSA_PSS_KEY_DETAILS_SUPPORTED = require('../lib/rsaPssKeyDetailsSupported');
+const { ASYMMETRIC_KEY_DETAILS_SUPPORTED, RSA_PSS_KEY_DETAILS_SUPPORTED } = require('../lib/flags');
 const fs = require('fs');
 const path = require('path');
 const { createPrivateKey } = require('crypto');
@@ -19,14 +17,11 @@ const algorithmParams = {
   },
   ES256: {
     invalidPrivateKey: loadKey('priv.pem')
-  }
-};
-
-if (PS_SUPPORTED) {
-  algorithmParams.PS256 = {
+  },
+  PS256: {
     invalidPrivateKey: loadKey('secp384r1-private.pem')
-  };
-}
+  },
+};
 
 describe('Asymmetric key validation', function() {
   Object.keys(algorithmParams).forEach(function(algorithm) {

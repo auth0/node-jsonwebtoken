@@ -80,7 +80,7 @@ describe('not before', function() {
     });
 
     it('should error with a Buffer payload', function (done) {
-      signWithNotBefore(100, new Buffer('a Buffer payload'), (err) => {
+      signWithNotBefore(100, Buffer.from('a Buffer payload'), (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property('message', 'invalid notBefore option for object payload');

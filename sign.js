@@ -1,20 +1,24 @@
 const timespan = require('./lib/timespan');
-const PS_SUPPORTED = require('./lib/psSupported');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
-const jws = require('jws');
 const includes = require('lodash.includes');
 const isBoolean = require('lodash.isboolean');
 const isInteger = require('lodash.isinteger');
 const isNumber = require('lodash.isnumber');
 const isPlainObject = require('lodash.isplainobject');
 const isString = require('lodash.isstring');
-const once = require('lodash.once');
-const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
+const crypto = require('crypto')
+const oneShotAlgs = require('./lib/oneShotAlgs');
+const encodeBase64url = require('./lib/base64url');
 
-const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
-if (PS_SUPPORTED) {
-  SUPPORTED_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
-}
+const SUPPORTED_ALGS = [
+  'RS256', 'RS384', 'RS512',
+  'PS256', 'PS384', 'PS512',
+  'ES256', 'ES256K', 'ES384', 'ES512',
+  'HS256', 'HS384', 'HS512',
+  'EdDSA',
+  'Ed25519', 'Ed448',
+  'none',
+];
 
 const sign_options_schema = {
   expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
@@ -38,6 +42,7 @@ const registered_claims_schema = {
   exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
   nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
 };
+
 
 function validate(schema, allowUnknown, object, parameterName) {
   if (!isPlainObject(object)) {
@@ -83,12 +88,39 @@ const options_for_objects = [
   'jwtid',
 ];
 
-module.exports = function (payload, secretOrPrivateKey, options, callback) {
+function encodePayload(payload, encoding = 'utf8') {
+  let buf;
+  if (payload instanceof Uint8Array) {
+    buf = Buffer.from(payload)
+  } else if (typeof payload === 'string') {
+    buf = Buffer.from(payload, encoding);
+  } else {
+    buf = Buffer.from(JSON.stringify(payload), encoding);
+  }
+
+  return encodeBase64url(buf);
+}
+
+function encodeHeader(header) {
+  return encodeBase64url(Buffer.from(JSON.stringify(header)));
+}
+
+module.exports = function(payload, secretOrPrivateKey, options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
   } else {
     options = options || {};
+  }
+
+  let done;
+  if (callback) {
+    done = callback;
+  } else {
+    done = function(err, data) {
+      if (err) throw err;
+      return data;
+    };
   }
 
   const isObjectPayload = typeof payload === 'object' &&
@@ -101,8 +133,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }, options.header);
 
   function failure(err) {
-    if (callback) {
-      return callback(err);
+    if (done) {
+      return done(err);
     }
     throw err;
   }
@@ -111,12 +143,12 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     return failure(new Error('secretOrPrivateKey must have a value'));
   }
 
-  if (secretOrPrivateKey != null && !(secretOrPrivateKey instanceof KeyObject)) {
+  if (secretOrPrivateKey != null && !(secretOrPrivateKey instanceof crypto.KeyObject)) {
     try {
-      secretOrPrivateKey = createPrivateKey(secretOrPrivateKey)
+      secretOrPrivateKey = crypto.createPrivateKey(secretOrPrivateKey)
     } catch (_) {
       try {
-        secretOrPrivateKey = createSecretKey(typeof secretOrPrivateKey === 'string' ? Buffer.from(secretOrPrivateKey) : secretOrPrivateKey)
+        secretOrPrivateKey = crypto.createSecretKey(typeof secretOrPrivateKey === 'string' ? Buffer.from(secretOrPrivateKey) : secretOrPrivateKey)
       } catch (_) {
         return failure(new Error('secretOrPrivateKey is not valid key material'));
       }
@@ -128,12 +160,6 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   } else if (/^(?:RS|PS|ES)/.test(header.alg)) {
     if (secretOrPrivateKey.type !== 'private') {
       return failure(new Error((`secretOrPrivateKey must be an asymmetric key when using ${header.alg}`)))
-    }
-    if (!options.allowInsecureKeySizes &&
-      !header.alg.startsWith('ES') &&
-      secretOrPrivateKey.asymmetricKeyDetails !== undefined && //KeyObject.asymmetricKeyDetails is supported in Node 15+
-      secretOrPrivateKey.asymmetricKeyDetails.modulusLength < 2048) {
-      return failure(new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`));
     }
   }
 
@@ -224,30 +250,50 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   });
 
-  const encoding = options.encoding || 'utf8';
+  const sync = done !== callback || header.alg === 'none' || header.alg.startsWith('HS') || parseInt(process.versions.node, 10) < 16 || options.allowInvalidAsymmetricKeyTypes;
+  const data = `${encodeHeader(header)}.${encodePayload(payload, options.encoding)}`
 
-  if (typeof callback === 'function') {
-    callback = callback && once(callback);
-
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: payload,
-      encoding: encoding
-    }).once('error', callback)
-      .once('done', function (signature) {
-        // TODO: Remove in favor of the modulus length check before signing once node 15+ is the minimum supported version
-        if(!options.allowInsecureKeySizes && /^(?:RS|PS)/.test(header.alg) && signature.length < 256) {
-          return callback(new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`))
-        }
-        callback(null, signature);
-      });
-  } else {
-    let signature = jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
-    // TODO: Remove in favor of the modulus length check before signing once node 15+ is the minimum supported version
-    if(!options.allowInsecureKeySizes && /^(?:RS|PS)/.test(header.alg) && signature.length < 256) {
-      throw new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`)
-    }
-    return signature
+  if (header.alg === 'none') {
+    return done(null, `${data}.`)
   }
+
+  if (header.alg.startsWith('HS')) {
+    const signature = encodeBase64url(crypto.createHmac(`sha${header.alg.substring(2, 5)}`, secretOrPrivateKey).update(Buffer.from(data)).digest());
+    return done(null, `${data}.${signature}`);
+  }
+
+  if (sync) {
+    const { digest, key } = oneShotAlgs(header.alg, secretOrPrivateKey);
+
+    let signature;
+    try {
+      signature = crypto.sign(digest, Buffer.from(data), key);
+    } catch (err) {
+      return done(err);
+    }
+
+    if(!options.allowInsecureKeySizes && (header.alg.startsWith('RS') || header.alg.startsWith('PS')) && signature.byteLength < 256) {
+      return done(new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`));
+    }
+
+    const token = `${data}.${encodeBase64url(signature)}`;
+
+    return done(null, token);
+  }
+
+  const { digest, key } = oneShotAlgs(header.alg, secretOrPrivateKey);
+
+  crypto.sign(digest, Buffer.from(data), key, (err, signature) => {
+    if (err) {
+      return done(err);
+    }
+
+    if(!options.allowInsecureKeySizes && (header.alg.startsWith('RS') || header.alg.startsWith('PS')) && signature.byteLength < 256) {
+      return done(new Error(`secretOrPrivateKey has a minimum key size of 2048 bits for ${header.alg}`));
+    }
+
+    const token = `${data}.${encodeBase64url(signature)}`;
+
+    return done(null, token);
+  });
 };

@@ -3,7 +3,7 @@ version: 2.1
 # Thanks to https://github.com/teppeis-sandbox/circleci2-multiple-node-versions
 
 commands:
-  test-nodejs:
+  test-modern:
     steps:
       - run:
           name: Versions
@@ -15,28 +15,50 @@ commands:
       - run:
           name: Test
           command: npm test
+  test-legacy:
+    steps:
+      - run:
+          name: Versions
+          command: npm version
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Test
+          command: npm run test-only
 
 jobs:
   node-v12:
     docker:
       - image: node:12
     steps:
-      - test-nodejs
+      - test-legacy
   node-v14:
     docker:
       - image: node:14
     steps:
-      - test-nodejs
+      - test-legacy
   node-v16:
     docker:
       - image: node:16
     steps:
-      - test-nodejs
+      - test-modern
   node-v18:
     docker:
       - image: node:18
     steps:
-      - test-nodejs
+      - test-modern
+  node-v20:
+    docker:
+      - image: node:20
+    steps:
+      - test-modern
+  node-v22:
+    docker:
+      - image: node:22
+    steps:
+      - test-modern
 
 workflows:
   node-multi-build:
@@ -45,3 +67,5 @@ workflows:
       - node-v14
       - node-v16
       - node-v18
+      - node-v20
+      - node-v22

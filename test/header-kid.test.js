@@ -75,7 +75,7 @@ describe('keyid', function() {
     });
 
     it('should add "kid" header when "keyid" option is provided and a Buffer payload', function(done) {
-      signWithKeyId('foo', new Buffer('a Buffer payload'), (err, token) => {
+      signWithKeyId('foo', Buffer.from('a Buffer payload'), (err, token) => {
         testUtils.asyncCheck(done, () => {
           const decoded = jwt.decode(token, {complete: true});
           expect(err).to.be.null;

@@ -77,7 +77,7 @@ describe('subject', function() {
     });
 
     it('should error with a Buffer payload', function (done) {
-      signWithSubject('foo', new Buffer('a Buffer payload'), (err) => {
+      signWithSubject('foo', Buffer.from('a Buffer payload'), (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property(

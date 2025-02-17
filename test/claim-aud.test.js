@@ -77,7 +77,7 @@ describe('audience', function() {
     });
 
     it('should error with a Buffer payload', function (done) {
-      signWithAudience('my_aud', new Buffer('a Buffer payload'), (err) => {
+      signWithAudience('my_aud', Buffer.from('a Buffer payload'), (err) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.instanceOf(Error);
           expect(err).to.have.property('message', 'invalid audience option for object payload');

@@ -1,13 +1,7 @@
 # jsonwebtoken
 
-| **Build**                                                                                                                               | **Dependency**                                                                                                         |
-|-----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken) |
-
 
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
-
-This was developed against `draft-ietf-oauth-json-web-token-08`. It makes use of [node-jws](https://github.com/brianloveswords/node-jws)
 
 # Install
 
@@ -33,8 +27,8 @@ $ npm install jsonwebtoken
 
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
-`secretOrPrivateKey` is a string (utf-8 encoded), buffer, object, or KeyObject containing either the secret for HMAC algorithms or the PEM
-encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+`secretOrPrivateKey` is a [KeyObject] (preferred), string (utf-8 encoded), buffer, object, or any valid input to [crypto.createPrivateKey] or [crypto.createSecretKey] containing either the secret for HMAC algorithms or the private key for RSA, ECDSA, or EdDSA.
+
 When signing with RSA algorithms the minimum modulus length is 2048 except when the allowInsecureKeySizes option is set to true. Private keys below this size will be rejected with an error.
 
 `options`:
@@ -52,8 +46,8 @@ When signing with RSA algorithms the minimum modulus length is 2048 except when 
 * `header`
 * `keyid`
 * `mutatePayload`: if true, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it but before it has been encoded into a token.
-* `allowInsecureKeySizes`: if true allows private keys with a modulus below 2048 to be used for RSA
-* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+* `allowInsecureKeySizes`: if true allows private keys with a modulus below 2048 to be used for RSA. This option is intended only for backwards compatibility and should be avoided.
+* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatibility and should be avoided.
 
 
 
@@ -133,8 +127,8 @@ jwt.sign({
 
 `token` is the JsonWebToken string
 
-`secretOrPublicKey` is a string (utf-8 encoded), buffer, or KeyObject containing either the secret for HMAC algorithms, or the PEM
-encoded public key for RSA and ECDSA.
+`secretOrPublicKey` is a [KeyObject] (preferred), string (utf-8 encoded), buffer, object, or any valid input to [crypto.createPublicKey] or [crypto.createSecretKey] containing either the secret for HMAC algorithms or the private key for RSA, ECDSA, or EdDSA.
+
 If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
@@ -144,9 +138,11 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. 
   > If not specified a defaults will be used based on the type of key provided
   > * secret - ['HS256', 'HS384', 'HS512']
-  > * rsa - ['RS256', 'RS384', 'RS512']
-  > * ec - ['ES256', 'ES384', 'ES512']
-  > * default - ['RS256', 'RS384', 'RS512']
+  > * rsa - ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512']
+  > * rsa-pss - ['PS256', 'PS384', 'PS512']
+  > * ec - ['ES256', 'ES256K', 'ES384', 'ES512']
+  > * ed25519 - ['EdDSA', 'Ed25519']
+  > * ed448 - ['EdDSA', 'Ed448']
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
@@ -160,7 +156,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > Eg: `1000`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
-* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+* `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatibility and should be avoided.
 
 ```js
 // verify a token symmetric - synchronous
@@ -352,9 +348,9 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 ```
 
 
-## Algorithms supported
+## Supported algorithms
 
-Array of supported algorithms. The following algorithms are currently supported.
+The following algorithms from the [IANA registry](https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms) are supported.
 
 | alg Parameter Value | Digital Signature or MAC Algorithm                                     |
 |---------------------|------------------------------------------------------------------------|
@@ -368,8 +364,12 @@ Array of supported algorithms. The following algorithms are currently supported.
 | PS384               | RSASSA-PSS using SHA-384 hash algorithm (only node ^6.12.0 OR >=8.0.0) |
 | PS512               | RSASSA-PSS using SHA-512 hash algorithm (only node ^6.12.0 OR >=8.0.0) |
 | ES256               | ECDSA using P-256 curve and SHA-256 hash algorithm                     |
+| ES256K              | ECDSA using secp256k1 curve and SHA-256 hash algorithm                 |
 | ES384               | ECDSA using P-384 curve and SHA-384 hash algorithm                     |
 | ES512               | ECDSA using P-521 curve and SHA-512 hash algorithm                     |
+| EdDSA (deprecated)  | EdDSA using Ed25519 or Ed448                                           |
+| Ed25519             | EdDSA using Ed25519                                                    |
+| Ed448               | EdDSA using Ed448                                                      |
 | none                | No digital signature or MAC value included                             |
 
 ## Refreshing JWTs
@@ -394,3 +394,8 @@ If you have found a bug or if you have a feature request, please report them at 
 ## License
 
 This project is licensed under the MIT license. See the [LICENSE](LICENSE) file for more info.
+
+[crypto.createPublicKey]: https://nodejs.org/api/crypto.html#cryptocreatepublickeykey
+[crypto.createPrivateKey]: https://nodejs.org/api/crypto.html#cryptocreateprivatekeykey
+[crypto.createSecretKey]: https://nodejs.org/api/crypto.html#cryptocreatesecretkeykey-encoding
+[KeyObject]: https://nodejs.org/api/crypto.html#class-keyobject
