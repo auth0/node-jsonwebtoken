@@ -2,7 +2,19 @@
   "name": "jsonwebtoken",
   "version": "9.0.2",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
-  "main": "index.js",
+  "keywords": [
+    "jwt"
+  ],
+  "author": "auth0",
+  "exports": {
+    ".": {
+      "module": "./dist/cjs/index.js",
+      "import": {
+        "node": "./dist/esm/index.js"
+      },
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "nyc": {
     "check-coverage": true,
     "lines": 95,
@@ -19,21 +31,13 @@
     ]
   },
   "scripts": {
-    "lint": "eslint .",
+    "prebuild": "rimraf dist",
+    "build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json && tsc-alias --project tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
     "coverage": "nyc mocha --use_strict",
+    "lint": "eslint .",
     "test": "npm run lint && npm run coverage && cost-of-modules"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/auth0/node-jsonwebtoken"
-  },
-  "keywords": [
-    "jwt"
-  ],
-  "author": "auth0",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/auth0/node-jsonwebtoken/issues"
   },
   "dependencies": {
     "jws": "^3.2.2",
@@ -43,11 +47,20 @@
     "lodash.isnumber": "^3.0.3",
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
-    "lodash.once": "^4.0.0",
     "ms": "^2.1.1",
     "semver": "^7.5.4"
   },
   "devDependencies": {
+    "@types/jws": "^3.2.10",
+    "@types/lodash.includes": "^4.3.9",
+    "@types/lodash.isboolean": "^3.0.9",
+    "@types/lodash.isinteger": "^4.0.9",
+    "@types/lodash.isnumber": "^3.0.9",
+    "@types/lodash.isplainobject": "^4.0.9",
+    "@types/lodash.isstring": "^4.0.9",
+    "@types/ms": "^2.1.0",
+    "@types/node": "^22.14.0",
+    "@types/semver": "^7.7.0",
     "atob": "^2.1.2",
     "chai": "^4.1.2",
     "conventional-changelog": "~1.1.0",
@@ -56,16 +69,21 @@
     "mocha": "^5.2.0",
     "nsp": "^2.6.2",
     "nyc": "^11.9.0",
-    "sinon": "^6.0.0"
+    "rimraf": "^6.0.1",
+    "sinon": "^6.0.0",
+    "tsc-alias": "^1.8.13",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "npm": ">=6",
     "node": ">=12"
   },
-  "files": [
-    "lib",
-    "decode.js",
-    "sign.js",
-    "verify.js"
-  ]
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auth0/node-jsonwebtoken"
+  },
+  "bugs": {
+    "url": "https://github.com/auth0/node-jsonwebtoken/issues"
+  },
+  "license": "MIT"
 }
