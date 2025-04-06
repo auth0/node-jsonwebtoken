@@ -21,7 +21,8 @@
     "build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias --project tsconfig.cjs.json",
     "build:esm": "tsc --project tsconfig.esm.json && tsc-alias --project tsconfig.esm.json",
     "build": "npm run build:cjs && npm run build:esm",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "husky"
   },
   "dependencies": {
     "jws": "^3.2.2",
@@ -35,6 +36,8 @@
     "semver": "^7.5.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@types/jws": "^3.2.10",
     "@types/lodash.includes": "^4.3.9",
     "@types/lodash.isboolean": "^3.0.9",
@@ -46,6 +49,7 @@
     "@types/node": "^22.14.0",
     "@types/semver": "^7.7.0",
     "atob": "^2.1.2",
+    "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "sinon": "^6.0.0",
     "tsc-alias": "^1.8.13",
