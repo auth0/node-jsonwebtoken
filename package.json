@@ -70,6 +70,7 @@
     "@typescript-eslint/parser": "^8.29.0",
     "atob": "^2.1.2",
     "eslint": "^9.24.0",
+    "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-prettier": "^5.2.6",
     "globals": "^16.0.0",
     "husky": "^9.1.7",

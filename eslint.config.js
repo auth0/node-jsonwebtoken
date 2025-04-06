@@ -7,6 +7,8 @@ import parser from '@typescript-eslint/parser'
 
 import prettier from 'eslint-plugin-prettier'
 
+import jest from 'eslint-plugin-jest'
+
 /** @type{import('eslint').Linter.Config[]} */
 const config = [
   js.configs.recommended,
@@ -36,6 +38,20 @@ const config = [
     },
     rules: {
       ...prettier.configs.recommended.rules
+    }
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    plugins: {
+      jest
+    },
+    languageOptions: {
+      globals: {
+        ...globals.jest
+      }
+    },
+    rules: {
+      ...jest.configs.recommended.rules
     }
   }
 ]
