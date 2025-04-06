@@ -1,6 +1,6 @@
 {
-  "name": "jsonwebtoken-ts",
-  "version": "9.0.2",
+  "name": "jsonwebtoken",
+  "version": "9.0.4",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "keywords": [
     "jwt"
@@ -22,10 +22,17 @@
       }
     }
   },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "files": [
     "./dist/**",
     "./package.json",
     "./package-lock.json",
+    "./tsconfig.json",
+    "./tsconfig.build.json",
+    "./tsconfig.cjs.json",
+    "./tsconfig.esm.json",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"
@@ -46,12 +53,6 @@
   },
   "dependencies": {
     "jws": "^3.2.2",
-    "lodash.includes": "^4.3.0",
-    "lodash.isboolean": "^3.0.3",
-    "lodash.isinteger": "^4.0.4",
-    "lodash.isnumber": "^3.0.3",
-    "lodash.isplainobject": "^4.0.6",
-    "lodash.isstring": "^4.0.1",
     "ms": "^2.1.1",
     "semver": "^7.5.4"
   },
@@ -62,12 +63,6 @@
     "@jest/globals": "^29.7.0",
     "@swc/jest": "^0.2.37",
     "@types/jws": "^3.2.10",
-    "@types/lodash.includes": "^4.3.9",
-    "@types/lodash.isboolean": "^3.0.9",
-    "@types/lodash.isinteger": "^4.0.9",
-    "@types/lodash.isnumber": "^3.0.9",
-    "@types/lodash.isplainobject": "^4.0.9",
-    "@types/lodash.isstring": "^4.0.9",
     "@types/ms": "^2.1.0",
     "@types/node": "^22.14.0",
     "@types/semver": "^7.7.0",
@@ -81,7 +76,6 @@
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
-    "sinon": "^6.0.0",
     "tsc-alias": "^1.8.13",
     "typescript": "^5.8.3"
   },
