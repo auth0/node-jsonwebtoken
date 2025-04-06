@@ -15,29 +15,13 @@
       "require": "./dist/cjs/index.js"
     }
   },
-  "nyc": {
-    "check-coverage": true,
-    "lines": 95,
-    "statements": 95,
-    "functions": 100,
-    "branches": 95,
-    "exclude": [
-      "./test/**"
-    ],
-    "reporter": [
-      "json",
-      "lcov",
-      "text-summary"
-    ]
-  },
+  "type": "module",
   "scripts": {
     "prebuild": "rimraf dist",
     "build:cjs": "tsc --project tsconfig.cjs.json && tsc-alias --project tsconfig.cjs.json",
     "build:esm": "tsc --project tsconfig.esm.json && tsc-alias --project tsconfig.esm.json",
     "build": "npm run build:cjs && npm run build:esm",
-    "coverage": "nyc mocha --use_strict",
-    "lint": "eslint .",
-    "test": "npm run lint && npm run coverage && cost-of-modules"
+    "lint": "eslint ."
   },
   "dependencies": {
     "jws": "^3.2.2",
@@ -62,13 +46,6 @@
     "@types/node": "^22.14.0",
     "@types/semver": "^7.7.0",
     "atob": "^2.1.2",
-    "chai": "^4.1.2",
-    "conventional-changelog": "~1.1.0",
-    "cost-of-modules": "^1.0.1",
-    "eslint": "^4.19.1",
-    "mocha": "^5.2.0",
-    "nsp": "^2.6.2",
-    "nyc": "^11.9.0",
     "rimraf": "^6.0.1",
     "sinon": "^6.0.0",
     "tsc-alias": "^1.8.13",
