@@ -18,6 +18,6 @@
   "module": {
     "type": "es6",
     "strict": true,
-    "noInterop": true
+    "noInterop": false
   }
 }
