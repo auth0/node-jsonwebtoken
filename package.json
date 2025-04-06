@@ -1,5 +1,5 @@
 {
-  "name": "jsonwebtoken",
+  "name": "jsonwebtoken-ts",
   "version": "9.0.2",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
   "keywords": [
@@ -8,13 +8,28 @@
   "author": "auth0",
   "exports": {
     ".": {
-      "module": "./dist/cjs/index.js",
+      "module": {
+        "types": "./dist/esm/index.d.ts",
+        "import": "./dist/esm/index.js"
+      },
       "import": {
+        "types": "./dist/esm/index.d.ts",
         "node": "./dist/esm/index.js"
       },
-      "require": "./dist/cjs/index.js"
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "require": "./dist/cjs/index.js"
+      }
     }
   },
+  "files": [
+    "./dist/**",
+    "./package.json",
+    "./package-lock.json",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "scripts": {
     "prebuild": "rimraf dist",
