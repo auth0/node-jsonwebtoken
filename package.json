@@ -22,6 +22,11 @@
     "build:esm": "tsc --project tsconfig.esm.json && tsc-alias --project tsconfig.esm.json",
     "build": "npm run build:cjs && npm run build:esm",
     "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:ci": "jest --passWithNoTests --ci",
+    "test:watch": "jest --passWithNoTests --watch",
+    "test:watchAll": "jest --passWithNoTests --watchAll",
+    "test:coverage": "jest --passWithNoTests --coverage",
     "prepare": "husky"
   },
   "dependencies": {
@@ -39,6 +44,8 @@
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@eslint/js": "^9.24.0",
+    "@jest/globals": "^29.7.0",
+    "@swc/jest": "^0.2.37",
     "@types/jws": "^3.2.10",
     "@types/lodash.includes": "^4.3.9",
     "@types/lodash.isboolean": "^3.0.9",
@@ -56,6 +63,7 @@
     "eslint-plugin-prettier": "^5.2.6",
     "globals": "^16.0.0",
     "husky": "^9.1.7",
+    "jest": "^29.7.0",
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "sinon": "^6.0.0",
