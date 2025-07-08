@@ -351,6 +351,9 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 });
 ```
 
+## Synchronous vs asynchronous
+
+There isn't any difference in performance between the synchronous and asynchronous APIs, because the asynchronous API calls the sync API internally. This means there's no reason to use the asynchronous API, and it's only there for historic reasons.
 
 ## Algorithms supported
 
