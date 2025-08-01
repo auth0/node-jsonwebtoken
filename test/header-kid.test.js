@@ -1,7 +1,6 @@
 'use strict';
 
 const jwt = require('../');
-const expect = require('chai').expect;
 const util = require('util');
 const testUtils = require('./test-utils');
 
@@ -13,8 +12,8 @@ function signWithKeyId(keyid, payload, callback) {
   testUtils.signJWTHelper(payload, 'secret', options, callback);
 }
 
-describe('keyid', function() {
-  describe('`jwt.sign` "keyid" option validation', function () {
+describe('keyid', () => {
+  describe('`jwt.sign` "keyid" option validation', () => {
     [
       true,
       false,
@@ -32,64 +31,64 @@ describe('keyid', function() {
       {},
       {foo: 'bar'},
     ].forEach((keyid) => {
-      it(`should error with with value ${util.inspect(keyid)}`, function (done) {
+      it(`should error with with value ${util.inspect(keyid)}`, (done) => {
         signWithKeyId(keyid, {}, (err) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.instanceOf(Error);
-            expect(err).to.have.property('message', '"keyid" must be a string');
+            expect(err).toBeInstanceOf(Error);
+            expect(err).toHaveProperty('message', '"keyid" must be a string');
           });
         });
       });
     });
 
     // undefined needs special treatment because {} is not the same as {keyid: undefined}
-    it('should error with with value undefined', function (done) {
+    it('should error with with value undefined', (done) => {
       testUtils.signJWTHelper({}, 'secret', {keyid: undefined, algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"keyid" must be a string');
+          expect(err).toBeInstanceOf(Error);
+          expect(err).toHaveProperty('message', '"keyid" must be a string');
         });
       });
     });
   });
 
-  describe('when signing a token', function () {
-    it('should not add "kid" header when "keyid" option not provided', function(done) {
+  describe('when signing a token', () => {
+    it('should not add "kid" header when "keyid" option not provided', (done) => {
       signWithKeyId(undefined, {}, (err, token) => {
         testUtils.asyncCheck(done, () => {
           const decoded = jwt.decode(token, {complete: true});
-          expect(err).to.be.null;
-          expect(decoded.header).to.not.have.property('kid');
+          expect(err).toBeNull();
+          expect(decoded.header).not.have.property('kid');
         });
       });
     });
 
-    it('should add "kid" header when "keyid" option is provided and an object payload', function(done) {
+    it('should add "kid" header when "keyid" option is provided and an object payload', (done) => {
       signWithKeyId('foo', {}, (err, token) => {
         testUtils.asyncCheck(done, () => {
           const decoded = jwt.decode(token, {complete: true});
-          expect(err).to.be.null;
-          expect(decoded.header).to.have.property('kid', 'foo');
+          expect(err).toBeNull();
+          expect(decoded.header).toHaveProperty('kid', 'foo');
         });
       });
     });
 
-    it('should add "kid" header when "keyid" option is provided and a Buffer payload', function(done) {
+    it('should add "kid" header when "keyid" option is provided and a Buffer payload', (done) => {
       signWithKeyId('foo', new Buffer('a Buffer payload'), (err, token) => {
         testUtils.asyncCheck(done, () => {
           const decoded = jwt.decode(token, {complete: true});
-          expect(err).to.be.null;
-          expect(decoded.header).to.have.property('kid', 'foo');
+          expect(err).toBeNull();
+          expect(decoded.header).toHaveProperty('kid', 'foo');
         });
       });
     });
 
-    it('should add "kid" header when "keyid" option is provided and a string payload', function(done) {
+    it('should add "kid" header when "keyid" option is provided and a string payload', (done) => {
       signWithKeyId('foo', 'a string payload', (err, token) => {
         testUtils.asyncCheck(done, () => {
           const decoded = jwt.decode(token, {complete: true});
-          expect(err).to.be.null;
-          expect(decoded.header).to.have.property('kid', 'foo');
+          expect(err).toBeNull();
+          expect(decoded.header).toHaveProperty('kid', 'foo');
         });
       });
     });

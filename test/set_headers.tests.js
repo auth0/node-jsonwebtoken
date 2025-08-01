@@ -1,18 +1,17 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
+const jwt = require('../index');
 
-describe('set header', function() {
+describe('set header', () => {
 
-  it('should add the header', function () {
-    var token = jwt.sign({foo: 123}, '123', { header: { foo: 'bar' } });
-    var decoded = jwt.decode(token, {complete: true});
-    expect(decoded.header.foo).to.equal('bar');
+  it('should add the header', () => {
+    const token = jwt.sign({foo: 123}, '123', { header: { foo: 'bar' } });
+    const decoded = jwt.decode(token, {complete: true});
+    expect(decoded.header.foo).toBe('bar');
   });
 
-  it('should allow overriding header', function () {
-    var token = jwt.sign({foo: 123}, '123', { header: { alg: 'HS512' } });
-    var decoded = jwt.decode(token, {complete: true});
-    expect(decoded.header.alg).to.equal('HS512');
+  it('should allow overriding header', () => {
+    const token = jwt.sign({foo: 123}, '123', { header: { alg: 'HS512' } });
+    const decoded = jwt.decode(token, {complete: true});
+    expect(decoded.header.alg).toBe('HS512');
   });
 
 });

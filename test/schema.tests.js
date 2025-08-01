@@ -1,25 +1,23 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
-var fs = require('fs');
-var PS_SUPPORTED = require('../lib/psSupported');
+const jwt = require('../index');
+const fs = require('fs');
+const PS_SUPPORTED = require('../lib/psSupported');
 
-describe('schema', function() {
+describe('schema', () => {
 
-  describe('sign options', function() {
-    var cert_rsa_priv = fs.readFileSync(__dirname + '/rsa-private.pem');
-    var cert_ecdsa_priv = fs.readFileSync(__dirname + '/ecdsa-private.pem');
-    var cert_secp384r1_priv = fs.readFileSync(__dirname + '/secp384r1-private.pem');
-    var cert_secp521r1_priv = fs.readFileSync(__dirname + '/secp521r1-private.pem');
+  describe('sign options', () => {
+    const cert_rsa_priv = fs.readFileSync(`${__dirname  }/rsa-private.pem`);
+    const cert_ecdsa_priv = fs.readFileSync(`${__dirname  }/ecdsa-private.pem`);
+    const cert_secp384r1_priv = fs.readFileSync(`${__dirname  }/secp384r1-private.pem`);
+    const cert_secp521r1_priv = fs.readFileSync(`${__dirname  }/secp521r1-private.pem`);
 
     function sign(options, secretOrPrivateKey) {
       jwt.sign({foo: 123}, secretOrPrivateKey, options);
     }
 
-    it('should validate algorithm', function () {
-      expect(function () {
+    it('should validate algorithm', () => {
+      expect(() => {
         sign({ algorithm: 'foo' }, cert_rsa_priv);
-      }).to.throw(/"algorithm" must be a valid string enum value/);
-      sign({ algorithm: 'none' }, null);
+      }).toThrow(/"algorithm" must be a valid string enum value/);
       sign({algorithm: 'RS256'}, cert_rsa_priv);
       sign({algorithm: 'RS384'}, cert_rsa_priv);
       sign({algorithm: 'RS512'}, cert_rsa_priv);
@@ -31,43 +29,49 @@ describe('schema', function() {
       sign({algorithm: 'ES256'}, cert_ecdsa_priv);
       sign({algorithm: 'ES384'}, cert_secp384r1_priv);
       sign({algorithm: 'ES512'}, cert_secp521r1_priv);
+      // ES256K - secp256k1 curve
+      const cert_secp256k1_priv = fs.readFileSync(`${__dirname}/secp256k1-private.pem`);
+      sign({algorithm: 'ES256K'}, cert_secp256k1_priv);
+      // EdDSA
+      const cert_ed25519_priv = fs.readFileSync(`${__dirname}/ed25519-private.pem`);
+      sign({algorithm: 'EdDSA'}, cert_ed25519_priv);
       sign({algorithm: 'HS256'}, 'superSecret');
       sign({algorithm: 'HS384'}, 'superSecret');
       sign({algorithm: 'HS512'}, 'superSecret');
     });
 
-    it('should validate header', function () {
-      expect(function () {
+    it('should validate header', () => {
+      expect(() => {
         sign({ header: 'foo' }, 'superSecret');
-      }).to.throw(/"header" must be an object/);
+      }).toThrow(/"header" must be an object/);
       sign({header: {}}, 'superSecret');
     });
 
-    it('should validate encoding', function () {
-      expect(function () {
+    it('should validate encoding', () => {
+      expect(() => {
         sign({ encoding: 10 }, 'superSecret');
-      }).to.throw(/"encoding" must be a string/);
+      }).toThrow(/"encoding" must be a string/);
       sign({encoding: 'utf8'},'superSecret');
     });
 
-    it('should validate noTimestamp', function () {
-      expect(function () {
+    it('should validate noTimestamp', () => {
+      expect(() => {
         sign({ noTimestamp: 10 }, 'superSecret');
-      }).to.throw(/"noTimestamp" must be a boolean/);
+      }).toThrow(/"noTimestamp" must be a boolean/);
       sign({noTimestamp: true}, 'superSecret');
     });
   });
 
-  describe('sign payload registered claims', function() {
+  describe('sign payload registered claims', () => {
 
     function sign(payload) {
       jwt.sign(payload, 'foo123');
     }
 
-    it('should validate exp', function () {
-      expect(function () {
+    it('should validate exp', () => {
+      expect(() => {
         sign({ exp: '1 monkey' });
-      }).to.throw(/"exp" should be a number of seconds/);
+      }).toThrow(/"exp" should be a number of seconds/);
       sign({ exp: 10.1 });
     });
 

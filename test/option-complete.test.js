@@ -1,19 +1,18 @@
 'use strict';
 
 const jws = require('jws');
-const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const testUtils = require('./test-utils')
 
-describe('complete option', function () {
+describe('complete option', () => {
   const secret = fs.readFileSync(path.join(__dirname, 'priv.pem'));
   const pub = fs.readFileSync(path.join(__dirname, 'pub.pem'));
 
   const header = { alg: 'RS256' };
   const payload = { iat: Math.floor(Date.now() / 1000 ) };
   const signed = jws.sign({ header, payload, secret, encoding: 'utf8' });
-  const signature = jws.decode(signed).signature;
+  const {signature} = jws.decode(signed);
 
   [
     {
@@ -21,13 +20,13 @@ describe('complete option', function () {
       complete: true,
     },
   ].forEach((testCase) => {
-    it(testCase.description, function (done) {
+    it(testCase.description, (done) => {
       testUtils.verifyJWTHelper(signed, pub, { typ: 'JWT', complete: testCase.complete }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded.header).to.have.property('alg', header.alg);
-          expect(decoded.payload).to.have.property('iat', payload.iat);
-          expect(decoded).to.have.property('signature', signature);
+          expect(err).toBeNull();
+          expect(decoded.header).toHaveProperty('alg', header.alg);
+          expect(decoded.payload).toHaveProperty('iat', payload.iat);
+          expect(decoded).toHaveProperty('signature', signature);
         });
       });
     });
@@ -38,14 +37,14 @@ describe('complete option', function () {
       complete: false,
     },
   ].forEach((testCase) => {
-    it(testCase.description, function (done) {
+    it(testCase.description, (done) => {
       testUtils.verifyJWTHelper(signed, pub, { typ: 'JWT', complete: testCase.complete }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded.header).to.be.undefined;
-          expect(decoded.payload).to.be.undefined;
-          expect(decoded.signature).to.be.undefined;
-          expect(decoded).to.have.property('iat', payload.iat);
+          expect(err).toBeNull();
+          expect(decoded.header).toBeUndefined();
+          expect(decoded.payload).toBeUndefined();
+          expect(decoded.signature).toBeUndefined();
+          expect(decoded).toHaveProperty('iat', payload.iat);
         });
       });
     });

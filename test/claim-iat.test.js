@@ -1,8 +1,6 @@
 'use strict';
 
 const jwt = require('../');
-const expect = require('chai').expect;
-const sinon = require('sinon');
 const util = require('util');
 const testUtils = require('./test-utils');
 const jws = require('jws');
@@ -23,8 +21,8 @@ function verifyWithIssueAt(token, maxAge, options, secret, callback) {
   testUtils.verifyJWTHelper(token, secret, opts, callback);
 }
 
-describe('issue at', function() {
-  describe('`jwt.sign` "iat" claim validation', function () {
+describe('issue at', () => {
+  describe('`jwt.sign` "iat" claim validation', () => {
     [
       true,
       false,
@@ -36,28 +34,28 @@ describe('issue at', function() {
       {},
       {foo: 'bar'},
     ].forEach((iat) => {
-      it(`should error with iat of ${util.inspect(iat)}`, function (done) {
+      it(`should error with iat of ${util.inspect(iat)}`, (done) => {
         signWithIssueAt(iat, {}, (err) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.instanceOf(Error);
-            expect(err.message).to.equal('"iat" should be a number of seconds');
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('"iat" should be a number of seconds');
           });
         });
       });
     });
 
     // undefined needs special treatment because {} is not the same as {iat: undefined}
-    it('should error with iat of undefined', function (done) {
+    it('should error with iat of undefined', (done) => {
       testUtils.signJWTHelper({iat: undefined}, 'secret', {algorithm: 'HS256'}, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err.message).to.equal('"iat" should be a number of seconds');
+          expect(err).toBeInstanceOf(Error);
+          expect(err.message).toBe('"iat" should be a number of seconds');
         });
       });
     });
   });
 
-  describe('"iat" in payload with "maxAge" option validation', function () {
+  describe('"iat" in payload with "maxAge" option validation', () => {
     [
       true,
       false,
@@ -73,27 +71,27 @@ describe('issue at', function() {
       {},
       {foo: 'bar'},
     ].forEach((iat) => {
-      it(`should error with iat of ${util.inspect(iat)}`, function (done) {
+      it(`should error with iat of ${util.inspect(iat)}`, (done) => {
         const header = { alg: 'HS256' };
         const payload = { iat };
         const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
         verifyWithIssueAt(token, '1 min', {}, 'secret', (err) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err.message).to.equal('iat required when maxAge is specified');
+            expect(err).toBeInstanceOf(jwt.JsonWebTokenError);
+            expect(err.message).toBe('iat required when maxAge is specified');
           });
         });
       });
     })
   });
 
-  describe('when signing a token', function () {
+  describe('when signing a token', () => {
     let fakeClock;
-    beforeEach(function () {
-      fakeClock = sinon.useFakeTimers({now: 60000});
+    beforeEach(() => {
+      fakeClock = jest.useFakeTimers();
     });
 
-    afterEach(function () {
+    afterEach(() => {
       fakeClock.uninstall();
     });
 
@@ -144,10 +142,10 @@ describe('issue at', function() {
         options: {noTimestamp: true}
       },
     ].forEach((testCase) => {
-      it(testCase.description, function (done) {
+      it(testCase.description, (done) => {
         signWithIssueAt(testCase.iat, testCase.options, (err, token) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.null;
+            expect(err).toBeNull();
             expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
           });
         });
@@ -155,14 +153,14 @@ describe('issue at', function() {
     });
   });
 
-  describe('when verifying a token', function() {
+  describe('when verifying a token', () => {
     let fakeClock;
 
-    beforeEach(function() {
-      fakeClock = sinon.useFakeTimers({now: 60000});
+    beforeEach(() => {
+      fakeClock = jest.useFakeTimers();
     });
 
-    afterEach(function () {
+    afterEach(() => {
       fakeClock.uninstall();
     });
 
@@ -186,13 +184,13 @@ describe('issue at', function() {
         options: {clockTimestamp: 2},
       },
     ].forEach((testCase) => {
-      it(testCase.description, function (done) {
+      it(testCase.description, (done) => {
         const token = jwt.sign({}, 'secret', {algorithm: 'HS256'});
         fakeClock.tick(testCase.clockAdvance);
         verifyWithIssueAt(token, testCase.maxAge, testCase.options, 'secret', (err, token) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.null;
-            expect(token).to.be.a('object');
+            expect(err).toBeNull();
+            expect(typeof token).toBe('object');
           });
         });
       });
@@ -232,42 +230,42 @@ describe('issue at', function() {
         expectedExpiresAt: 68000,
       },
     ].forEach((testCase) => {
-      it(testCase.description, function(done) {
+      it(testCase.description, (done) => {
         const expectedExpiresAtDate = new Date(testCase.expectedExpiresAt);
         const token = jwt.sign({}, 'secret', {algorithm: 'HS256'});
         fakeClock.tick(testCase.clockAdvance);
 
         verifyWithIssueAt(token, testCase.maxAge, testCase.options, 'secret', (err) => {
           testUtils.asyncCheck(done, () => {
-            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-            expect(err.message).to.equal(testCase.expectedError);
-            expect(err.expiredAt).to.deep.equal(expectedExpiresAtDate);
+            expect(err).toBeInstanceOf(jwt.JsonWebTokenError);
+            expect(err.message).toBe(testCase.expectedError);
+            expect(err.expiredAt).toEqual(expectedExpiresAtDate);
           });
         });
       });
     });
   });
 
-  describe('with string payload', function () {
-    it('should not add iat to string', function (done) {
+  describe('with string payload', () => {
+    it('should not add iat to string', (done) => {
       const payload = 'string payload';
       const options = {algorithm: 'HS256'};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
         const decoded = jwt.decode(token);
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.equal(payload);
+          expect(err).toBeNull();
+          expect(decoded).toBe(payload);
         });
       });
     });
 
-    it('should not add iat to stringified object', function (done) {
+    it('should not add iat to stringified object', (done) => {
       const payload = '{}';
       const options = {algorithm: 'HS256', header: {typ: 'JWT'}};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
         const decoded = jwt.decode(token);
         testUtils.asyncCheck(done, () => {
-          expect(err).to.equal(null);
+          expect(err).toBe(null);
           expect(JSON.stringify(decoded)).to.equal(payload);
         });
       });

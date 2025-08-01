@@ -1,11 +1,10 @@
-var jwt = require('../index');
-var expect = require('chai').expect;
+const jwt = require('../index');
 
-describe('decoding', function() {
+describe('decoding', () => {
 
-  it('should not crash when decoding a null token', function () {
-    var decoded = jwt.decode("null");
-    expect(decoded).to.equal(null);
+  it('should not crash when decoding a null token', () => {
+    const decoded = jwt.decode("null");
+    expect(decoded).toBe(null);
   });
 
 });

@@ -1,14 +1,13 @@
 'use strict';
 
 const jwt = require('../');
-const expect = require('chai').expect;
 const util = require('util');
 const testUtils = require('./test-utils')
 
-describe('nonce option', function () {
+describe('nonce option', () => {
   let token;
 
-  beforeEach(function () {
+  beforeEach(() => {
     token = jwt.sign({ nonce: 'abcde' }, 'secret', { algorithm: 'HS256' });
   });
   [
@@ -17,11 +16,11 @@ describe('nonce option', function () {
       nonce: 'abcde',
     },
   ].forEach((testCase) => {
-    it(testCase.description, function (done) {
+    it(testCase.description, (done) => {
       testUtils.verifyJWTHelper(token, 'secret', { nonce: testCase.nonce }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('nonce', 'abcde');
+          expect(err).toBeNull();
+          expect(decoded).toHaveProperty('nonce', 'abcde');
         });
       });
     });
@@ -45,11 +44,11 @@ describe('nonce option', function () {
     {},
     { foo: 'bar' },
   ].forEach((nonce) => {
-    it(`should error with value ${util.inspect(nonce)}`, function (done) {
+    it(`should error with value ${util.inspect(nonce)}`, (done) => {
       testUtils.verifyJWTHelper(token, 'secret', { nonce }, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
-          expect(err).to.have.property('message', 'nonce must be a non-empty string')
+          expect(err).toBeInstanceOf(jwt.JsonWebTokenError);
+          expect(err).toHaveProperty('message', 'nonce must be a non-empty string')
         });
       });
     });

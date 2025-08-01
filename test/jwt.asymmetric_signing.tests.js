@@ -3,8 +3,6 @@ const PS_SUPPORTED = require('../lib/psSupported');
 const fs = require('fs');
 const path = require('path');
 
-const expect = require('chai').expect;
-const assert = require('chai').assert;
 const ms = require('ms');
 
 function loadKey(filename) {
@@ -12,22 +10,64 @@ function loadKey(filename) {
 }
 
 const algorithms = {
+  // RSA algorithms
   RS256: {
     pub_key: loadKey('pub.pem'),
     priv_key: loadKey('priv.pem'),
     invalid_pub_key: loadKey('invalid_pub.pem')
   },
+  RS384: {
+    pub_key: loadKey('pub.pem'),
+    priv_key: loadKey('priv.pem'),
+    invalid_pub_key: loadKey('invalid_pub.pem')
+  },
+  RS512: {
+    pub_key: loadKey('pub.pem'),
+    priv_key: loadKey('priv.pem'),
+    invalid_pub_key: loadKey('invalid_pub.pem')
+  },
+  // ECDSA algorithms
   ES256: {
-    // openssl ecparam -name secp256r1 -genkey -param_enc explicit -out ecdsa-private.pem
     priv_key: loadKey('ecdsa-private.pem'),
-    // openssl ec -in ecdsa-private.pem -pubout -out ecdsa-public.pem
     pub_key: loadKey('ecdsa-public.pem'),
     invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
+  },
+  ES384: {
+    priv_key: loadKey('secp384r1-private.pem'),
+    pub_key: loadKey('secp384r1-public.pem'),
+    invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
+  },
+  ES512: {
+    priv_key: loadKey('secp521r1-private.pem'),
+    pub_key: loadKey('secp521r1-public.pem'),
+    invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
+  },
+  ES256K: {
+    priv_key: loadKey('secp256k1-private.pem'),
+    pub_key: loadKey('secp256k1-public.pem'),
+    invalid_pub_key: loadKey('ecdsa-public-invalid.pem')
+  },
+  // EdDSA algorithms
+  EdDSA: {
+    priv_key: loadKey('ed25519-private.pem'),
+    pub_key: loadKey('ed25519-public.pem'),
+    invalid_pub_key: loadKey('ed448-public.pem')  // Different curve as invalid key
   }
 };
 
 if (PS_SUPPORTED) {
+  // RSA-PSS algorithms
   algorithms.PS256 = {
+    pub_key: loadKey('pub.pem'),
+    priv_key: loadKey('priv.pem'),
+    invalid_pub_key: loadKey('invalid_pub.pem')
+  };
+  algorithms.PS384 = {
+    pub_key: loadKey('pub.pem'),
+    priv_key: loadKey('priv.pem'),
+    invalid_pub_key: loadKey('invalid_pub.pem')
+  };
+  algorithms.PS512 = {
     pub_key: loadKey('pub.pem'),
     priv_key: loadKey('priv.pem'),
     invalid_pub_key: loadKey('invalid_pub.pem')
@@ -35,174 +75,185 @@ if (PS_SUPPORTED) {
 }
 
 
-describe('Asymmetric Algorithms', function() {
-  Object.keys(algorithms).forEach(function (algorithm) {
-    describe(algorithm, function () {
-      const pub = algorithms[algorithm].pub_key;
-      const priv = algorithms[algorithm].priv_key;
+describe('Asymmetric Algorithms', () => {
+  Object.keys(algorithms).forEach((algorithm) => {
+    describe(algorithm, () => {
+      let pub, priv, invalid_pub;
 
-      // "invalid" means it is not the public key for the loaded "priv" key
-      const invalid_pub = algorithms[algorithm].invalid_pub_key;
+      beforeEach(() => {
+        pub = algorithms[algorithm].pub_key;
+        priv = algorithms[algorithm].priv_key;
+        // "invalid" means it is not the public key for the loaded "priv" key
+        invalid_pub = algorithms[algorithm].invalid_pub_key;
+      });
 
-      describe('when signing a token', function () {
-        const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm });
+      describe('when signing a token', () => {
+        let token;
 
-        it('should be syntactically valid', function () {
-          expect(token).to.be.a('string');
-          expect(token.split('.')).to.have.length(3);
+        beforeEach(() => {
+          token = jwt.sign({ foo: 'bar' }, priv, { algorithm });
         });
 
-        context('asynchronous', function () {
-          it('should validate with public key', function (done) {
-            jwt.verify(token, pub, function (err, decoded) {
-              assert.ok(decoded.foo);
-              assert.equal('bar', decoded.foo);
+        it('should be syntactically valid', () => {
+          expect(typeof token).toBe('string');
+          expect(token.split('.')).toHaveLength(3);
+        });
+
+        describe('asynchronous', () => {
+          it('should validate with public key', (done) => {
+            jwt.verify(token, pub, (err, decoded) => {
+              expect(decoded.foo).toBeTruthy();
+              expect(decoded.foo).toBe('bar');
               done();
             });
           });
 
-          it('should throw with invalid public key', function (done) {
-            jwt.verify(token, invalid_pub, function (err, decoded) {
-              assert.isUndefined(decoded);
-              assert.isNotNull(err);
+          it('should throw with invalid public key', (done) => {
+            jwt.verify(token, invalid_pub, (err, decoded) => {
+              expect(decoded).toBeUndefined();
+              expect(err).not.toBeNull();
               done();
             });
           });
         });
 
-        context('synchronous', function () {
-          it('should validate with public key', function () {
+        describe('synchronous', () => {
+          it('should validate with public key', () => {
             const decoded = jwt.verify(token, pub);
-            assert.ok(decoded.foo);
-            assert.equal('bar', decoded.foo);
+            expect(decoded.foo).toBeTruthy();
+            expect(decoded.foo).toBe('bar');
           });
 
-          it('should throw with invalid public key', function () {
+          it('should throw with invalid public key', () => {
             const jwtVerify = jwt.verify.bind(null, token, invalid_pub)
-            assert.throw(jwtVerify, 'invalid signature');
+            expect(jwtVerify).toThrow('invalid signature');
           });
         });
 
       });
 
-      describe('when signing a token with expiration', function () {
-        it('should be valid expiration', function (done) {
-          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, expiresIn: '10m' });
-          jwt.verify(token, pub, function (err, decoded) {
-            assert.isNotNull(decoded);
-            assert.isNull(err);
+      describe('when signing a token with expiration', () => {
+        it('should be valid expiration', (done) => {
+          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm, expiresIn: '10m' });
+          jwt.verify(token, pub, (err, decoded) => {
+            expect(decoded).not.toBeNull();
+            expect(err).toBeNull();
             done();
           });
         });
 
-        it('should be invalid', function (done) {
+        it('should be invalid', (done) => {
           // expired token
-          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, expiresIn: -1 * ms('10m') });
-          jwt.verify(token, pub, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'TokenExpiredError');
-            assert.instanceOf(err.expiredAt, Date);
-            assert.instanceOf(err, jwt.TokenExpiredError);
+          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm, expiresIn: -1 * ms('10m') });
+          jwt.verify(token, pub, (err, decoded) => {
+            expect(decoded).toBeUndefined();
+            expect(err).not.toBeNull();
+            expect(err.name).toBe('TokenExpiredError');
+            expect(err.expiredAt).toBeInstanceOf(Date);
+            expect(err).toBeInstanceOf(jwt.TokenExpiredError);
             done();
           });
         });
 
-        it('should NOT be invalid', function (done) {
+        it('should NOT be invalid', (done) => {
           // expired token
-          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm, expiresIn: -1 * ms('10m') });
+          const token = jwt.sign({ foo: 'bar' }, priv, { algorithm, expiresIn: -1 * ms('10m') });
 
-          jwt.verify(token, pub, { ignoreExpiration: true }, function (err, decoded) {
-            assert.ok(decoded.foo);
-            assert.equal('bar', decoded.foo);
+          jwt.verify(token, pub, { ignoreExpiration: true }, (err, decoded) => {
+            expect(decoded.foo).toBeTruthy();
+            expect(decoded.foo).toBe('bar');
             done();
           });
         });
       });
 
-      describe('when verifying a malformed token', function () {
-        it('should throw', function (done) {
-          jwt.verify('fruit.fruit.fruit', pub, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
-            assert.equal(err.name, 'JsonWebTokenError');
+      describe('when verifying a malformed token', () => {
+        it('should throw', (done) => {
+          jwt.verify('fruit.fruit.fruit', pub, (err, decoded) => {
+            expect(decoded).toBeUndefined();
+            expect(err).not.toBeNull();
+            expect(err.name).toBe('JsonWebTokenError');
             done();
           });
         });
       });
 
-      describe('when decoding a jwt token with additional parts', function () {
-        const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: algorithm });
+      describe('when decoding a jwt token with additional parts', () => {
+        let token;
 
-        it('should throw', function (done) {
-          jwt.verify(token + '.foo', pub, function (err, decoded) {
-            assert.isUndefined(decoded);
-            assert.isNotNull(err);
+        beforeEach(() => {
+          token = jwt.sign({ foo: 'bar' }, priv, { algorithm });
+        });
+
+        it('should throw', (done) => {
+          jwt.verify(`${token  }.foo`, pub, (err, decoded) => {
+            expect(decoded).toBeUndefined();
+            expect(err).not.toBeNull();
             done();
           });
         });
       });
 
-      describe('when decoding a invalid jwt token', function () {
-        it('should return null', function (done) {
+      describe('when decoding a invalid jwt token', () => {
+        it('should return null', (done) => {
           const payload = jwt.decode('whatever.token');
-          assert.isNull(payload);
+          expect(payload).toBeNull();
           done();
         });
       });
 
-      describe('when decoding a valid jwt token', function () {
-        it('should return the payload', function (done) {
+      describe('when decoding a valid jwt token', () => {
+        it('should return the payload', (done) => {
           const obj = { foo: 'bar' };
-          const token = jwt.sign(obj, priv, { algorithm: algorithm });
+          const token = jwt.sign(obj, priv, { algorithm });
           const payload = jwt.decode(token);
-          assert.equal(payload.foo, obj.foo);
+          expect(payload.foo).toBe(obj.foo);
           done();
         });
-        it('should return the header and payload and signature if complete option is set', function (done) {
+        it('should return the header and payload and signature if complete option is set', (done) => {
           const obj = { foo: 'bar' };
-          const token = jwt.sign(obj, priv, { algorithm: algorithm });
+          const token = jwt.sign(obj, priv, { algorithm });
           const decoded = jwt.decode(token, { complete: true });
-          assert.equal(decoded.payload.foo, obj.foo);
-          assert.deepEqual(decoded.header, { typ: 'JWT', alg: algorithm });
-          assert.ok(typeof decoded.signature == 'string');
+          expect(decoded.payload.foo).toBe(obj.foo);
+          expect(decoded.header).toEqual({ typ: 'JWT', alg: algorithm });
+          expect(typeof decoded.signature == 'string').toBeTruthy();
           done();
         });
       });
     });
   });
 
-  describe('when signing a token with an unsupported private key type', function () {
-    it('should throw an error', function() {
+  describe('when signing a token with an unsupported private key type', () => {
+    it('should throw an error', () => {
       const obj = { foo: 'bar' };
       const key = loadKey('dsa-private.pem');
       const algorithm = 'RS256';
 
-      expect(function() {
+      expect(() => {
         jwt.sign(obj, key, { algorithm });
       }).to.throw('Unknown key type "dsa".');
     });
   });
 
-  describe('when signing a token with an incorrect private key type', function () {
-    it('should throw a validation error if key validation is enabled', function() {
+  describe('when signing a token with an incorrect private key type', () => {
+    it('should throw a validation error if key validation is enabled', () => {
       const obj = { foo: 'bar' };
       const key = loadKey('rsa-private.pem');
       const algorithm = 'ES256';
 
-      expect(function() {
+      expect(() => {
         jwt.sign(obj, key, { algorithm });
       }).to.throw(/"alg" parameter for "rsa" key type must be one of:/);
     });
 
-    it('should throw an unknown error if key validation is disabled', function() {
+    it('should throw an unknown error if key validation is disabled', () => {
       const obj = { foo: 'bar' };
       const key = loadKey('rsa-private.pem');
       const algorithm = 'ES256';
 
-      expect(function() {
+      expect(() => {
         jwt.sign(obj, key, { algorithm, allowInvalidAsymmetricKeyTypes: true });
-      }).to.not.throw(/"alg" parameter for "rsa" key type must be one of:/);
+      }).not.throw(/"alg" parameter for "rsa" key type must be one of:/);
     });
   });
 });

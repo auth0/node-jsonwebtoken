@@ -5,7 +5,6 @@ const RSA_PSS_KEY_DETAILS_SUPPORTED = require('../lib/rsaPssKeyDetailsSupported'
 const fs = require('fs');
 const path = require('path');
 const { createPrivateKey } = require('crypto');
-const expect = require('chai').expect;
 
 function loadKey(filename) {
   return createPrivateKey(
@@ -28,16 +27,16 @@ if (PS_SUPPORTED) {
   };
 }
 
-describe('Asymmetric key validation', function() {
-  Object.keys(algorithmParams).forEach(function(algorithm) {
-    describe(algorithm, function() {
+describe('Asymmetric key validation', () => {
+  Object.keys(algorithmParams).forEach((algorithm) => {
+    describe(algorithm, () => {
       const keys = algorithmParams[algorithm];
 
-      describe('when validating a key with an invalid private key type', function () {
-        it('should throw an error', function () {
+      describe('when validating a key with an invalid private key type', () => {
+        it('should throw an error', () => {
           const expectedErrorMessage = /"alg" parameter for "[\w\d-]+" key type must be one of:/;
 
-          expect(function() {
+          expect(() => {
             validateAsymmetricKey(algorithm, keys.invalidPrivateKey);
           }).to.throw(expectedErrorMessage);
         });
@@ -45,31 +44,31 @@ describe('Asymmetric key validation', function() {
     });
   });
 
-  describe('when the function has missing parameters', function() {
-    it('should pass the validation if no key has been provided', function() {
+  describe('when the function has missing parameters', () => {
+    it('should pass the validation if no key has been provided', () => {
       const algorithm = 'ES256';
       validateAsymmetricKey(algorithm);
     });
 
-    it('should pass the validation if no algorithm has been provided', function() {
+    it('should pass the validation if no algorithm has been provided', () => {
       const key = loadKey('dsa-private.pem');
       validateAsymmetricKey(null, key);
     });
   });
 
-  describe('when validating a key with an unsupported type', function () {
-    it('should throw an error', function() {
+  describe('when validating a key with an unsupported type', () => {
+    it('should throw an error', () => {
       const algorithm = 'RS256';
       const key = loadKey('dsa-private.pem');
       const expectedErrorMessage = 'Unknown key type "dsa".';
 
-      expect(function() {
+      expect(() => {
         validateAsymmetricKey(algorithm, key);
       }).to.throw(expectedErrorMessage);
     });
   });
 
-  describe('Elliptic curve algorithms', function () {
+  describe('Elliptic curve algorithms', () => {
     const curvesAlgorithms = [
       { algorithm: 'ES256', curve: 'prime256v1' },
       { algorithm: 'ES384', curve: 'secp384r1' },
@@ -82,26 +81,26 @@ describe('Asymmetric key validation', function() {
       { curve: 'secp521r1', key: loadKey('secp521r1-private.pem') }
     ];
 
-    describe('when validating keys generated using Elliptic Curves', function () {
-      curvesAlgorithms.forEach(function(curveAlgorithm) {
+    describe('when validating keys generated using Elliptic Curves', () => {
+      curvesAlgorithms.forEach((curveAlgorithm) => {
         curvesKeys
           .forEach((curveKeys) => {
             if (curveKeys.curve !== curveAlgorithm.curve) {
               if (ASYMMETRIC_KEY_DETAILS_SUPPORTED) {
-                it(`should throw an error when validating an ${curveAlgorithm.algorithm} token for key with curve ${curveKeys.curve}`, function() {
+                it(`should throw an error when validating an ${curveAlgorithm.algorithm} token for key with curve ${curveKeys.curve}`, () => {
                   expect(() => {
                     validateAsymmetricKey(curveAlgorithm.algorithm, curveKeys.key);
                   }).to.throw(`"alg" parameter "${curveAlgorithm.algorithm}" requires curve "${curveAlgorithm.curve}".`);
                 });
               } else {
-                it(`should pass the validation for incorrect keys if the Node version does not support checking the key's curve name`, function() {
+                it(`should pass the validation for incorrect keys if the Node version does not support checking the key's curve name`, () => {
                   expect(() => {
                     validateAsymmetricKey(curveAlgorithm.algorithm, curveKeys.key);
                   }).not.to.throw();
                 });
               }
             } else {
-              it(`should accept an ${curveAlgorithm.algorithm} token for key with curve ${curveKeys.curve}`, function() {
+              it(`should accept an ${curveAlgorithm.algorithm} token for key with curve ${curveKeys.curve}`, () => {
                 expect(() => {
                   validateAsymmetricKey(curveAlgorithm.algorithm, curveKeys.key);
                 }).not.to.throw();
@@ -113,26 +112,26 @@ describe('Asymmetric key validation', function() {
   });
 
   if (RSA_PSS_KEY_DETAILS_SUPPORTED) {
-    describe('RSA-PSS algorithms', function () {
+    describe('RSA-PSS algorithms', () => {
       const key = loadKey('rsa-pss-private.pem');
 
-      it(`it should throw an error when validating a key with wrong RSA-RSS parameters`, function () {
+      it(`it should throw an error when validating a key with wrong RSA-RSS parameters`, () => {
         const algorithm = 'PS512';
-        expect(function() {
+        expect(() => {
           validateAsymmetricKey(algorithm, key);
         }).to.throw('Invalid key for this operation, its RSA-PSS parameters do not meet the requirements of "alg" PS512')
       });
 
-      it(`it should throw an error when validating a key with invalid salt length`, function () {
+      it(`it should throw an error when validating a key with invalid salt length`, () => {
         const algorithm = 'PS256';
         const shortSaltKey = loadKey('rsa-pss-invalid-salt-length-private.pem');
-        expect(function() {
+        expect(() => {
           validateAsymmetricKey(algorithm, shortSaltKey);
         }).to.throw('Invalid key for this operation, its RSA-PSS parameter saltLength does not meet the requirements of "alg" PS256.')
       });
 
-      it(`it should pass the validation when the key matches all the requirements for the algorithm`, function () {
-        expect(function() {
+      it(`it should pass the validation when the key matches all the requirements for the algorithm`, () => {
+        expect(() => {
           const algorithm = 'PS256';
           validateAsymmetricKey(algorithm, key);
         }).not.to.throw()
