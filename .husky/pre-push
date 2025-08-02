@@ -1,0 +1,3 @@
+npm run lint
+npm run coverage
+npm run type-check

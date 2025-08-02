@@ -2,25 +2,32 @@
   "name": "jsonwebtoken",
   "version": "10.0.0",
   "description": "JSON Web Token implementation (symmetric and asymmetric)",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    }
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "prebuild": "rm -rf dist",
-    "build": "tsc",
-    "watch": "tsc -w",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "watch": "tsc -p tsconfig.esm.json -w",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test:coverage": "jest --coverage",
     "test": "npm run lint && jest --coverage && cost-of-modules",
     "test:watch": "jest --watch",
-    "prepare": "npm run build"
+    "prepare": "husky",
+    "type-check": "tsc --noEmit",
+    "cost": "cost-of-modules"
   },
   "repository": {
     "type": "git",
@@ -48,7 +55,11 @@
     "conventional-changelog": "^5.1.0",
     "cost-of-modules": "^1.0.1",
     "eslint": "^9.0.0",
+    "glob": "^11.0.3",
+    "husky": "^9.1.7",
     "jest": "^30.0.5",
+    "jws": "^4.0.0",
+    "lint-staged": "^16.1.2",
     "ts-jest": "^29.4.0",
     "typescript": "^5.0.0"
   },
@@ -59,5 +70,11 @@
   "files": [
     "dist",
     "src"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "jest --bail --findRelatedTests"
+    ]
+  }
 }
