@@ -1,4 +1,4 @@
-const ms = require('ms');
+import ms from 'ms';
 
 export function timespan(time: string | number, iat?: number): number {
   const timestamp = iat || Math.floor(Date.now() / 1000);
