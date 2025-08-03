@@ -5,7 +5,7 @@ export function timespan(time: string | number, iat?: number): number {
 
   if (typeof time === 'string') {
     try {
-      const milliseconds = ms(time);
+      const milliseconds = ms(time as ms.StringValue);
       if (!milliseconds || isNaN(milliseconds)) {
         return NaN;
       }
