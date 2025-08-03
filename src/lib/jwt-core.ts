@@ -1,4 +1,7 @@
 import { Buffer } from 'buffer';
+import { safeJsonParse } from './shared/prototype-pollution-protection.js';
+import { DoSProtectionOptions, validatePayloadSize, validatePayloadDepth, validateClaimCount, DEFAULT_MAX_PAYLOAD_SIZE, DEFAULT_MAX_PAYLOAD_DEPTH, DEFAULT_MAX_CLAIM_COUNT } from './shared/dos-protection.js';
+import { validateEncoding, validatePayloadString } from './shared/encoding-validation.js';
 
 /**
  * Convert a string to base64url format
@@ -26,6 +29,12 @@ export function base64urlUnescape(str: string): string {
  * Encode data to base64url format
  */
 export function base64urlEncode(data: string | Buffer, encoding: BufferEncoding = 'utf8'): string {
+  // Validate encoding to prevent encoding-based attacks
+  validateEncoding(encoding);
+  
+  // Only validate if it's a raw string payload (not for headers or JSON)
+  // The validation will be done at a higher level for structured data
+  
   const buffer = Buffer.isBuffer(data) ? data : Buffer.from(data, encoding);
   return base64urlEscape(buffer.toString('base64'));
 }
@@ -34,7 +43,14 @@ export function base64urlEncode(data: string | Buffer, encoding: BufferEncoding 
  * Decode base64url string
  */
 export function base64urlDecode(str: string, encoding: BufferEncoding = 'utf8'): string {
-  return Buffer.from(base64urlUnescape(str), 'base64').toString(encoding);
+  // Validate encoding to prevent encoding-based attacks
+  validateEncoding(encoding);
+  
+  try {
+    return Buffer.from(base64urlUnescape(str), 'base64').toString(encoding);
+  } catch {
+    throw new Error('Invalid base64url string');
+  }
 }
 
 /**
@@ -76,7 +92,7 @@ export function decodeHeader(token: string): any {
   }
   
   try {
-    return JSON.parse(base64urlDecode(parts.header));
+    return safeJsonParse(base64urlDecode(parts.header));
   } catch {
     return null;
   }
@@ -85,21 +101,42 @@ export function decodeHeader(token: string): any {
 /**
  * Decode JWT payload from token
  */
-export function decodePayload(token: string, json = true): any {
+export function decodePayload(token: string, json = true, dosOptions?: DoSProtectionOptions): any {
   const parts = parseJwt(token);
   if (!parts) {
     return null;
   }
   
-  const decoded = base64urlDecode(parts.payload);
-  
-  if (json) {
-    try {
-      return JSON.parse(decoded);
-    } catch {
-      return decoded;
+  try {
+    const decoded = base64urlDecode(parts.payload);
+    
+    // Apply payload size validation if DoS protection is enabled
+    if (dosOptions && !dosOptions.disableDoSProtection) {
+      const maxPayloadSize = dosOptions.maxPayloadSize ?? DEFAULT_MAX_PAYLOAD_SIZE;
+      validatePayloadSize(decoded, maxPayloadSize);
     }
+    
+    if (json) {
+      try {
+        const payload = safeJsonParse(decoded);
+        
+        // Apply depth and claim count validation for object payloads
+        if (dosOptions && !dosOptions.disableDoSProtection && payload && typeof payload === 'object') {
+          const maxPayloadDepth = dosOptions.maxPayloadDepth ?? DEFAULT_MAX_PAYLOAD_DEPTH;
+          const maxClaimCount = dosOptions.maxClaimCount ?? DEFAULT_MAX_CLAIM_COUNT;
+          
+          validatePayloadDepth(payload, maxPayloadDepth);
+          validateClaimCount(payload, maxClaimCount);
+        }
+        
+        return payload;
+      } catch {
+        return decoded;
+      }
+    }
+    
+    return decoded;
+  } catch {
+    return null;
   }
-  
-  return decoded;
 }

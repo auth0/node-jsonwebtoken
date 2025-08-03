@@ -15,17 +15,18 @@ npm install jsonwebtoken
 
 ## Documentation
 
-📚 **[View the complete documentation in our Wiki](https://github.com/auth0/node-jsonwebtoken/wiki)**
+📚 **[View the complete documentation in our Wiki](https://github.com/interpret-tech/node-jsonwebtoken/wiki)**
 
 The Wiki includes:
-- [Getting Started Guide](https://github.com/auth0/node-jsonwebtoken/wiki/Installation-&-Setup)
-- [API Reference](https://github.com/auth0/node-jsonwebtoken/wiki)
-- [Migration Guides](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Guide-v10)
-- [TypeScript Examples](https://github.com/auth0/node-jsonwebtoken/wiki/Usage-Examples#typescript-examples)
-- [Security Best Practices](https://github.com/auth0/node-jsonwebtoken/wiki/Security-&-Algorithms)
+- [Getting Started Guide](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Installation-&-Setup)
+- [API Reference](https://github.com/interpret-tech/node-jsonwebtoken/wiki)
+- [Migration Guides](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Migration-Guide-v10)
+- [TypeScript Examples](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Usage-Examples#typescript-examples)
+- [Security Best Practices](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Security-&-Algorithms)
 
 ## Quick Start
 
+### Asynchronous (Promise-based)
 ```javascript
 const jwt = require('jsonwebtoken');
 
@@ -35,6 +36,34 @@ const token = await jwt.sign({ foo: 'bar' }, 'secret');
 // Verify a token
 const decoded = await jwt.verify(token, 'secret');
 console.log(decoded.foo) // 'bar'
+```
+
+### Synchronous
+```javascript
+const jwt = require('jsonwebtoken');
+
+// Sign a token
+const token = jwt.signSync({ foo: 'bar' }, 'secret');
+
+// Verify a token
+const decoded = jwt.verifySync(token, 'secret');
+console.log(decoded.foo) // 'bar'
+```
+
+### Callback-based
+```javascript
+const jwt = require('jsonwebtoken');
+
+// Sign a token
+jwt.sign({ foo: 'bar' }, 'secret', (err, token) => {
+  if (err) throw err;
+  
+  // Verify the token
+  jwt.verify(token, 'secret', (err, decoded) => {
+    if (err) throw err;
+    console.log(decoded.foo) // 'bar'
+  });
+});
 ```
 
 ## Requirements

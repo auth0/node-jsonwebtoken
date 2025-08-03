@@ -49,6 +49,12 @@ export interface SignOptions {
   allowInvalidAsymmetricKeyTypes?: boolean;
   allowInsecureNoneAlgorithm?: boolean;
   encoding?: string;
+  // DoS Protection options
+  maxTokenSize?: number;
+  maxPayloadSize?: number;
+  maxPayloadDepth?: number;
+  maxClaimCount?: number;
+  disableDoSProtection?: boolean;
 }
 
 export interface VerifyOptions {
@@ -65,11 +71,29 @@ export interface VerifyOptions {
   clockTimestamp?: number;
   nonce?: string;
   allowInvalidAsymmetricKeyTypes?: boolean;
+  allowInsecureKeySizes?: boolean;
+  // Header validation options
+  maxHeaderSize?: number; // Maximum header size in bytes (default: 8192)
+  maxKidLength?: number; // Maximum kid parameter length (default: 1024)
+  kidCharacterWhitelist?: RegExp; // Regex for allowed kid characters (default: /^[\w\-._~]+$/)
+  disableHeaderValidation?: boolean; // Disable all header validation (default: false)
+  // DoS Protection options
+  maxTokenSize?: number;
+  maxPayloadSize?: number;
+  maxPayloadDepth?: number;
+  maxClaimCount?: number;
+  disableDoSProtection?: boolean;
 }
 
 export interface DecodeOptions {
   complete?: boolean;
   json?: boolean;
+  // DoS Protection options
+  maxTokenSize?: number;
+  maxPayloadSize?: number;
+  maxPayloadDepth?: number;
+  maxClaimCount?: number;
+  disableDoSProtection?: boolean;
 }
 
 export interface CompleteResult {
@@ -81,6 +105,11 @@ export interface CompleteResult {
 export type GetPublicKeyOrSecret = (
   header: JwtHeader
 ) => Promise<Secret | PublicKey>;
+
+// Callback types
+export type SignCallback = (err: Error | null, token?: string) => void;
+export type VerifyCallback = (err: VerifyErrors | null, decoded?: JwtPayload) => void;
+export type VerifyCallbackComplete = (err: VerifyErrors | null, decoded?: CompleteResult) => void;
 
 // Import actual error classes
 import { JsonWebTokenError } from './lib/JsonWebTokenError.js';

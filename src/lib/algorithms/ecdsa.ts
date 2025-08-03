@@ -3,6 +3,7 @@ import { Buffer } from 'buffer';
 import { AlgorithmImplementation, SecretOrKey } from './types.js';
 import { base64urlEscape, base64urlUnescape } from '../jwt-core.js';
 import { derToJose, joseToDer } from './ecdsa-sig-formatter.js';
+import { validateCryptographicParameters, validateECDSASignatureComponents } from '../shared/crypto-validation.js';
 
 function normalizeKey(key: SecretOrKey, forSigning: boolean): KeyObject {
   if (key instanceof KeyObject) {
@@ -21,28 +22,34 @@ function normalizeKey(key: SecretOrKey, forSigning: boolean): KeyObject {
 }
 
 function createEcdsaSigner(bits: string): AlgorithmImplementation {
-  const algorithm = 'RSA-SHA' + bits; // Node crypto uses RSA-SHA for ECDSA too
+  const algorithm = 'SHA' + bits;
   const algoName = 'ES' + bits;
   
   return {
     sign(message: string | Buffer, key: SecretOrKey): string {
       const privateKey = normalizeKey(key, true);
+      
+      // Validate key parameters
+      validateCryptographicParameters(privateKey, algoName);
+      
       const signer = createSign(algorithm);
       signer.update(message);
       const derSignature = signer.sign(privateKey);
       // Convert DER format to Jose format
-      const joseSignature = derToJose(derSignature, algoName);
-      return base64urlEscape(joseSignature);
+      return derToJose(derSignature, algoName);
     },
     
     verify(message: string | Buffer, signature: string, key: SecretOrKey): boolean {
       const publicKey = normalizeKey(key, false);
+      
+      // Validate key and signature parameters
+      validateCryptographicParameters(publicKey, algoName, signature);
+      
       const verifier = createVerify(algorithm);
       verifier.update(message);
       
       // Convert Jose format signature to DER format
-      const base64Signature = base64urlUnescape(signature);
-      const derSignature = joseToDer(base64Signature, algoName);
+      const derSignature = joseToDer(signature, algoName);
       
       return verifier.verify(publicKey, derSignature);
     }
@@ -51,28 +58,34 @@ function createEcdsaSigner(bits: string): AlgorithmImplementation {
 
 // Special case for secp256k1 curve
 function createEcdsaK1Signer(): AlgorithmImplementation {
-  const algorithm = 'RSA-SHA256';
+  const algorithm = 'SHA256';
   const algoName = 'ES256K';
   
   return {
     sign(message: string | Buffer, key: SecretOrKey): string {
       const privateKey = normalizeKey(key, true);
+      
+      // Validate key parameters
+      validateCryptographicParameters(privateKey, algoName);
+      
       const signer = createSign(algorithm);
       signer.update(message);
       const derSignature = signer.sign(privateKey);
       // Convert DER format to Jose format
-      const joseSignature = derToJose(derSignature, algoName);
-      return base64urlEscape(joseSignature);
+      return derToJose(derSignature, algoName);
     },
     
     verify(message: string | Buffer, signature: string, key: SecretOrKey): boolean {
       const publicKey = normalizeKey(key, false);
+      
+      // Validate key and signature parameters
+      validateCryptographicParameters(publicKey, algoName, signature);
+      
       const verifier = createVerify(algorithm);
       verifier.update(message);
       
       // Convert Jose format signature to DER format
-      const base64Signature = base64urlUnescape(signature);
-      const derSignature = joseToDer(base64Signature, algoName);
+      const derSignature = joseToDer(signature, algoName);
       
       return verifier.verify(publicKey, derSignature);
     }

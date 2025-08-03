@@ -2,6 +2,7 @@ import { KeyObject } from 'crypto';
 import { Algorithm } from '../types.js';
 import { ASYMMETRIC_KEY_DETAILS_SUPPORTED } from './asymmetricKeyDetailsSupported.js';
 import { RSA_PSS_KEY_DETAILS_SUPPORTED } from './rsaPssKeyDetailsSupported.js';
+import { validateCryptographicParameters } from './shared/crypto-validation.js';
 
 type AsymmetricKeyType = 'ec' | 'rsa' | 'rsa-pss' | 'ed25519' | 'ed448' | 'x25519' | 'x448';
 
@@ -22,7 +23,7 @@ const allowedCurves: Record<string, string> = {
   ES256K: 'secp256k1'
 };
 
-export function validateAsymmetricKey(algorithm: Algorithm | undefined, key: KeyObject | undefined): void {
+export function validateAsymmetricKey(algorithm: Algorithm | undefined, key: KeyObject | undefined, allowInsecureKeySizes = false): void {
   if (!algorithm || !key) return;
 
   const keyType = key.asymmetricKeyType as AsymmetricKeyType | undefined;
@@ -36,6 +37,14 @@ export function validateAsymmetricKey(algorithm: Algorithm | undefined, key: Key
 
   if (!allowedAlgorithms.includes(algorithm)) {
     throw new Error(`"alg" parameter for "${keyType}" key type must be one of: ${allowedAlgorithms.join(', ')}.`);
+  }
+  
+  // Check RSA key size
+  if ((keyType === 'rsa' || keyType === 'rsa-pss') && !allowInsecureKeySizes && ASYMMETRIC_KEY_DETAILS_SUPPORTED) {
+    const keySize = (key as any).asymmetricKeyDetails?.modulusLength;
+    if (keySize && keySize < 2048) {
+      throw new Error(`minimum RSA key size is 2048 bits`);
+    }
   }
 
   /*
@@ -75,4 +84,7 @@ export function validateAsymmetricKey(algorithm: Algorithm | undefined, key: Key
       }
     }
   }
+  
+  // Perform additional cryptographic parameter validation
+  validateCryptographicParameters(key, algorithm);
 }

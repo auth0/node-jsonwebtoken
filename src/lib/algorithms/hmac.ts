@@ -2,20 +2,26 @@ import { createHmac, timingSafeEqual, createSecretKey, KeyObject } from 'crypto'
 import { Buffer } from 'buffer';
 import { AlgorithmImplementation, SecretOrKey } from './types.js';
 import { base64urlEscape, base64urlUnescape } from '../jwt-core.js';
+import { validateHMACKey } from '../shared/key-validation.js';
+import { validateAndNormalizeKey, validateBufferContent } from '../shared/encoding-validation.js';
 
 function normalizeSecret(key: SecretOrKey): Buffer | import('crypto').KeyObject {
+  // Validate the key is appropriate for HMAC
+  validateHMACKey(key);
+  
   if (key instanceof Buffer) {
     return createSecretKey(key);
   }
   
   if (typeof key === 'string') {
-    return createSecretKey(Buffer.from(key));
+    // String validation and normalization is done in validateHMACKey
+    // We need to normalize again here to use the normalized version
+    const normalizedKey = validateAndNormalizeKey(key, 'HMAC key');
+    return createSecretKey(Buffer.from(normalizedKey));
   }
   
   if (key instanceof KeyObject) {
-    if (key.type !== 'secret') {
-      throw new TypeError('Invalid secret key type');
-    }
+    // Additional validation already done in validateHMACKey
     return key;
   }
   
