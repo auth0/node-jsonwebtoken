@@ -15,14 +15,18 @@ npm install jsonwebtoken
 
 ## Documentation
 
-📚 **[View the complete documentation in our Wiki](https://github.com/interpret-tech/node-jsonwebtoken/wiki)**
+📚 **Complete documentation is available in the [docs](./docs) folder**
 
-The Wiki includes:
-- [Getting Started Guide](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Installation-&-Setup)
-- [API Reference](https://github.com/interpret-tech/node-jsonwebtoken/wiki)
-- [Migration Guides](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Migration-Guide-v10)
-- [TypeScript Examples](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Usage-Examples#typescript-examples)
-- [Security Best Practices](https://github.com/interpret-tech/node-jsonwebtoken/wiki/Security-&-Algorithms)
+### API Reference
+- [sign() - Create JWTs](./docs/API-Reference-sign.md)
+- [verify() - Validate JWTs](./docs/API-Reference-verify.md)
+- [decode() - Decode without verification](./docs/API-Reference-decode.md)
+- [Synchronous API](./docs/API-Reference-Sync.md)
+
+### Guides
+- [Installation & Setup](./docs/Installation-&-Setup.md)
+- [Migration Guide v10](./docs/Migration-Guide-v10.md)
+- [Security & Algorithms](./docs/Security-&-Algorithms.md)
 
 ## Quick Start
 
