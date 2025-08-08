@@ -1,8 +1,15 @@
+const decode = require('./decode');
+const verify = require('./verify');
+const sign = require('./sign');
+const JsonWebTokenError = require('./lib/JsonWebTokenError');
+const NotBeforeError = require('./lib/NotBeforeError');
+const TokenExpiredError = require('./lib/TokenExpiredError');
+
 module.exports = {
-  decode: require('./decode'),
-  verify: require('./verify'),
-  sign: require('./sign'),
-  JsonWebTokenError: require('./lib/JsonWebTokenError'),
-  NotBeforeError: require('./lib/NotBeforeError'),
-  TokenExpiredError: require('./lib/TokenExpiredError'),
+  decode,
+  verify,
+  sign,
+  JsonWebTokenError,
+  NotBeforeError,
+  TokenExpiredError,
 };
