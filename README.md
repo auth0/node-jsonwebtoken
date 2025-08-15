@@ -66,11 +66,13 @@ The header can be customized via the `options.header` object.
 
 Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
+It is recommended to store the secret key in a .env file.
+
 Synchronous Sign with default (HMAC SHA256)
 
 ```js
 var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+var token = jwt.sign({ foo: 'bar' }, 'secretkey');
 ```
 
 Synchronous Sign with RSA SHA256
