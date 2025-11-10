@@ -2,7 +2,7 @@
 
 | **Build**                                                                                                                               | **Dependency**                                                                                                         |
 |-----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken) |
+| [![Build Status]() | [![Dependency Status]() |
 
 
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
