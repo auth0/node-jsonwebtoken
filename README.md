@@ -40,7 +40,7 @@ When signing with RSA algorithms the minimum modulus length is 2048 except when 
 `options`:
 
 * `algorithm` (default: `HS256`)
-* `expiresIn`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms). 
+* `expiresIn`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms).(Use ms.StringValue when taking value from .env) 
   > Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
 * `notBefore`: expressed in seconds or a string describing a time span [vercel/ms](https://github.com/vercel/ms). 
   > Eg: `60`, `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as a seconds count. If you use a string be sure you provide the time units (days, hours, etc), otherwise milliseconds unit is used by default (`"120"` is equal to `"120ms"`).
