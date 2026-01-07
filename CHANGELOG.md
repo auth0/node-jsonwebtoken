@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file starting from version **v4.0.0**.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.3 - 2025-12-04
+
+- updates jws version to 4.0.1.
+
 ## 9.0.2 - 2023-08-30
 
 - security: updating semver to 7.5.4 to resolve CVE-2022-25883, closes [#921](https://github.com/auth0/node-jsonwebtoken/issues/921).
