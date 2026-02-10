@@ -25,7 +25,7 @@
     "test:coverage": "jest --coverage",
     "test": "npm run lint && jest --coverage && cost-of-modules",
     "test:watch": "jest --watch",
-    "prepare": "husky",
+    "prepare": "npm run build",
     "type-check": "tsc --noEmit",
     "cost": "cost-of-modules"
   },
