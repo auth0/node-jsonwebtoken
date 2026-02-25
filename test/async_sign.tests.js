@@ -147,4 +147,31 @@ describe('signing a token asynchronously', function() {
       });
     });
   });
+
+  // Regression test for https://github.com/auth0/node-jsonwebtoken/issues/1000
+  describe('when payload has a claim that conflicts with options', function () {
+    it('should call the callback only once with an error', function (done) {
+      var callCount = 0;
+      jwt.sign(
+        { iss: 'bar', iat: Math.floor(Date.now() / 1000) },
+        'secret',
+        { algorithm: 'HS256', issuer: 'foo' },
+        function (err, token) {
+          callCount++;
+          if (callCount === 1) {
+            expect(err).to.be.an.instanceof(Error);
+            expect(err.message).to.match(/payload already has an "iss" property/);
+            expect(token).to.be.undefined;
+            // Wait a tick to ensure callback isn't called again
+            setTimeout(function () {
+              expect(callCount).to.equal(1);
+              done();
+            }, 10);
+          } else {
+            done(new Error('Callback was called ' + callCount + ' times, expected once'));
+          }
+        }
+      );
+    });
+  });
 });
