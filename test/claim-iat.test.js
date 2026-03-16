@@ -110,27 +110,6 @@ describe('issue at', function() {
         expectedIssueAt: 100,
         options: {}
       },
-      // TODO an iat of -Infinity should fail validation
-      {
-        description: 'should set null "iat" when given -Infinity',
-        iat: -Infinity,
-        expectedIssueAt: null,
-        options: {}
-      },
-      // TODO an iat of Infinity should fail validation
-      {
-        description: 'should set null "iat" when given Infinity',
-        iat: Infinity,
-        expectedIssueAt: null,
-        options: {}
-      },
-      // TODO an iat of NaN should fail validation
-      {
-        description: 'should set to current time for "iat" when given value NaN',
-        iat: NaN,
-        expectedIssueAt: 60,
-        options: {}
-      },
       {
         description: 'should remove default "iat" with "noTimestamp" option',
         iat: undefined,
@@ -149,6 +128,21 @@ describe('issue at', function() {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.null;
             expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
+          });
+        });
+      });
+    });
+
+    [
+      -Infinity,
+      Infinity,
+      NaN,
+    ].forEach((iat) => {
+      it(`should error when "iat" is ${util.inspect(iat)}`, function (done) {
+        signWithIssueAt(iat, {}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(Error);
+            expect(err.message).to.equal('"iat" should be a number of seconds');
           });
         });
       });

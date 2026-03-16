@@ -231,35 +231,29 @@ describe('expires', function() {
       });
     });
 
-    // TODO an exp of -Infinity should fail validation
-    it('should set null "exp" when given -Infinity', function (done) {
-      signWithExpiresIn(undefined, {exp: -Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
+    it('should throw error when "exp" is -Infinity', function (done) {
+      signWithExpiresIn(undefined, {exp: -Infinity}, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', '"exp" should be a number of seconds');
         });
       });
     });
 
-    // TODO an exp of Infinity should fail validation
-    it('should set null "exp" when given value Infinity', function (done) {
-      signWithExpiresIn(undefined, {exp: Infinity}, (err, token) => {
-        const decoded = jwt.decode(token);
+    it('should throw error when "exp" is Infinity', function (done) {
+      signWithExpiresIn(undefined, {exp: Infinity}, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', '"exp" should be a number of seconds');
         });
       });
     });
 
-    // TODO an exp of NaN should fail validation
-    it('should set null "exp" when given value NaN', function (done) {
-      signWithExpiresIn(undefined, {exp: NaN}, (err, token) => {
-        const decoded = jwt.decode(token);
+    it('should throw error when "exp" is NaN', function (done) {
+      signWithExpiresIn(undefined, {exp: NaN}, (err) => {
         testUtils.asyncCheck(done, () => {
-          expect(err).to.be.null;
-          expect(decoded).to.have.property('exp', null);
+          expect(err).to.be.instanceOf(Error);
+          expect(err).to.have.property('message', '"exp" should be a number of seconds');
         });
       });
     });

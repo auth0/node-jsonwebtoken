@@ -5,7 +5,6 @@ const jws = require('jws');
 const includes = require('lodash.includes');
 const isBoolean = require('lodash.isboolean');
 const isInteger = require('lodash.isinteger');
-const isNumber = require('lodash.isnumber');
 const isPlainObject = require('lodash.isplainobject');
 const isString = require('lodash.isstring');
 const once = require('lodash.once');
@@ -34,9 +33,9 @@ const sign_options_schema = {
 };
 
 const registered_claims_schema = {
-  iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
-  exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
-  nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
+  iat: { isValid: function(value) { return typeof value === 'number' && Number.isFinite(value); }, message: '"iat" should be a number of seconds' },
+  exp: { isValid: function(value) { return typeof value === 'number' && Number.isFinite(value); }, message: '"exp" should be a number of seconds' },
+  nbf: { isValid: function(value) { return typeof value === 'number' && Number.isFinite(value); }, message: '"nbf" should be a number of seconds' }
 };
 
 function validate(schema, allowUnknown, object, parameterName) {
