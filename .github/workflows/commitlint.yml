@@ -1,38 +1,25 @@
-name: Test
+name: Lint Commits
 
 on:
   pull_request:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [16, 18, 20, 22, 24]
-
-    name: Test (Node ${{ matrix.node }})
+  commitlint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Test
-        run: npm test
+      - name: Validate commit messages
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose

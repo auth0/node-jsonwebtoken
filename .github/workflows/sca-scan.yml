@@ -1,0 +1,10 @@
+name: Snyk Scan
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  snyk-cli:
+    uses: auth0/devsecops-tooling/.github/workflows/sca-scan.yml@5246a8b59100e3eea284ce4f2e2a51b51e237380
+    secrets: inherit

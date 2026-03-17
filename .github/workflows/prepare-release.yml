@@ -1,0 +1,71 @@
+name: Prepare Release
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Detect Next Version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEXT_VERSION=$(npx semantic-release --dry-run --plugins @semantic-release/commit-analyzer | tee /dev/stderr | awk '/The next release version is/{print $NF}')
+          echo "next=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update package.json
+        if: steps.version.outputs.next != ''
+        run: npm version "$NEXT_VERSION" --no-git-tag-version
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.next }}
+
+      - name: Update CHANGELOG.md
+        if: steps.version.outputs.next != ''
+        run: npx conventional-changelog-cli -p angular -i CHANGELOG.md -s
+
+      - name: Create Pull Request
+        if: steps.version.outputs.next != ''
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(release): ${{ steps.version.outputs.next }}"
+          branch: "release/v${{ steps.version.outputs.next }}"
+          delete-branch: true
+          title: "chore(release): ${{ steps.version.outputs.next }}"
+          body: |
+            This PR prepares the release of version ${{ steps.version.outputs.next }}.
+
+            **Changes:**
+            - Updated version in `package.json` to ${{ steps.version.outputs.next }}
+            - Updated `CHANGELOG.md` with release notes
+
+            **Next Steps:**
+            Review and merge this PR to trigger the publish workflow.
+          labels: release
