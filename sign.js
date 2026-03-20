@@ -214,7 +214,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   }
 
-  Object.keys(options_to_payload).forEach(function (key) {
+  for (const key of Object.keys(options_to_payload)) {
     const claim = options_to_payload[key];
     if (typeof options[key] !== 'undefined') {
       if (typeof payload[claim] !== 'undefined') {
@@ -222,7 +222,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
       }
       payload[claim] = options[key];
     }
-  });
+  }
 
   const encoding = options.encoding || 'utf8';
 
