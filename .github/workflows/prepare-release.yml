@@ -37,7 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          NEXT_VERSION=$(npx semantic-release --dry-run --plugins @semantic-release/commit-analyzer | tee /dev/stderr | awk '/The next release version is/{print $NF}')
+          # Run semantic-release with dry-run to detect version
+          NEXT_VERSION=$(npx semantic-release --dry-run --verify-conditions false | tee /dev/stderr | awk '/The next release version is/{print $NF}')
           echo "next=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update package.json
@@ -48,7 +49,7 @@ jobs:
 
       - name: Update CHANGELOG.md
         if: steps.version.outputs.next != ''
-        run: npx conventional-changelog-cli -p angular -i CHANGELOG.md -s
+        run: npx conventional-changelog-cli -p conventionalcommits -i CHANGELOG.md -s
 
       - name: Create Pull Request
         if: steps.version.outputs.next != ''
