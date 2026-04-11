@@ -2,12 +2,7 @@ const timespan = require('./lib/timespan');
 const PS_SUPPORTED = require('./lib/psSupported');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const jws = require('jws');
-const includes = require('lodash.includes');
-const isBoolean = require('lodash.isboolean');
-const isInteger = require('lodash.isinteger');
-const isNumber = require('lodash.isnumber');
-const isPlainObject = require('lodash.isplainobject');
-const isString = require('lodash.isstring');
+
 const once = require('lodash.once');
 const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
 
@@ -16,11 +11,22 @@ if (PS_SUPPORTED) {
   SUPPORTED_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
 }
 
+const isBoolean = (value) => value === true || value === false;
+const isNumber = (value) => typeof value === 'number';
+const isString = (value) => typeof value === 'string';
+
+function isPlainObject(obj) {
+  if (!obj) return false;
+  if (typeof obj !== "object") return false;
+  const proto = Object.getPrototypeOf(obj);
+  return (proto === null || proto === Object.prototype);
+}
+
 const sign_options_schema = {
-  expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
-  notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
+  expiresIn: { isValid: function(value) { return Number.isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
+  notBefore: { isValid: function(value) { return Number.isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
   audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, SUPPORTED_ALGS), message: '"algorithm" must be a valid string enum value' },
+  algorithm: { isValid: (val) => SUPPORTED_ALGS.includes(val), message: '"algorithm" must be a valid string enum value' },
   header: { isValid: isPlainObject, message: '"header" must be an object' },
   encoding: { isValid: isString, message: '"encoding" must be a string' },
   issuer: { isValid: isString, message: '"issuer" must be a string' },
