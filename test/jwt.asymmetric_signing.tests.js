@@ -172,6 +172,22 @@ describe('Asymmetric Algorithms', function() {
     });
   });
 
+  describe('when verifying a truncated EC signature (issue #767)', function () {
+    it('should throw JsonWebTokenError (not TypeError) for truncated ES512 signature', function (done) {
+      const priv = loadKey('secp521r1-private.pem');
+      const pub = loadKey('secp521r1-public.pem');
+      const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'ES512' });
+      const truncated = token.substring(0, token.length - 1);
+      jwt.verify(truncated, pub, { algorithms: ['ES512'] }, function (err, decoded) {
+        assert.isUndefined(decoded);
+        assert.isNotNull(err);
+        assert.equal(err.name, 'JsonWebTokenError');
+        assert.equal(err.message, 'invalid signature');
+        done();
+      });
+    });
+  });
+
   describe('when signing a token with an unsupported private key type', function () {
     it('should throw an error', function() {
       const obj = { foo: 'bar' };

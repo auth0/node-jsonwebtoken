@@ -46,6 +46,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('clockTimestamp must be a number'));
   }
 
+  if (options.clockTolerance !== undefined && typeof options.clockTolerance !== 'number') {
+    return done(new JsonWebTokenError('clockTolerance must be a number'));
+  }
+
   if (options.nonce !== undefined && (typeof options.nonce !== 'string' || options.nonce.trim() === '')) {
     return done(new JsonWebTokenError('nonce must be a non-empty string'));
   }
@@ -164,6 +168,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     try {
       valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
     } catch (e) {
+      if (e instanceof TypeError) {
+        return done(new JsonWebTokenError('invalid signature'));
+      }
       return done(e);
     }
 
