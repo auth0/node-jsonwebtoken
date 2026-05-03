@@ -246,6 +246,15 @@ describe('verify', function() {
           done();
         });
       });
+      it('should verify clockTolerance is a number', function (done) {
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+        jwt.verify(token, key, {clockTolerance: 'notANumber'}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
     });
 
     describe('option: maxAge and clockTimestamp', function () {
