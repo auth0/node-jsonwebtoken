@@ -248,6 +248,61 @@ describe('verify', function() {
       });
     });
 
+    describe('option: clockTolerance', function () {
+      const clockTimestamp = 1000000000;
+
+      it('should reject a non-number clockTolerance', function (done) {
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+        jwt.verify(token, key, {clockTolerance: '5'}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a non-negative number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('should reject a negative clockTolerance', function (done) {
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+        jwt.verify(token, key, {clockTolerance: -5}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a non-negative number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('should reject a non-finite clockTolerance', function (done) {
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp + 1}, key);
+        jwt.verify(token, key, {clockTolerance: Infinity}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a non-negative number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('should reject an expired token instead of silently accepting it when clockTolerance is non-finite', function (done) {
+        // exp + Infinity === Infinity made `clockTimestamp >= exp + clockTolerance`
+        // always false, silently accepting an expired token. It is now rejected.
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp - 1}, key);
+        jwt.verify(token, key, {clockTimestamp: clockTimestamp, clockTolerance: Infinity}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a non-negative number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('should accept a valid non-negative clockTolerance', function (done) {
+        const token = jwt.sign({foo: 'bar', iat: clockTimestamp, exp: clockTimestamp - 1}, key);
+        jwt.verify(token, key, {clockTimestamp: clockTimestamp, clockTolerance: 5}, function (err, p) {
+          assert.isNull(err);
+          assert.equal(p.foo, 'bar');
+          done();
+        });
+      });
+    });
+
     describe('option: maxAge and clockTimestamp', function () {
       // { foo: 'bar', iat: 1437018582, exp: 1437018800 } exp = iat + 218s
       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODgwMH0.AVOsNC7TiT-XVSpCpkwB1240izzCIJ33Lp07gjnXVpA';
