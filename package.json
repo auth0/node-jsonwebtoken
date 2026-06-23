@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "coverage": "nyc mocha --use_strict",
     "test": "mocha",
-    "prepare": "husky"
+    "prepare": "husky",
+    "update-changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md"
   },
   "repository": {
     "type": "git",
@@ -54,7 +55,7 @@
     "@semantic-release/exec": "^7.0.3",
     "atob": "^2.1.2",
     "chai": "^4.1.2",
-    "conventional-changelog": "~1.1.0",
+    "conventional-changelog": "^7.2.1",
     "conventional-changelog-conventionalcommits": "^9.3.0",
     "eslint": "^4.19.1",
     "husky": "^9.1.7",
