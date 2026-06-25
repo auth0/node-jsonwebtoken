@@ -431,6 +431,15 @@ describe('audience', function() {
           });
         });
       });
+
+      it('should error with a Regex verify "audience" option that matches any string', function (done) {
+        verifyWithAudience(token, /.+/, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /.+/');
+          });
+        });
+      });
     });
   });
 });
