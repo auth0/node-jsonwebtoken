@@ -197,7 +197,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
       const match = target.some(function (targetAudience) {
         return audiences.some(function (audience) {
-          return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+          return audience instanceof RegExp ? typeof targetAudience === 'string' && audience.test(targetAudience) : audience === targetAudience;
         });
       });
 
