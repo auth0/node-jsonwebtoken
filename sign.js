@@ -83,6 +83,29 @@ const options_for_objects = [
   'jwtid',
 ];
 
+/**
+ * (Asynchronous) If a callback is supplied, the callback is called with the err or the JWT.
+ *
+ * (Synchronous) Returns the JsonWebToken as string
+ * @param {object | Buffer | string} payload Represents valid JSON.
+ * @param {string | Buffer | object | KeyObject} secretOrPrivateKey Contains either the secret for HMAC algorithms or the PEM encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option. When signing with RSA algorithms the minimum modulus length is 2048 except when the allowInsecureKeySizes option is set to true. Private keys below this size will be rejected with an error.
+ * @param {object?} options Options
+ * @param {string} options.algorithm (default: `HS256`)
+ * @param {string | number} options.expiresIn Expressed in seconds or a string describing a time span vercel/ms.
+ * @param {string | number} options.notBefore Expressed in seconds or a string describing a time span vercel/ms.
+ * @param options.audience
+ * @param options.issuer
+ * @param options.jwtid
+ * @param options.subject
+ * @param options.noTimestamp
+ * @param options.header
+ * @param options.keyid
+ * @param {boolean} options.mutatePayload If `true`, the sign function will modify the payload object directly. This is useful if you need a raw reference to the payload after claims have been applied to it, but before it has been encoded into a token.
+ * @param {boolean} options.allowInsecureKeySizes If `true` allows private keys with a modulus below 2048 to be used for RSA.
+ * @param {boolean} options.allowInvalidAsymmetricKeyTypes If `true`, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+ * @param {function?} callback
+ * @returns {*}
+ */
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
   if (typeof options === 'function') {
     callback = options;

@@ -18,6 +18,31 @@ if (PS_SUPPORTED) {
   RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
 }
 
+/**
+ * (Asynchronous) If a callback is supplied, function acts asynchronously. The callback is called with the decoded payload if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will be called with the error.
+ *
+ * (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
+ *
+ * > Warning: When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected.
+ * @param {string} jwtString The JsonWebToken string
+ * @param {string | Buffer | KeyObject} secretOrPublicKey Contains either the secret for HMAC algorithms, or the PEM encoded public key for RSA and ECDSA. If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key.
+ * @param {object?} options Options
+ * @param {string[]} options.algorithms List of string with the names of the allowed algorithms.
+ * @param {string | string[] | RegExp} options.audience If you want to check audience (aud), provide a value here.
+ * @param {boolean} options.complete Return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
+ * @param {string | string[]?} options.issuer Valid values for the iss field.
+ * @param {string?} options.jwtid If you want to check JWT ID (jti), provide a string value here.
+ * @param {boolean} options.ignoreExpiration If `true` do not validate the expiration of the token.
+ * @param options.ignoreNotBefore ...
+ * @param options.subject If you want to check subject (`sub`), provide a value here.
+ * @param {number} options.clockTolerance Number of seconds to tolerate when checking the nbf and exp claims, to deal with small clock differences among different servers.
+ * @param {string | number} options.maxAge The maximum allowed age for tokens to still be valid. It is expressed in seconds or a string describing a time span vercel/ms.
+ * @param {number} options.clockTimestamp The time in seconds that should be used as the current time for all necessary comparisons.
+ * @param {string} options.nonce If you want to check nonce claim, provide a string value here. It is used on Open ID for the ID Tokens.
+ * @param options.allowInvalidAsymmetricKeyTypes If true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+ * @param {function?} callback Callback function
+ * @returns {*}
+ */
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
