@@ -9,7 +9,7 @@ const isNumber = require('lodash.isnumber');
 const isPlainObject = require('lodash.isplainobject');
 const isString = require('lodash.isstring');
 const once = require('lodash.once');
-const { KeyObject, createSecretKey, createPrivateKey } = require('crypto')
+const { KeyObject, createSecretKey, createPrivateKey } = require('node:crypto')
 
 const SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none'];
 if (PS_SUPPORTED) {

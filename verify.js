@@ -6,7 +6,7 @@ const timespan = require('./lib/timespan');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const PS_SUPPORTED = require('./lib/psSupported');
 const jws = require('jws');
-const {KeyObject, createSecretKey, createPublicKey} = require("crypto");
+const {KeyObject, createSecretKey, createPublicKey} = require("node:crypto");
 
 const PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
 const EC_KEY_ALGS = ['ES256', 'ES384', 'ES512'];
