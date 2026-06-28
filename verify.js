@@ -75,7 +75,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   try {
     decodedToken = decode(jwtString, { complete: true });
   } catch(err) {
-    return done(err);
+    return done(err instanceof SyntaxError ? new JsonWebTokenError('jwt malformed') : err);
   }
 
   if (!decodedToken) {
