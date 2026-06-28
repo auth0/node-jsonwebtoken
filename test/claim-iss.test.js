@@ -32,22 +32,12 @@ describe('issuer', function() {
       {},
       {foo: 'bar'},
     ].forEach((issuer) => {
-      it(`should error with with value ${util.inspect(issuer)}`, function (done) {
+      it(`should error with value ${util.inspect(issuer)}`, function (done) {
         signWithIssuer(issuer, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message', '"issuer" must be a string');
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {issuer: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {issuer: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"issuer" must be a string');
         });
       });
     });

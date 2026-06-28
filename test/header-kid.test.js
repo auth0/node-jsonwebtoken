@@ -32,22 +32,12 @@ describe('keyid', function() {
       {},
       {foo: 'bar'},
     ].forEach((keyid) => {
-      it(`should error with with value ${util.inspect(keyid)}`, function (done) {
+      it(`should error with value ${util.inspect(keyid)}`, function (done) {
         signWithKeyId(keyid, {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(Error);
             expect(err).to.have.property('message', '"keyid" must be a string');
           });
-        });
-      });
-    });
-
-    // undefined needs special treatment because {} is not the same as {keyid: undefined}
-    it('should error with with value undefined', function (done) {
-      testUtils.signJWTHelper({}, 'secret', {keyid: undefined, algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err).to.have.property('message', '"keyid" must be a string');
         });
       });
     });

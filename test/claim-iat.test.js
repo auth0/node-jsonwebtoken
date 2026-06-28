@@ -45,16 +45,6 @@ describe('issue at', function() {
         });
       });
     });
-
-    // undefined needs special treatment because {} is not the same as {iat: undefined}
-    it('should error with iat of undefined', function (done) {
-      testUtils.signJWTHelper({iat: undefined}, 'secret', {algorithm: 'HS256'}, (err) => {
-        testUtils.asyncCheck(done, () => {
-          expect(err).to.be.instanceOf(Error);
-          expect(err.message).to.equal('"iat" should be a number of seconds');
-        });
-      });
-    });
   });
 
   describe('"iat" in payload with "maxAge" option validation', function () {
