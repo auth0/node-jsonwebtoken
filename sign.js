@@ -84,6 +84,10 @@ const options_for_objects = [
 ];
 
 module.exports = function (payload, secretOrPrivateKey, options, callback) {
+  if (typeof payload !== 'object') {
+    throw Error('Payload must be valid JSON object')
+  }
+  
   if (typeof options === 'function') {
     callback = options;
     options = {};
