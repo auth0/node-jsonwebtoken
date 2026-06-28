@@ -83,6 +83,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   const header = decodedToken.header;
+
+  if (options.type) {
+    const invalid_type =
+        (typeof options.type === 'string' && header.typ !== options.type);
+
+    if (invalid_type) {
+      return done(new JsonWebTokenError('jwt type invalid. expected: ' + options.type));
+    }
+  }
+
   let getSecret;
 
   if(typeof secretOrPublicKey === 'function') {

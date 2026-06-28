@@ -147,6 +147,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > * rsa - ['RS256', 'RS384', 'RS512']
   > * ec - ['ES256', 'ES384', 'ES512']
   > * default - ['RS256', 'RS384', 'RS512']
+* `type`: if you want to check token type (`typ`), provide a string value here (e.g. 'JWT', 'at+jwt').
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
@@ -189,6 +190,12 @@ jwt.verify(token, 'wrong-secret', function(err, decoded) {
 var cert = fs.readFileSync('public.pem');  // get public key
 jwt.verify(token, cert, function(err, decoded) {
   console.log(decoded.foo) // bar
+});
+
+// verify type
+var cert = fs.readFileSync('public.pem');  // get public key
+jwt.verify(token, cert, { type: 'at+jwt' }, function(err, decoded) {
+  // if typ mismatch, err == invalid type
 });
 
 // verify audience
@@ -314,6 +321,8 @@ Error object:
   * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
   * 'jwt id invalid. expected: [OPTIONS JWT ID]'
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
+  * 'jwt type invalid. expected: [OPTIONS TYPE]'
+
 
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {

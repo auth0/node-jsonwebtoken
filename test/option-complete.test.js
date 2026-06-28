@@ -10,7 +10,7 @@ describe('complete option', function () {
   const secret = fs.readFileSync(path.join(__dirname, 'priv.pem'));
   const pub = fs.readFileSync(path.join(__dirname, 'pub.pem'));
 
-  const header = { alg: 'RS256' };
+  const header = { alg: 'RS256', typ: 'JWT' };
   const payload = { iat: Math.floor(Date.now() / 1000 ) };
   const signed = jws.sign({ header, payload, secret, encoding: 'utf8' });
   const signature = jws.decode(signed).signature;
@@ -26,6 +26,7 @@ describe('complete option', function () {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded.header).to.have.property('alg', header.alg);
+          expect(decoded.header).to.have.property('typ', header.typ);
           expect(decoded.payload).to.have.property('iat', payload.iat);
           expect(decoded).to.have.property('signature', signature);
         });

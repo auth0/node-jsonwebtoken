@@ -268,6 +268,32 @@ describe('verify', function() {
     });
   });
 
+  describe('option: type', function () {
+    // { "alg": "HS256", "typ": "JWT" } { "foo": "bar", "iat": 1437018582, "exp": 1437018592 }
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODU5Mn0.3aR3vocmgRpG05rsI9MpR6z2T_BGtMQaPq2YR6QaroU';
+    let clock;
+    const key = 'key';
+
+    beforeEach(function () {
+      // iat + 1s
+      try { clock = sinon.useFakeTimers(1437018583000); } catch (e) {}
+    });
+
+    afterEach(function () {
+      try { clock.restore(); } catch (e) {}
+    });
+
+    it('should pass if token.header.typ is equal to options.type', function () {
+      const options = { type: 'JWT' };
+      expect(function() { jwt.verify(token, key, options) }).to.not.throw();
+    });
+
+    it('should error if token.header.typ is not equal to options.type', function () {
+      const options = { type: 'at+jwt' };
+      expect(function() { jwt.verify(token, key, options) }).to.throw('jwt type invalid. expected: at+jwt');
+    });
+  });
+
   describe('when verifying a token with an unsupported public key type', function () {
     it('should throw an error', function() {
       const token = 'eyJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Njk5OTAwMDN9.YdjFWJtPg_9nccMnTfQyesWQ0UX-GsWrfCGit_HqjeIkNjoV6dkAJ8AtbnVEhA4oxwqSXx6ilMOfHEjmMlPtyyyVKkWKQHcIWYnqPbNSEv8a7Men8KhJTIWb4sf5YbhgSCpNvU_VIZjLO1Z0PzzgmEikp0vYbxZFAbCAlZCvUlcIc-kdjIRCnDJe0BBrYRxNLEJtYsf7D1yFIFIqw8-VP87yZdExA4eHsTaE84SgnL24ZK5h5UooDx-IRNd_rrMyio8kNy63grVxCWOtkXZ26iZk6v-HMsnBqxvUwR6-8wfaWrcpADkyUO1q3SNsoTdwtflbvfwgjo3uve0IvIzHMw';
