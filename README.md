@@ -7,7 +7,7 @@
 
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
 
-This was developed against `draft-ietf-oauth-json-web-token-08`. It makes use of [node-jws](https://github.com/brianloveswords/node-jws)
+This was developed against `draft-ietf-oauth-json-web-token-08`. It makes use of [node-jws](https://github.com/brianloveswords/node-jws).
 
 # Install
 
@@ -26,7 +26,7 @@ $ npm install jsonwebtoken
 
 (Asynchronous) If a callback is supplied, the callback is called with the `err` or the JWT.
 
-(Synchronous) Returns the JsonWebToken as string
+(Synchronous) Returns the JsonWebToken as string.
 
 `payload` could be an object literal, buffer or string representing valid JSON. 
 > **Please _note_ that** `exp` or any other claim is only set if the payload is an object literal. Buffer or string payloads are not checked for JSON validity.
@@ -59,35 +59,35 @@ When signing with RSA algorithms the minimum modulus length is 2048 except when 
 
 > There are no default values for `expiresIn`, `notBefore`, `audience`, `subject`, `issuer`.  These claims can also be provided in the payload directly with `exp`, `nbf`, `aud`, `sub` and `iss` respectively, but you **_can't_** include in both places.
 
-Remember that `exp`, `nbf` and `iat` are **NumericDate**, see related [Token Expiration (exp claim)](#token-expiration-exp-claim)
+Remember that `exp`, `nbf` and `iat` are **NumericDate**, see related [Token Expiration (exp claim)](#token-expiration-exp-claim).
 
 
 The header can be customized via the `options.header` object.
 
 Generated jwts will include an `iat` (issued at) claim by default unless `noTimestamp` is specified. If `iat` is inserted in the payload, it will be used instead of the real timestamp for calculating other things like `exp` given a timespan in `options.expiresIn`.
 
-Synchronous Sign with default (HMAC SHA256)
+Synchronous Sign with default (HMAC SHA256):
 
 ```js
 var jwt = require('jsonwebtoken');
 var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 ```
 
-Synchronous Sign with RSA SHA256
+Synchronous Sign with RSA SHA256:
 ```js
 // sign with RSA SHA256
 var privateKey = fs.readFileSync('private.key');
 var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
 ```
 
-Sign asynchronously
+Sign asynchronously:
 ```js
 jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token) {
   console.log(token);
 });
 ```
 
-Backdate a jwt 30 seconds
+Backdate a jwt 30 seconds:
 ```js
 var older_token = jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, 'shhhhh');
 ```
@@ -129,17 +129,17 @@ jwt.sign({
 
 (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
-> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected.
 
-`token` is the JsonWebToken string
+`token` is the JsonWebToken string.
 
 `secretOrPublicKey` is a string (utf-8 encoded), buffer, or KeyObject containing either the secret for HMAC algorithms, or the PEM
 encoded public key for RSA and ECDSA.
-If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See below for a detailed example
+If `jwt.verify` is called asynchronous, `secretOrPublicKey` can be a function that should fetch the secret or public key. See [below](#examples) for a detailed example.
 
 As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues/208#issuecomment-231861138), there are other libraries that expect base64 encoded secrets (random bytes encoded using base64), if that is your case you can pass `Buffer.from(secret, 'base64')`, by doing this the secret will be decoded using base64 and the token verification will use the original random bytes.
 
-`options`
+`options`:
 
 * `algorithms`: List of strings with the names of the allowed algorithms. For instance, `["HS256", "HS384"]`. 
   > If not specified a defaults will be used based on the type of key provided
@@ -162,6 +162,7 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
 * `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
 
+<a name="examples"></a>
 ```js
 // verify a token symmetric - synchronous
 var decoded = jwt.verify(token, 'shhhhh');
@@ -249,17 +250,17 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 
 > __Warning:__ This will __not__ verify whether the signature is valid. You should __not__ use this for untrusted messages. You most likely want to use `jwt.verify` instead.
 
-> __Warning:__ When the token comes from an untrusted source (e.g. user input or external request), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external request), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected.
 
 
-`token` is the JsonWebToken string
+`token` is the JsonWebToken string.
 
 `options`:
 
 * `json`: force JSON.parse on the payload even if the header doesn't contain `"typ":"JWT"`.
 * `complete`: return an object with the decoded payload and header.
 
-Example
+Example:
 
 ```js
 // get the decoded payload ignoring signature, no secretOrPrivateKey needed
@@ -268,7 +269,7 @@ var decoded = jwt.decode(token);
 // get the decoded payload and header
 var decoded = jwt.decode(token, {complete: true});
 console.log(decoded.header);
-console.log(decoded.payload)
+console.log(decoded.payload);
 ```
 
 </details>
@@ -381,7 +382,7 @@ Apart from that example there are [an issue](https://github.com/auth0/node-jsonw
 
 # TODO
 
-* X.509 certificate chain is not checked
+* X.509 certificate chain is not checked.
 
 ## Issue Reporting
 
