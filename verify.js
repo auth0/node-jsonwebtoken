@@ -164,7 +164,14 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     try {
       valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
     } catch (e) {
-      return done(e);
+      // Wrap low-level crypto errors (e.g. TypeError from malformed EC/RSA
+      // signatures) in a JsonWebTokenError so callers always receive a
+      // consistent, documented error type instead of an undocumented TypeError.
+      // See: https://github.com/auth0/node-jsonwebtoken/issues/767
+      if (e instanceof JsonWebTokenError) {
+        return done(e);
+      }
+      return done(new JsonWebTokenError('invalid signature'));
     }
 
     if (!valid) {
@@ -208,8 +215,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     if (options.issuer) {
       const invalid_issuer =
-              (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
-              (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
+        (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
+        (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
 
       if (invalid_issuer) {
         return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
