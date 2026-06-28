@@ -123,13 +123,13 @@ jwt.sign({
 }, 'secret', { expiresIn: '1h' });
 ```
 
-### jwt.verify(token, secretOrPublicKey, [options, callback])
+### jwt.verify(token, secretOrPublicKey, [options, callback, payloadCallback])
 
 (Asynchronous) If a callback is supplied, function acts asynchronously. The callback is called with the decoded payload if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will be called with the error.
 
 (Synchronous) If a callback is not supplied, function acts synchronously. Returns the payload decoded if the signature is valid and optional expiration, audience, or issuer are valid. If not, it will throw the error.
 
-> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests), the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
+> __Warning:__ When the token comes from an untrusted source (e.g. user input or external requests) and a payloadCallback is not specified, the returned decoded payload should be treated like any other user input; please make sure to sanitize and only work with properties that are expected
 
 `token` is the JsonWebToken string
 
@@ -161,6 +161,10 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
 * `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+
+`payloadCallback`
+
+A function to specify custom validation of the token payload obtained from decoding the token. This function is applied before token verification. Throwing an error in this function will throw an error in `jwt.verify` before the token is verified, allowing sanitizing the token payload without needing to manually call `jwt.decode` before or after validation
 
 ```js
 // verify a token symmetric - synchronous
@@ -219,6 +223,17 @@ jwt.verify(token, cert, { audience: 'urn:foo', issuer: 'urn:issuer', jwtid: 'jwt
 var cert = fs.readFileSync('public.pem'); // get public key
 jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
   // if token alg != RS256,  err == invalid signature
+});
+
+// alo verify token payload
+var cert = fs.readFileSync('public.pem'); // get public key
+jwt.verify(token, cert, { algorithms: ['RS256'] }, function (err, payload) {
+  // if token alg != RS256,  err == invalid signature
+}, function (payload) {
+  // specify custom payload schema validation here without needing to decode separately
+  if (payload.foo !== 'bar' || typeof payload.userId !== 'number') {
+    throw new Error('token does not have the correct schema');
+  }
 });
 
 // Verify using getKey callback
@@ -351,6 +366,30 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 });
 ```
 
+### InvalidPayloadError
+Thrown if the payload validation callback failed. The error message will be inherited from the error thrown in the `payloadCallback` or defaults to *'invalid token payload'* if for example a number was thrown and not an error
+
+Error object example:
+
+* name: 'InvalidPayloadError'
+* message: 'invalid token payload'
+
+```js
+jwt.verify(token, 'shhhhh', function(err, decoded) {
+  if (err) {
+    /*
+      err = {
+        name: 'InvalidPayloadError',
+        message: 'foo property not equal to bar',
+      }
+    */
+  }
+}, function (payload) {
+  if (payload.foo !== 'bar') {
+    throw new Error('foo property not equal to bar');
+  }
+});
+```
 
 ## Algorithms supported
 

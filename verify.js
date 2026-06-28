@@ -1,6 +1,7 @@
 const JsonWebTokenError = require('./lib/JsonWebTokenError');
 const NotBeforeError = require('./lib/NotBeforeError');
 const TokenExpiredError = require('./lib/TokenExpiredError');
+const InvalidPayloadError = require('./lib/InvalidPayloadError');
 const decode = require('./decode');
 const timespan = require('./lib/timespan');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
@@ -18,7 +19,7 @@ if (PS_SUPPORTED) {
   RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
 }
 
-module.exports = function (jwtString, secretOrPublicKey, options, callback) {
+module.exports = function (jwtString, secretOrPublicKey, options, callback, payloadCallback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
     options = {};
@@ -159,6 +160,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       }
     }
 
+    const payload = decodedToken.payload;
+    if (typeof payloadCallback === 'function') {
+      try {
+        payloadCallback(payload);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'invalid token payload';
+        return done(new InvalidPayloadError(message));
+      }
+    }
+
     let valid;
 
     try {
@@ -170,8 +181,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (!valid) {
       return done(new JsonWebTokenError('invalid signature'));
     }
-
-    const payload = decodedToken.payload;
 
     if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
       if (typeof payload.nbf !== 'number') {
