@@ -46,7 +46,7 @@
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
-    "ms": "^2.1.1",
+    "ms-tiny": "^1.1.0",
     "semver": "^7.5.4"
   },
   "devDependencies": {

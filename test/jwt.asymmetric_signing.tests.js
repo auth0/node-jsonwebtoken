@@ -5,7 +5,7 @@ const path = require('path');
 
 const expect = require('chai').expect;
 const assert = require('chai').assert;
-const ms = require('ms');
+const ms = require('ms-tiny');
 
 function loadKey(filename) {
   return fs.readFileSync(path.join(__dirname, filename));
