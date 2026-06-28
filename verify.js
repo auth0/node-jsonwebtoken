@@ -229,7 +229,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (options.nonce) {
-      if (payload.nonce !== options.nonce) {
+      if (payload.nonce !== options.nonce && payload.nonce_supported !== false) {
         return done(new JsonWebTokenError('jwt nonce invalid. expected: ' + options.nonce));
       }
     }
