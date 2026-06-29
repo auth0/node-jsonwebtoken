@@ -28,7 +28,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     options = {};
   }
 
-  //clone this object since we are going to mutate it.
   options = Object.assign({}, options);
 
   let done;
@@ -44,6 +43,12 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
     return done(new JsonWebTokenError('clockTimestamp must be a number'));
+  }
+
+  if (options.clockTolerance !== undefined && options.clockTolerance > 300) {
+    return done(new JsonWebTokenError(
+      'clockTolerance must not exceed 300 seconds to prevent accidental expiry bypass'
+    ));
   }
 
   if (options.nonce !== undefined && (typeof options.nonce !== 'string' || options.nonce.trim() === '')) {
@@ -186,11 +191,6 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       if (typeof payload.exp !== 'number') {
         return done(new JsonWebTokenError('invalid exp value'));
       }
-      if (options.clockTolerance !== undefined && options.clockTolerance > 300) {
-       return done(new JsonWebTokenError(
-     'clockTolerance must not exceed 300 seconds to prevent accidental expiry bypass'
-      ));
-    }
       if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
         return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
       }
