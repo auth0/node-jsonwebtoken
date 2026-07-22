@@ -147,8 +147,10 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > * rsa - ['RS256', 'RS384', 'RS512']
   > * ec - ['ES256', 'ES384', 'ES512']
   > * default - ['RS256', 'RS384', 'RS512']
-* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
-  > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
+* `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions.
+  > Eg: `"urn:foo"`, `/^urn:f[o]{2}$/`, `[/^urn:f[o]{2}$/, "urn:bar"]`
+  >
+  > **Security note:** String audiences use exact equality. RegExp audiences use `RegExp#test`, so unanchored patterns can match unintended values (for example `/api\.myapp\.com/` matches `evil-api.myapp.com.attacker.com`). Prefer anchored patterns such as `/^api\.myapp\.com$/`.
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `jwtid` (optional): if you want to check JWT ID (`jti`), provide a string value here.
