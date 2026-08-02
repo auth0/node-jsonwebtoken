@@ -308,6 +308,7 @@ Error object:
 * message:
   * 'invalid token' - the header or payload could not be parsed
   * 'jwt malformed' - the token does not have three components (delimited by a `.`)
+  * 'unsupported "crit" header parameter' - the token marks header parameters as critical ([RFC 7515 Section 4.1.11](https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.11)), which this library does not implement
   * 'jwt signature is required'
   * 'invalid signature'
   * 'jwt audience invalid. expected: [OPTIONS AUDIENCE]'

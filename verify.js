@@ -83,6 +83,14 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   }
 
   const header = decodedToken.header;
+
+  //RFC 7515 Section 4.1.11: "crit" lists extension header parameters that must be
+  //understood and processed, and the JWS is invalid if any of them are not. This
+  //library implements no such extension, so any "crit" header is unsupported.
+  if (typeof header.crit !== 'undefined') {
+    return done(new JsonWebTokenError('unsupported "crit" header parameter'));
+  }
+
   let getSecret;
 
   if(typeof secretOrPublicKey === 'function') {
