@@ -39,12 +39,6 @@
   },
   "dependencies": {
     "jws": "^4.0.1",
-    "lodash.includes": "^4.3.0",
-    "lodash.isboolean": "^3.0.3",
-    "lodash.isinteger": "^4.0.4",
-    "lodash.isnumber": "^3.0.3",
-    "lodash.isplainobject": "^4.0.6",
-    "lodash.isstring": "^4.0.1",
     "lodash.once": "^4.0.0",
     "ms": "^2.1.1",
     "semver": "^7.5.4"
