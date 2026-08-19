@@ -182,7 +182,7 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
     }
   }
 
-  const timestamp = payload.iat || Math.floor(Date.now() / 1000);
+  const timestamp = (typeof payload.iat === 'number' && !isNaN(payload.iat)) ? payload.iat : Math.floor(Date.now() / 1000);
 
   if (options.noTimestamp) {
     delete payload.iat;
