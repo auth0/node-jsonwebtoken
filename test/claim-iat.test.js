@@ -110,6 +110,14 @@ describe('issue at', function() {
         expectedIssueAt: 100,
         options: {}
       },
+      {
+        // regression for #874: iat of 0 (the Unix epoch) is a valid number and
+        // must be preserved, not treated as falsy and overwritten with "now".
+        description: 'should sign with provided time for "iat" of 0',
+        iat: 0,
+        expectedIssueAt: 0,
+        options: {}
+      },
       // TODO an iat of -Infinity should fail validation
       {
         description: 'should set null "iat" when given -Infinity',
@@ -150,6 +158,21 @@ describe('issue at', function() {
             expect(err).to.be.null;
             expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
           });
+        });
+      });
+    });
+
+    // regression for #874: an "iat" of 0 must anchor "exp"/"nbf" too, not "now".
+    // The bug also affected timespan() (lib/timespan.js), which independently
+    // applied the same `iat || now` fallback, so exp/nbf were derived from "now".
+    it('should derive "exp" and "nbf" from an "iat" of 0', function (done) {
+      signWithIssueAt(0, {expiresIn: 86400, notBefore: 60}, (err, token) => {
+        testUtils.asyncCheck(done, () => {
+          expect(err).to.be.null;
+          const decoded = jwt.decode(token);
+          expect(decoded.iat).to.equal(0);
+          expect(decoded.exp).to.equal(86400);
+          expect(decoded.nbf).to.equal(60);
         });
       });
     });
