@@ -149,6 +149,8 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
   > * default - ['RS256', 'RS384', 'RS512']
 * `audience`: if you want to check audience (`aud`), provide a value here. The audience can be checked against a string, a regular expression or a list of strings and/or regular expressions. 
   > Eg: `"urn:foo"`, `/urn:f[o]{2}/`, `[/urn:f[o]{2}/, "urn:bar"]`
+  > When `audience` includes a regular expression, it is matched against the token's `aud` claim, which is attacker-controlled. A poorly-written pattern (e.g. one with nested quantifiers) can be forced into catastrophic backtracking by a crafted `aud` value (ReDoS). `maxAudienceLength` (below) bounds the input length that gets tested, but the real fix is to write `aud` patterns that can't backtrack catastrophically in the first place - anchor them and avoid nested/ambiguous quantifiers.
+* `maxAudienceLength`: maximum length, in characters, that a token's `aud` claim may be before being tested against a regular-expression `audience` (default: `256`). A claim longer than this is treated as a non-match rather than being passed to the regex, protecting against ReDoS via an oversized `aud` value. Has no effect on string `audience` checks, which use plain equality.
 * `complete`: return an object with the decoded `{ payload, header, signature }` instead of only the usual content of the payload.
 * `issuer` (optional): string or array of strings of valid values for the `iss` field.
 * `jwtid` (optional): if you want to check JWT ID (`jti`), provide a string value here.
