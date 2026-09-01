@@ -54,6 +54,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
   }
 
+  if (options.maxAudienceLength !== undefined && (typeof options.maxAudienceLength !== 'number' || !(options.maxAudienceLength > 0))) {
+    return done(new JsonWebTokenError('maxAudienceLength must be a positive number'));
+  }
+
   const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
 
   if (!jwtString){
@@ -195,9 +199,20 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       const audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
       const target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
 
+      // A RegExp audience is tested against the aud claim, which comes straight
+      // from the token payload - an attacker who controls that claim can pick
+      // an input crafted to catastrophically backtrack against the
+      // application's regex (ReDoS). Capping the length of what gets tested
+      // bounds a single verify() call regardless of how that regex is written.
+      const maxAudienceLength = options.maxAudienceLength || 256;
+
       const match = target.some(function (targetAudience) {
         return audiences.some(function (audience) {
-          return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
+          if (audience instanceof RegExp) {
+            const targetAudienceString = String(targetAudience);
+            return targetAudienceString.length <= maxAudienceLength && audience.test(targetAudienceString);
+          }
+          return audience === targetAudience;
         });
       });
 

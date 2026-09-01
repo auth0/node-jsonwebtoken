@@ -248,6 +248,24 @@ describe('verify', function() {
       });
     });
 
+    describe('option: maxAudienceLength', function () {
+      [
+        'notANumber',
+        0,
+        -1,
+        NaN,
+      ].forEach((maxAudienceLength) => {
+        it(`should error with value ${String(maxAudienceLength)}`, function (done) {
+          jwt.verify(token, key, {maxAudienceLength}, function (err, p) {
+            assert.equal(err.name, 'JsonWebTokenError');
+            assert.equal(err.message, 'maxAudienceLength must be a positive number');
+            assert.isUndefined(p);
+            done();
+          });
+        });
+      });
+    });
+
     describe('option: maxAge and clockTimestamp', function () {
       // { foo: 'bar', iat: 1437018582, exp: 1437018800 } exp = iat + 218s
       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODgwMH0.AVOsNC7TiT-XVSpCpkwB1240izzCIJ33Lp07gjnXVpA';

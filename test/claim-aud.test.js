@@ -433,4 +433,74 @@ describe('audience', function() {
       });
     });
   });
+
+  // See: https://github.com/auth0/node-jsonwebtoken/issues/1031
+  // A RegExp "audience" is tested (RegExp#test) against the "aud" claim, which
+  // comes straight from the token payload. An oversized, attacker-crafted "aud"
+  // can force a catastrophically-backtracking pattern into a multi-second (or
+  // longer) hang. maxAudienceLength bounds this by rejecting an overlong "aud"
+  // before it ever reaches the regex.
+  describe('ReDoS protection for a RegExp "audience" option', function () {
+    // Catastrophic backtracking: verify() with the pre-fix code takes ~2s for
+    // 24 "a"s and grows exponentially from there - never actually run this
+    // against an unbounded-length "aud" in a test.
+    const catastrophicRegex = /(a+)+$/;
+    let longAudToken;
+
+    beforeEach(function (done) {
+      // 300 "a"s: past the default 256-char cap, so the fix never touches
+      // the regex engine at all - safe to include in the normal test run.
+      signWithAudience(undefined, {aud: 'a'.repeat(300) + '!'}, (err, t) => {
+        longAudToken = t;
+        done(err);
+      });
+    });
+
+    it('should quickly reject an "aud" claim longer than the default maxAudienceLength instead of matching it against the regex', function (done) {
+      const start = Date.now();
+      verifyWithAudience(longAudToken, catastrophicRegex, (err) => {
+        testUtils.asyncCheck(done, () => {
+          expect(Date.now() - start).to.be.below(500);
+          expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+          expect(err).to.have.property('message', `jwt audience invalid. expected: ${String(catastrophicRegex)}`);
+        });
+      });
+    });
+
+    it('should still match a legitimate "aud" claim under the length cap against a RegExp "audience"', function (done) {
+      testUtils.signJWTHelper({aud: 'urn:foo'}, 'secret', {algorithm: 'HS256'}, (signErr, token) => {
+        if (signErr) return done(signErr);
+        verifyWithAudience(token, /^urn:f[o]{2}$/, (err, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.null;
+            expect(decoded).to.have.property('aud', 'urn:foo');
+          });
+        });
+      });
+    });
+
+    it('should respect a custom "maxAudienceLength" option, rejecting an "aud" the default cap would allow', function (done) {
+      testUtils.signJWTHelper({aud: 'urn:foo'}, 'secret', {algorithm: 'HS256'}, (signErr, token) => {
+        if (signErr) return done(signErr);
+        testUtils.verifyJWTHelper(token, 'secret', {audience: /^urn:f[o]{2}$/, maxAudienceLength: 3}, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /^urn:f[o]{2}$/');
+          });
+        });
+      });
+    });
+
+    it('should not apply maxAudienceLength to a string "audience" check', function (done) {
+      testUtils.signJWTHelper({aud: 'a'.repeat(300)}, 'secret', {algorithm: 'HS256'}, (signErr, token) => {
+        if (signErr) return done(signErr);
+        verifyWithAudience(token, 'a'.repeat(300), (err, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.null;
+            expect(decoded).to.have.property('aud', 'a'.repeat(300));
+          });
+        });
+      });
+    });
+  });
 });
