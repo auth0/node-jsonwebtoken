@@ -248,6 +248,50 @@ describe('verify', function() {
       });
     });
 
+    describe('option: clockTolerance', function () {
+      // a token that's already expired by 100 seconds, so any of these
+      // should reject it unless clockTolerance is silently doing nothing
+      const token = jwt.sign({foo: 'bar'}, key, {expiresIn: -100});
+
+      it('rejects a non-numeric clockTolerance instead of ignoring it', function (done) {
+        // this used to get past validation, and `exp + '5'` turns into
+        // string concatenation once it hits the comparison below, which
+        // makes an already-expired token look valid no matter how old it is
+        jwt.verify(token, key, {clockTolerance: '5'}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('rejects Infinity as a clockTolerance', function (done) {
+        jwt.verify(token, key, {clockTolerance: Infinity}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('rejects NaN as a clockTolerance', function (done) {
+        jwt.verify(token, key, {clockTolerance: NaN}, function (err, p) {
+          assert.equal(err.name, 'JsonWebTokenError');
+          assert.equal(err.message, 'clockTolerance must be a number');
+          assert.isUndefined(p);
+          done();
+        });
+      });
+
+      it('still honors a normal numeric clockTolerance', function (done) {
+        jwt.verify(token, key, {clockTolerance: 200}, function (err, p) {
+          assert.isNull(err);
+          assert.equal(p.foo, 'bar');
+          done();
+        });
+      });
+    });
+
     describe('option: maxAge and clockTimestamp', function () {
       // { foo: 'bar', iat: 1437018582, exp: 1437018800 } exp = iat + 218s
       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJpYXQiOjE0MzcwMTg1ODIsImV4cCI6MTQzNzAxODgwMH0.AVOsNC7TiT-XVSpCpkwB1240izzCIJ33Lp07gjnXVpA';
