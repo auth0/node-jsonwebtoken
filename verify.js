@@ -18,6 +18,16 @@ if (PS_SUPPORTED) {
   RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
 }
 
+// PEM/SSH/JWK material must still go through createPublicKey first so an HS*
+// token cannot treat an RSA public key as an HMAC secret.
+function looksLikeAsymmetricKey(key) {
+  if (typeof key !== 'string') {
+    return true;
+  }
+  // OpenSSL accepts text before a PEM header, so BEGIN must match anywhere.
+  return key.indexOf('-----BEGIN') !== -1 || /^\s*(ssh-|\{)/.test(key);
+}
+
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
@@ -118,11 +128,16 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     }
 
     if (secretOrPublicKey != null && !(secretOrPublicKey instanceof KeyObject)) {
+      const trySecretFirst = !looksLikeAsymmetricKey(secretOrPublicKey);
       try {
-        secretOrPublicKey = createPublicKey(secretOrPublicKey);
+        secretOrPublicKey = trySecretFirst
+          ? createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey)
+          : createPublicKey(secretOrPublicKey);
       } catch (_) {
         try {
-          secretOrPublicKey = createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey);
+          secretOrPublicKey = trySecretFirst
+            ? createPublicKey(secretOrPublicKey)
+            : createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey);
         } catch (_) {
           return done(new JsonWebTokenError('secretOrPublicKey is not valid key material'))
         }
