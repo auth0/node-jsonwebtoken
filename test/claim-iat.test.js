@@ -148,7 +148,7 @@ describe('issue at', function() {
         signWithIssueAt(testCase.iat, testCase.options, (err, token) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.null;
-            expect(jwt.decode(token).iat).to.equal(testCase.expectedIssueAt);
+            expect(jwt.unsafe_decode(token).iat).to.equal(testCase.expectedIssueAt);
           });
         });
       });
@@ -253,7 +253,7 @@ describe('issue at', function() {
       const payload = 'string payload';
       const options = {algorithm: 'HS256'};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.unsafe_decode(token);
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded).to.equal(payload);
@@ -265,7 +265,7 @@ describe('issue at', function() {
       const payload = '{}';
       const options = {algorithm: 'HS256', header: {typ: 'JWT'}};
       testUtils.signJWTHelper(payload, 'secret', options, (err, token) => {
-        const decoded = jwt.decode(token);
+        const decoded = jwt.unsafe_decode(token);
         testUtils.asyncCheck(done, () => {
           expect(err).to.equal(null);
           expect(JSON.stringify(decoded)).to.equal(payload);

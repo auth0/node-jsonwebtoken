@@ -2,7 +2,7 @@ var jws = require('jws');
 
 module.exports = function (jwt, options) {
   options = options || {};
-  var decoded = jws.decode(jwt, options);
+  var decoded = jws.unsafe_decode(jwt, options);
   if (!decoded) { return null; }
   var payload = decoded.payload;
 

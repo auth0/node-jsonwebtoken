@@ -243,7 +243,7 @@ jwt.verify(token, getKey, options, function(err, decoded) {
 <details>
 <summary><em></em>Need to peek into a JWT without verifying it? (Click to expand)</summary>
 
-### jwt.decode(token [, options])
+### jwt.unsafe_decode(token [, options])
 
 (Synchronous) Returns the decoded payload without verifying if the signature is valid.
 
@@ -263,10 +263,10 @@ Example
 
 ```js
 // get the decoded payload ignoring signature, no secretOrPrivateKey needed
-var decoded = jwt.decode(token);
+var decoded = jwt.unsafe_decode(token);
 
 // get the decoded payload and header
-var decoded = jwt.decode(token, {complete: true});
+var decoded = jwt.unsafe_decode(token, {complete: true});
 console.log(decoded.header);
 console.log(decoded.payload)
 ```

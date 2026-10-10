@@ -1,7 +1,7 @@
 const JsonWebTokenError = require('./lib/JsonWebTokenError');
 const NotBeforeError = require('./lib/NotBeforeError');
 const TokenExpiredError = require('./lib/TokenExpiredError');
-const decode = require('./decode');
+const unsafe_decode = require('./decode');
 const timespan = require('./lib/timespan');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
 const PS_SUPPORTED = require('./lib/psSupported');
@@ -73,7 +73,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   let decodedToken;
 
   try {
-    decodedToken = decode(jwtString, { complete: true });
+    decodedToken = unsafe_decode(jwtString, { complete: true });
   } catch(err) {
     return done(err);
   }

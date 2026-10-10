@@ -104,7 +104,7 @@ describe('signing a token asynchronously', function() {
     it('should not stringify the payload', function (done) {
       jwt.sign('string', 'secret', {}, function (err, token) {
         if (err) { return done(err); }
-        expect(jws.decode(token).payload).to.equal('string');
+        expect(jws.unsafe_decode(token).payload).to.equal('string');
         done();
       });
     });

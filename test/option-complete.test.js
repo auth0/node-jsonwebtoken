@@ -13,7 +13,7 @@ describe('complete option', function () {
   const header = { alg: 'RS256' };
   const payload = { iat: Math.floor(Date.now() / 1000 ) };
   const signed = jws.sign({ header, payload, secret, encoding: 'utf8' });
-  const signature = jws.decode(signed).signature;
+  const signature = jws.unsafe_decode(signed).signature;
 
   [
     {
