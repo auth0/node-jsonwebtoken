@@ -30,6 +30,37 @@ describe('verify', function() {
     });
   });
 
+  describe('with a malformed PEM public key', function () {
+    const token = jwt.sign({ foo: 'bar' }, priv, { algorithm: 'RS256' });
+    const malformedPem = pub.toString().replace(/\n[A-Za-z0-9+/]{10}/, '\n');
+
+    it('should report the key parsing error instead of "invalid algorithm"', function () {
+      let error;
+      try {
+        jwt.verify(token, malformedPem);
+      } catch (e) {
+        error = e;
+      }
+      expect(error).to.be.instanceOf(JsonWebTokenError);
+      expect(error.message).to.match(/^secretOrPublicKey is not a valid PEM key: /);
+      expect(error.inner).to.be.instanceOf(Error);
+    });
+
+    it('should report the key parsing error when the key is a Buffer', function () {
+      expect(function () {
+        jwt.verify(token, Buffer.from(malformedPem));
+      }).to.throw(JsonWebTokenError, /secretOrPublicKey is not a valid PEM key/);
+    });
+
+    it('should report the key parsing error to the callback', function (done) {
+      jwt.verify(token, malformedPem, function (err) {
+        expect(err).to.be.instanceOf(JsonWebTokenError);
+        expect(err.message).to.match(/secretOrPublicKey is not a valid PEM key/);
+        done();
+      });
+    });
+  });
+
   it('should not be able to verify unsigned token', function () {
     const header = { alg: 'none' };
     const payload = { iat: Math.floor(Date.now() / 1000 ) };

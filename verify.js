@@ -18,6 +18,10 @@ if (PS_SUPPORTED) {
   RSA_KEY_ALGS.splice(RSA_KEY_ALGS.length, 0, 'PS256', 'PS384', 'PS512');
 }
 
+function looksLikePem(key) {
+  return (typeof key === 'string' || Buffer.isBuffer(key)) && key.includes('-----BEGIN');
+}
+
 module.exports = function (jwtString, secretOrPublicKey, options, callback) {
   if ((typeof options === 'function') && !callback) {
     callback = options;
@@ -120,7 +124,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (secretOrPublicKey != null && !(secretOrPublicKey instanceof KeyObject)) {
       try {
         secretOrPublicKey = createPublicKey(secretOrPublicKey);
-      } catch (_) {
+      } catch (err) {
+        if (looksLikePem(secretOrPublicKey)) {
+          return done(new JsonWebTokenError('secretOrPublicKey is not a valid PEM key: ' + err.message, err));
+        }
         try {
           secretOrPublicKey = createSecretKey(typeof secretOrPublicKey === 'string' ? Buffer.from(secretOrPublicKey) : secretOrPublicKey);
         } catch (_) {
