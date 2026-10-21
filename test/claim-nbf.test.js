@@ -273,6 +273,32 @@ describe('not before', function() {
       });
     });
 
+    it('should accept a fractional "nbf" that is already active within the current second', function (done) {
+      signWithNotBefore(undefined, {nbf: 60.111}, (e1, token) => {
+        fakeClock.tick(999);
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2, decoded) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.null;
+            expect(decoded).to.have.property('nbf', 60.111);
+          });
+        })
+      });
+    });
+
+    it('should error on verify if a fractional "nbf" is after current time within the same second', function (done) {
+      signWithNotBefore(undefined, {nbf: 60.5}, (e1, token) => {
+        fakeClock.tick(200);
+        testUtils.verifyJWTHelper(token, 'secret', {}, (e2) => {
+          testUtils.asyncCheck(done, () => {
+            expect(e1).to.be.null;
+            expect(e2).to.be.instanceOf(jwt.NotBeforeError);
+            expect(e2).to.have.property('message', 'jwt not active');
+          });
+        })
+      });
+    });
+
     it('should verify "nbf" using "clockTimestamp"', function (done) {
       signWithNotBefore(10, {}, (e1, token) => {
         testUtils.verifyJWTHelper(token, 'secret', {clockTimestamp: 70}, (e2, decoded) => {

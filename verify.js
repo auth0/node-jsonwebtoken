@@ -54,7 +54,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
   }
 
-  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+  const now = Date.now() / 1000;
+  const clockTimestamp = options.clockTimestamp || Math.floor(now);
+  const notBeforeTimestamp = options.clockTimestamp || now;
 
   if (!jwtString){
     return done(new JsonWebTokenError('jwt must be provided'));
@@ -177,7 +179,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
       if (typeof payload.nbf !== 'number') {
         return done(new JsonWebTokenError('invalid nbf value'));
       }
-      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
+      if (payload.nbf > notBeforeTimestamp + (options.clockTolerance || 0)) {
         return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
       }
     }
