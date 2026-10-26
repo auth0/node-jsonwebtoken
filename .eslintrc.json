@@ -10,7 +10,10 @@
   "rules": {
     "comma-style": "error",
     "dot-notation": "error",
-    "indent": ["error", 2],
+    "indent": [
+      "error",
+      2
+    ],
     "no-control-regex": "error",
     "no-div-regex": "error",
     "no-eval": "error",
@@ -18,6 +21,19 @@
     "no-invalid-regexp": "error",
     "no-trailing-spaces": "error",
     "no-undef": "error",
-    "no-unused-vars": "error"
+    "no-unused-vars": "error",
+    "eqeqeq": "warn",
+    "complexity": [
+      "warn",
+      15
+    ],
+    "max-statements": [
+      "warn",
+      30
+    ],
+    "max-depth": [
+      "warn",
+      4
+    ]
   }
 }

@@ -1,0 +1,39 @@
+name: TDD quality gate
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [16, 18, 20, 22, 24]
+
+    name: Lint + cobertura (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Analisis estatico (ESLint)
+        run: npm run lint
+
+      - name: Pruebas y puerta de cobertura (nyc)
+        run: npm run coverage

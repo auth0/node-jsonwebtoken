@@ -97,7 +97,7 @@ describe('HS256', function() {
 
     it('should return an error when the token is expired', function(done) {
       var token = jwt.sign({ exp: 1 }, secret, { algorithm: 'HS256' });
-      jwt.verify(token, secret, { algorithm: 'HS256' }, function(err, decoded) {
+      jwt.verify(token, secret, { algorithms: ['HS256'] }, function(err, decoded) {
         assert.isUndefined(decoded);
         assert.isNotNull(err);
         done();
@@ -106,7 +106,7 @@ describe('HS256', function() {
 
     it('should NOT return an error when the token is expired with "ignoreExpiration"', function(done) {
       var token = jwt.sign({ exp: 1, foo: 'bar' }, secret, { algorithm: 'HS256' });
-      jwt.verify(token, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err, decoded) {
+      jwt.verify(token, secret, { algorithms: ['HS256'], ignoreExpiration: true }, function(err, decoded) {
         assert.ok(decoded.foo);
         assert.equal('bar', decoded.foo);
         assert.isNull(err);
@@ -128,7 +128,7 @@ describe('HS256', function() {
 
     it('should return the "invalid token" error', function(done) {
       var malformedToken = token + ' '; // corrupt the token by adding a space
-      jwt.verify(malformedToken, secret, { algorithm: 'HS256', ignoreExpiration: true }, function(err) {
+      jwt.verify(malformedToken, secret, { algorithms: ['HS256'], ignoreExpiration: true }, function(err) {
         assert.isNotNull(err);
         assert.equal('JsonWebTokenError', err.name);
         assert.equal('invalid token', err.message);

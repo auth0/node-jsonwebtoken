@@ -17,6 +17,7 @@ $ npm install jsonwebtoken
 
 # Migration notes
 
+* [Unknown `verify()` options are rejected (fork)](MIGRATION.md)
 * [From v8 to v9](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v8-to-v9)
 * [From v7 to v8](https://github.com/auth0/node-jsonwebtoken/wiki/Migration-Notes:-v7-to-v8)
 
@@ -161,6 +162,8 @@ As mentioned in [this comment](https://github.com/auth0/node-jsonwebtoken/issues
 * `clockTimestamp`: the time in seconds that should be used as the current time for all necessary comparisons.
 * `nonce`: if you want to check `nonce` claim, provide a string value here. It is used on Open ID for the ID Tokens. ([Open ID implementation notes](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes))
 * `allowInvalidAsymmetricKeyTypes`: if true, allows asymmetric keys which do not match the specified algorithm. This option is intended only for backwards compatability and should be avoided.
+
+Any other option name is rejected with a `JsonWebTokenError` (`'"<name>" is not an allowed option'`), so a typo such as `algoritms` cannot silently disable a check.
 
 ```js
 // verify a token symmetric - synchronous
@@ -314,6 +317,7 @@ Error object:
   * 'jwt issuer invalid. expected: [OPTIONS ISSUER]'
   * 'jwt id invalid. expected: [OPTIONS JWT ID]'
   * 'jwt subject invalid. expected: [OPTIONS SUBJECT]'
+  * '"[OPTION NAME]" is not an allowed option' - `verify()` received an undocumented option
 
 ```js
 jwt.verify(token, 'shhhhh', function(err, decoded) {

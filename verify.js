@@ -4,6 +4,7 @@ const TokenExpiredError = require('./lib/TokenExpiredError');
 const decode = require('./decode');
 const timespan = require('./lib/timespan');
 const validateAsymmetricKey = require('./lib/validateAsymmetricKey');
+const validateVerifyOptions = require('./lib/validateVerifyOptions');
 const PS_SUPPORTED = require('./lib/psSupported');
 const jws = require('jws');
 const {KeyObject, createSecretKey, createPublicKey} = require("crypto");
@@ -42,16 +43,9 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     };
   }
 
-  if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
-    return done(new JsonWebTokenError('clockTimestamp must be a number'));
-  }
-
-  if (options.nonce !== undefined && (typeof options.nonce !== 'string' || options.nonce.trim() === '')) {
-    return done(new JsonWebTokenError('nonce must be a non-empty string'));
-  }
-
-  if (options.allowInvalidAsymmetricKeyTypes !== undefined && typeof options.allowInvalidAsymmetricKeyTypes !== 'boolean') {
-    return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
+  const optionsError = validateVerifyOptions(options);
+  if (optionsError) {
+    return done(optionsError);
   }
 
   const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);

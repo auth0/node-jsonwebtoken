@@ -134,7 +134,7 @@ describe('expires', function() {
         const header = { alg: 'HS256' };
         const payload = { exp };
         const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
-        testUtils.verifyJWTHelper(token, 'secret', { exp }, (err) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property('message', 'invalid exp value');

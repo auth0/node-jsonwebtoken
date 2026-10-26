@@ -134,7 +134,7 @@ describe('not before', function() {
         const header = { alg: 'HS256' };
         const payload = { nbf };
         const token = jws.sign({ header, payload, secret: 'secret', encoding: 'utf8' });
-        testUtils.verifyJWTHelper(token, 'secret', {nbf}, (err) => {
+        testUtils.verifyJWTHelper(token, 'secret', {}, (err) => {
           testUtils.asyncCheck(done, () => {
             expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
             expect(err).to.have.property('message', 'invalid nbf value');

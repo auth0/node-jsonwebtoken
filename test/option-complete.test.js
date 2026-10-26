@@ -22,7 +22,7 @@ describe('complete option', function () {
     },
   ].forEach((testCase) => {
     it(testCase.description, function (done) {
-      testUtils.verifyJWTHelper(signed, pub, { typ: 'JWT', complete: testCase.complete }, (err, decoded) => {
+      testUtils.verifyJWTHelper(signed, pub, { complete: testCase.complete }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded.header).to.have.property('alg', header.alg);
@@ -39,7 +39,7 @@ describe('complete option', function () {
     },
   ].forEach((testCase) => {
     it(testCase.description, function (done) {
-      testUtils.verifyJWTHelper(signed, pub, { typ: 'JWT', complete: testCase.complete }, (err, decoded) => {
+      testUtils.verifyJWTHelper(signed, pub, { complete: testCase.complete }, (err, decoded) => {
         testUtils.asyncCheck(done, () => {
           expect(err).to.be.null;
           expect(decoded.header).to.be.undefined;

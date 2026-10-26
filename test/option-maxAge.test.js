@@ -37,8 +37,8 @@ describe('maxAge option', function() {
     },
   ].forEach((testCase) => {
     it(testCase.description, function (done) {
-      expect(jwt.verify(token, 'secret', {maxAge: '3s', algorithm: 'HS256'})).to.not.throw;
-      jwt.verify(token, 'secret', {maxAge: testCase.maxAge, algorithm: 'HS256'}, (err) => {
+      expect(jwt.verify(token, 'secret', {maxAge: '3s', algorithms: ['HS256']})).to.not.throw;
+      jwt.verify(token, 'secret', {maxAge: testCase.maxAge, algorithms: ['HS256']}, (err) => {
         expect(err).to.be.null;
         done();
       })
@@ -54,11 +54,11 @@ describe('maxAge option', function() {
     {foo: 'bar'},
   ].forEach((maxAge) => {
     it(`should error with value ${util.inspect(maxAge)}`, function (done) {
-      expect(() => jwt.verify(token, 'secret', {maxAge, algorithm: 'HS256'})).to.throw(
+      expect(() => jwt.verify(token, 'secret', {maxAge, algorithms: ['HS256']})).to.throw(
         jwt.JsonWebTokenError,
         '"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'
       );
-      jwt.verify(token, 'secret', {maxAge, algorithm: 'HS256'}, (err) => {
+      jwt.verify(token, 'secret', {maxAge, algorithms: ['HS256']}, (err) => {
         expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
         expect(err.message).to.equal(
           '"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'

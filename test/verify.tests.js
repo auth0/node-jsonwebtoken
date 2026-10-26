@@ -23,7 +23,7 @@ describe('verify', function() {
       encoding: 'utf8'
     });
 
-    jwt.verify(signed, pub, {typ: 'JWT'}, function(err, p) {
+    jwt.verify(signed, pub, {}, function(err, p) {
       assert.isNull(err);
       assert.deepEqual(p, payload);
       done();
@@ -42,7 +42,7 @@ describe('verify', function() {
     });
 
     expect(function () {
-      jwt.verify(signed, 'secret', {typ: 'JWT'});
+      jwt.verify(signed, 'secret', {});
     }).to.throw(JsonWebTokenError, /jwt signature is required/);
   });
 
@@ -58,7 +58,7 @@ describe('verify', function() {
     });
 
     expect(function () {
-      jwt.verify(signed, undefined, {typ: 'JWT'});
+      jwt.verify(signed, undefined, {});
     }).to.throw(JsonWebTokenError, /please specify "none" in "algorithms" to verify unsigned tokens/);
   });
 
@@ -73,7 +73,7 @@ describe('verify', function() {
       encoding: 'utf8'
     });
 
-    jwt.verify(signed, null, {typ: 'JWT', algorithms: ['none']}, function(err, p) {
+    jwt.verify(signed, null, {algorithms: ['none']}, function(err, p) {
       assert.isNull(err);
       assert.deepEqual(p, payload);
       done();
@@ -83,7 +83,7 @@ describe('verify', function() {
   it('should not mutate options', function (done) {
     const header = { alg: 'HS256' };
     const payload = { iat: Math.floor(Date.now() / 1000 ) };
-    const  options = { typ: 'JWT' };
+    const options = {};
     const signed = jws.sign({
       header: header,
       payload: payload,
@@ -93,7 +93,7 @@ describe('verify', function() {
 
     jwt.verify(signed, 'secret', options, function(err) {
       assert.isNull(err);
-      assert.deepEqual(Object.keys(options).length, 1);
+      assert.deepEqual(Object.keys(options).length, 0);
       done();
     });
   });
