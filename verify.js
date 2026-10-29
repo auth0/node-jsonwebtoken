@@ -147,6 +147,8 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
     if (header.alg.startsWith('HS') && secretOrPublicKey.type !== 'secret') {
       return done(new JsonWebTokenError((`secretOrPublicKey must be a symmetric key when using ${header.alg}`)))
+    } else if (header.alg.startsWith('HS') && secretOrPublicKey.symmetricKeySize === 0) {
+      return done(new JsonWebTokenError('secret or public key must be provided'));
     } else if (/^(?:RS|PS|ES)/.test(header.alg) && secretOrPublicKey.type !== 'public') {
       return done(new JsonWebTokenError((`secretOrPublicKey must be an asymmetric key when using ${header.alg}`)))
     }
