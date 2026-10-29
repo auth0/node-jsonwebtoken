@@ -125,6 +125,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
 
   if (header.alg.startsWith('HS') && secretOrPrivateKey.type !== 'secret') {
     return failure(new Error((`secretOrPrivateKey must be a symmetric key when using ${header.alg}`)))
+  } else if (header.alg.startsWith('HS') && secretOrPrivateKey.symmetricKeySize === 0) {
+    return failure(new Error('secretOrPrivateKey must have a value'));
   } else if (/^(?:RS|PS|ES)/.test(header.alg)) {
     if (secretOrPrivateKey.type !== 'private') {
       return failure(new Error((`secretOrPrivateKey must be an asymmetric key when using ${header.alg}`)))
