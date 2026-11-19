@@ -1,10 +1,5 @@
 # jsonwebtoken
 
-| **Build**                                                                                                                               | **Dependency**                                                                                                         |
-|-----------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [![Build Status](https://secure.travis-ci.org/auth0/node-jsonwebtoken.svg?branch=master)](http://travis-ci.org/auth0/node-jsonwebtoken) | [![Dependency Status](https://david-dm.org/auth0/node-jsonwebtoken.svg)](https://david-dm.org/auth0/node-jsonwebtoken) |
-
-
 An implementation of [JSON Web Tokens](https://tools.ietf.org/html/rfc7519).
 
 This was developed against `draft-ietf-oauth-json-web-token-08`. It makes use of [node-jws](https://github.com/brianloveswords/node-jws)
@@ -34,7 +29,7 @@ $ npm install jsonwebtoken
 > If `payload` is not a buffer or a string, it will be coerced into a string using `JSON.stringify`.
 
 `secretOrPrivateKey` is a string (utf-8 encoded), buffer, object, or KeyObject containing either the secret for HMAC algorithms or the PEM
-encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#crypto_sign_sign_private_key_output_format)), in this case be sure you pass the `algorithm` option.
+encoded private key for RSA and ECDSA. In case of a private key with passphrase an object `{ key, passphrase }` can be used (based on [crypto documentation](https://nodejs.org/api/crypto.html#signsignprivatekey-outputencoding)), in this case be sure you pass the `algorithm` option.
 When signing with RSA algorithms the minimum modulus length is 2048 except when the allowInsecureKeySizes option is set to true. Private keys below this size will be rejected with an error.
 
 `options`:
