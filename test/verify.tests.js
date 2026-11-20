@@ -140,13 +140,15 @@ describe('verify', function() {
     });
 
     it('simple error', function (done) {
+      const keyError = new Error('key not found');
       const keyFunc = function(header, callback) {
-        callback(new Error('key not found'));
+        callback(keyError);
       };
 
       jwt.verify(token, keyFunc, options, function (err, p) {
         assert.equal(err.name, 'JsonWebTokenError');
         assert.match(err.message, /error in secret or public key callback/);
+        assert.equal(err.inner, keyError);
         assert.isUndefined(p);
         done();
       });
@@ -167,15 +169,17 @@ describe('verify', function() {
     });
 
     it('delayed error', function (done) {
+      const keyError = new Error('key not found');
       const keyFunc = function(header, callback) {
         setTimeout(function() {
-          callback(new Error('key not found'));
+          callback(keyError);
         }, 25);
       };
 
       jwt.verify(token, keyFunc, options, function (err, p) {
         assert.equal(err.name, 'JsonWebTokenError');
         assert.match(err.message, /error in secret or public key callback/);
+        assert.equal(err.inner, keyError);
         assert.isUndefined(p);
         done();
       });

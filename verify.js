@@ -100,7 +100,7 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
 
   return getSecret(header, function(err, secretOrPublicKey) {
     if(err) {
-      return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
+      return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message, err));
     }
 
     const hasSignature = parts[2].trim() !== '';
