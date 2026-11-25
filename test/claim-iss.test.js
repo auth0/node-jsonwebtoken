@@ -102,6 +102,22 @@ describe('issuer', function() {
       });
     });
 
+    describe('with invalid "issuer" option types', function () {
+      [/^foo$/, { foo: 'bar' }, 42].forEach((issuer) => {
+        it('should reject verify "issuer" option ' + util.inspect(issuer), function (done) {
+          signWithIssuer(undefined, { iss: 'foo' }, (e1, token) => {
+            testUtils.verifyJWTHelper(token, 'secret', { issuer }, (e2) => {
+              testUtils.asyncCheck(done, () => {
+                expect(e1).to.be.null;
+                expect(e2).to.be.instanceOf(jwt.JsonWebTokenError);
+                expect(e2).to.have.property('message', 'issuer must be a string or array');
+              });
+            });
+          });
+        });
+      });
+    });
+
     describe('with string "issuer" option', function () {
       it('should verify with a string "issuer"', function (done) {
         signWithIssuer('foo', {}, (e1, token) => {

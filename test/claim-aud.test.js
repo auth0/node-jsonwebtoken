@@ -116,6 +116,35 @@ describe('audience', function() {
         });
       });
 
+      it('should reject a token with no "aud" claim using a RegExp verify "audience" option', function (done) {
+        const tokenWithoutAudience = jwt.sign({ foo: 'bar' }, 'secret');
+        testUtils.verifyJWTHelper(tokenWithoutAudience, 'secret', { audience: /.*/ }, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: /.*/');
+          });
+        });
+      });
+
+      it('should reject a token with a non-string "aud" claim', function (done) {
+        const tokenWithNumericAudience = jwt.sign({ aud: 42 }, 'secret');
+        testUtils.verifyJWTHelper(tokenWithNumericAudience, 'secret', { audience: '42' }, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'jwt audience invalid. expected: 42');
+          });
+        });
+      });
+
+      it('should reject an invalid verify "audience" option type', function (done) {
+        testUtils.verifyJWTHelper(token, 'secret', { audience: 42 }, (err) => {
+          testUtils.asyncCheck(done, () => {
+            expect(err).to.be.instanceOf(jwt.JsonWebTokenError);
+            expect(err).to.have.property('message', 'audience must be a string, regular expression, or array');
+          });
+        });
+      });
+
       it(`should error on no match with a string verify "audience" option`, function (done) {
         verifyWithAudience(token, 'urn:no-match', (err) => {
           testUtils.asyncCheck(done, () => {

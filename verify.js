@@ -50,6 +50,15 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     return done(new JsonWebTokenError('nonce must be a non-empty string'));
   }
 
+  if (options.audience !== undefined && !Array.isArray(options.audience) &&
+      typeof options.audience !== 'string' && !(options.audience instanceof RegExp)) {
+    return done(new JsonWebTokenError('audience must be a string, regular expression, or array'));
+  }
+
+  if (options.issuer !== undefined && !Array.isArray(options.issuer) && typeof options.issuer !== 'string') {
+    return done(new JsonWebTokenError('issuer must be a string or array'));
+  }
+
   if (options.allowInvalidAsymmetricKeyTypes !== undefined && typeof options.allowInvalidAsymmetricKeyTypes !== 'boolean') {
     return done(new JsonWebTokenError('allowInvalidAsymmetricKeyTypes must be a boolean'));
   }
@@ -194,6 +203,10 @@ module.exports = function (jwtString, secretOrPublicKey, options, callback) {
     if (options.audience) {
       const audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
       const target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+
+      if (!target.every(function (targetAudience) { return typeof targetAudience === 'string'; })) {
+        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
+      }
 
       const match = target.some(function (targetAudience) {
         return audiences.some(function (audience) {
